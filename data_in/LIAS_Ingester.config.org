@@ -1,0 +1,70 @@
+common:
+
+  packaging:
+    type:             dir
+    location:         images
+    selection:        *.{tiff,jpg,jpeg,mp4,csv,png}
+
+  pre_process:
+    check_virus:      false
+    check_checksum:   true
+    check_ingested:   false
+
+  pre_ingest:
+    work_dir:         /nas/vol03/ingest_work
+
+  ingest:
+
+  post_ingest:
+
+  checksum:
+    type:             md5
+    file:             MD5/md5sums.txt
+
+  metadata:
+    target:           Opac
+    host:             http://opac.libis.be/X
+    index:            sig
+    base:             KADOC
+#  metadata_file:     dc_records.list
+
+  control_fields:
+    partition_c:      LIAS testen
+
+  accessrights:
+    original:         id = 31682
+    archive:          id = 31682
+    view:             ip = 10.32.0.0-10.32.255.255 || user = WW
+    view_main:        watermark = "(C) LIBIS, 2010"
+
+configurations:
+  
+  - match:            \.png$
+    mime_type:        image\/png
+    ingest_model:
+      model:          Afbeeldingen hoge kwaliteit
+    control_fields:
+      partition_b:    Test PNG files
+
+  - match:            \.jpeg$
+    mime_type:        image\/jpeg
+    ingest_model:
+      media_type:     image
+      quality:        low
+
+  - match:            \.mp4$
+    mime_type:        video\/mpeg4
+    ingest_model:
+      model:          Video hoge kwaliteit
+
+  - match:            ^(.+)_([\d]+)\.jpg$
+    mime_type:        image\/jpeg
+    ingest_model:
+      model:          Afbeeldingen lage kwaliteit
+    complex:
+      group:          $1
+      label:          "$1 + ' : ' + $2"
+      usage_type:     view
+      accessright:    id = 31682
+    accessrights:
+      view:           ip = 10.32.0.0-10.32.255.255 && user = WW

@@ -1,0 +1,25 @@
+
+:NAME:      Afbeeldingen archivering
+:MEDIA:     :IMAGE
+:QUALITY:   :ARCHIVE
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   ARCHIVE
+    :FORMAT:          :TIFF
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :SCALE:         50
+      :QUALITY:       70
+
+  - :MANIFESTATION:   VIEW
+    :FORMAT:          :JPEG2000
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESIZE:        107x150
+      :QUALITY:       50
+

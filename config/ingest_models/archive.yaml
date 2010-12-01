@@ -1,0 +1,22 @@
+
+:NAME:      Inventaris archivering
+:MEDIA:     :ARCHIVE
+:QUALITY:   :ARCHIVE
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   ARCHIVE
+    :FORMAT:          :EAD
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :PDF
+
+  - :MANIFESTATION:   VIEW
+    :FORMAT:          :EAD
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESIZE:        107x150
+      :QUALITY:       50
+

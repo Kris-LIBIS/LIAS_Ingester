@@ -1,0 +1,18 @@
+
+:NAME:      Afbeeldingen lage kwaliteit
+:MEDIA:     :IMAGE
+:QUALITY:   :LOW
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :QUALITY:       70
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESIZE:        107x150
+      :QUALITY:       50
+

@@ -1,0 +1,10 @@
+
+:NAME:      Audio lage kwaliteit
+:MEDIA:     :AUDIO
+:QUALITY:   :LOW
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :MP3
+

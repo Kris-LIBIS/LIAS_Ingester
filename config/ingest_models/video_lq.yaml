@@ -1,0 +1,10 @@
+
+:NAME:      Video hoge kwaliteit
+:MEDIA:     :VIDEO
+:QUALITY:   :LOW
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :FLASH
+

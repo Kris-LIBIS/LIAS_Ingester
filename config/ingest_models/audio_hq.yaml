@@ -1,0 +1,13 @@
+
+:NAME:      Audio hoge kwaliteit
+:MEDIA:     :AUDIO
+:QUALITY:   :HIGH
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :MP3
+
+  - :MANIFESTATION:   VIEW
+    :FORMAT:          :MP3
+

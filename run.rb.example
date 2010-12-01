@@ -1,0 +1,24 @@
+require '/exlibris/lias/tools/LIAS_Ingester/application.rb'
+
+initializer = Initializer.new
+
+initializer.start 'data_in/LIAS_Ingester.config'
+
+pre_processor = PreProcessor.new
+
+pre_processor.start
+
+pre_ingester = PreIngester.new
+
+pre_ingester.start
+
+ingester = Ingester.new
+
+ingester.start
+
+post_ingester = PostIngester.new
+
+post_ingester.start
+
+Application.instance.terminate
+

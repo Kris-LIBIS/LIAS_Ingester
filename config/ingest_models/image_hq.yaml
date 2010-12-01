@@ -1,0 +1,27 @@
+
+:NAME:      Afbeeldingen hoge kwaliteit
+:MEDIA:     :IMAGE
+:QUALITY:   :HIGH
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   ARCHIVE
+    :FORMAT:          :JPEG2000
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :SCALE:         50
+      :QUALITY:       70
+
+  - :MANIFESTATION:   VIEW
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :QUALITY:       100
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESIZE:        107x150
+      :QUALITY:       50
+

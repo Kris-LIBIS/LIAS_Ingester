@@ -1,0 +1,17 @@
+database: /exlibris/lias/tools/LIAS_Ingester/log.db
+db_logging: true
+db_logging_level: warn
+
+# 0: DEBUG, 1: INFO, 2: WARN, 3:ERROR, 4:FATAL
+log_to_db_level: 2
+log_level: 1
+
+user: LIA01
+password: dtl34lias
+ingest_name: lias
+
+dtl_base: /exlibris/dtl/j3_1/digitool/home
+dtl_ingest_dir: profile/units/LIA01/load
+dtl_bin_dir: system/bin
+
+SOAP_logging: false

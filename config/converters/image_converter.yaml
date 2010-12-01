@@ -1,0 +1,19 @@
+:TYPES:
+  - :TYPE:        :TIFF
+    :MIME:        image/tiff
+    :EXTENSIONS:  tif,tiff
+  - :TYPE:        :JPEG2000
+    :MIME:        image/jp2
+    :EXTENSIONS:  jp2,jpg2
+  - :TYPE:        :JPEG
+    :MIME:        image/jpeg
+    :EXTENSIONS:  jpg,jpe,jpeg
+  - :TYPE:        :PNG
+    :MIME:        image/png
+    :EXTENSIONS:  png
+  - :TYPE:        :BMP
+    :MIME:        image/bmp
+    :EXTENSIONS:  bmp
+  - :TYPE:        :GIF
+    :MIME:        image/gif
+    :EXTENSIONS:  gif

@@ -1,0 +1,13 @@
+
+:NAME:      Website
+:MEDIA:     :CONTAINER
+:QUALITY:   :ARCHIVE
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :ZIP
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+
