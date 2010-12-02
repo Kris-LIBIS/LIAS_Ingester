@@ -133,10 +133,10 @@ class FileChecker
 
     config_init obj
 
-    existing_file = IngestObject.first(:status => :END, IngestObject.file_info.file_path => obj.file_path, :order => [ :updated_at.desc ])
+    existing_file = IngestObject.first(:status => Status::Done, :file_info => {:file_path => obj.file_path}, :order => [ :updated_at.desc ])
 
-    result  = existing_file.file_info.mtime == obj.file_info.mtime
-    result |= existing_file.get_checksum(@config.checksum_type) == obj.get_checksum(@config.checksum_type)
+    result  = existing_file.file_info.mtime == obj.file_info.mtime if existing_file
+    result |= existing_file.get_checksum(@config.checksum_type) == obj.get_checksum(@config.checksum_type) if existing_file
 
     obj.message = "File '#{obj.file_path}' already ingested" unless result
 
