@@ -31,6 +31,7 @@ module CommonConfig
       property    :search_host,     DataMapper::Property::String
       property    :search_index,    DataMapper::Property::String
       property    :search_base,     DataMapper::Property::String
+      property    :search_term,     DataMapper::Property::String
 
       # contol fields
       property    :control_fields,  DataMapper::Property::Yaml
@@ -48,6 +49,7 @@ module CommonConfig
           self.search_host      = 'http://opac.libis.be/X'
           self.search_index     = 'sig'
           self.search_base      = 'KADOC'
+          self.search_term      = nil
           self.control_fields   = '[]'
         end
 
@@ -121,6 +123,8 @@ module CommonConfig
                 self.search_index   = v
               when :base
                 self.search_base    = v
+              when :term
+                self.search_term    = v
               when :file
                 self.metadata_file1 = v
               else
@@ -193,6 +197,7 @@ module CommonConfig
         result[:target] = self.search_target  if self.search_target
         result[:base]   = self.search_base    if self.search_base
         result[:index]  = self.search_index   if self.search_index
+        result[:term]   = self.search_term    if self.search_term
         result
       end
 

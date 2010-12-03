@@ -45,16 +45,29 @@ class ImageConverter
   def init(source)
     @source = Magick::Image.read(source).first
     @work   = @source.clone
-    @quality = 90
+    @quality = 100
     load_config Application.dir + '/config/converters/image_converter.yaml'
   end
 
   def do_convert(target,format)
     format = :JP2 if format == :JPEG2000
     @work.format = format.to_s if format
-    Application.info('ImageConverter') { "Writing conversion #{@work.inspect}" }
+    Application.debug('ImageConverter') { "Writing conversion #{@work.inspect}" }
     q = @quality
-    @work.write(target) { self.quality = q; self.filename = target }
+    if format == :JP2
+      @work.format = "BMP"
+      tmp_file = target + '.tmp.bmp' if format == :JP2
+      @work.write(tmp_file) { self.quality = q; self.filename = tmp_file }
+      result = `j2kdriver -i #{tmp_file} -t jp2 -R 0 -w R53 -o #{target} 2>&1`
+      if result.match(/error/i)
+        Application.error ('ImageConverter') { "JPEG2000 conversion failed: #{result}" }
+      elsif result.match(/warning/i)
+        Application.warn ('ImageConverter') { "JPEG2000 conversion: #{result}" }
+      end
+      FileUtils.rm(tmp_file)
+    else
+      @work.write(target) { self.quality = q; self.filename = target }
+    end
   end
 
 end

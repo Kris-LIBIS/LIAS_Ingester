@@ -13,6 +13,11 @@ class Metadata
   def get_from_aleph(options)
     final_options = SearchOptions.merge options
     search_term = @obj.label
+    if options[:term]
+      fname = @obj.file_name
+      fname =~ @obj.get_config.filename_match
+      search_term = eval options[:term]
+    end
     record = load_record search_term, final_options
     copy_metadata record
   end
@@ -27,7 +32,6 @@ class Metadata
   def load_record(search_term, options)
       search = SearchFactory.new(options[:target]).new_search
       search.query(search_term, options[:index], options[:base], options)
-      
       found = nil
       i = 0
       search.each do |r|
@@ -63,7 +67,7 @@ class Metadata
 
   def copy_metadata(record)
     if record
-      @obj.metadata = "#{@obj.ingest_config.ingest_dir}/transform/dc_#{@obj.id}.xml"
+      @obj.metadata = "#{@obj.get_config.ingest_dir}/transform/dc_#{@obj.id}.xml"
       File.open(@obj.metadata, "w") do |f|
         f.puts "<records>"
         f.puts record.to_dc.to_s.gsub(/\s*<\?.*\?>[\n]*/,'')

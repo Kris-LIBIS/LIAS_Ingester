@@ -136,7 +136,7 @@ private
       raise Exception, "No host set"
       return
     end
-    
+
     begin
       xml_document = nil
       redo_search = false

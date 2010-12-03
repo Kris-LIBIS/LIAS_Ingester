@@ -61,7 +61,7 @@ class PostIngester
     info "Processing object ##{obj.id}"
 
     ### link the accessright records
-    link_ar obj.ingest_config, obj
+    link_ar obj.get_config, obj
 
     ### link the dc metadata records
     create_and_link_dc obj

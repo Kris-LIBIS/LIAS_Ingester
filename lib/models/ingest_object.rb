@@ -42,8 +42,8 @@ class IngestObject
 #    self.debug_print
   end
 
-  def ingest_config
-    return super unless self.parent
+  def get_config
+    return self.ingest_config unless self.parent
     child = parent = self
     until parent.nil?
       child = parent
@@ -52,9 +52,9 @@ class IngestObject
     child.ingest_config
   end
 
-  def ingest_run
-    return super if super
-    ingest_config.ingest_run
+  def get_run
+    return self.ingest_run if self.ingest_run
+    get_config.ingest_run
   end
 
   def initialize(file_path = nil, checksum_type = nil)

@@ -35,15 +35,9 @@ class Initializer
     # TODO: unpack the container if necessary
 
     # get all the files
-    files = Dir.glob "#{run.location}/*"
-    selected_files = []
+    files = get_files(run.location, run.selection)
+    info "Found #{files.size} files to process"
     files.each do |f|
-      if f.match(run.selection)
-        selected_files << f
-      end
-    end
-    info "Found #{selected_files.size} files to process"
-    selected_files.each do |f|
       obj = IngestObject.new(f, run.checksum_type)
       obj.save
       run.add_object obj
@@ -77,6 +71,22 @@ class Initializer
   def undo(run)
     run.ingest_objects.destroy
     run.save
+  end
+
+  private
+
+  def get_files(directory, match_expression)
+    result = []
+    file_list = Dir.glob "#{directory}/*"
+    file_list.each do |f|
+      next unless File.exist? f
+      if File.directory? f
+        result += get_files(f, match_expression)
+      else
+        result << f if f.match(match_expression)
+      end
+    end
+    result
   end
 
 end

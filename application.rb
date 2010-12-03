@@ -36,6 +36,13 @@ module ApplicationTask
     raise AbortException.new
   end
 
+  def print_exception(e)
+    unless e.instance_of?(AbortException)
+      error "Exception in #{self.class}: #{e.message}"
+      e.backtrace.each { |x| error "#{x}" }
+    end
+  end
+
 end
 require 'tools/database'
 require 'models/common/status'

@@ -113,7 +113,7 @@ class PreProcessor
 
     end
 
-    object.ingest_run.save
+    object.get_run.save
 
   rescue Exception => e
     object.status = Status::PreProcessFailed
