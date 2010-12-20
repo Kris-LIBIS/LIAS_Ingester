@@ -23,7 +23,7 @@ module Converter
   end
 
   def initialize(source)
-    init(source)
+    init(source.to_s)
   end
 
   def convert(target, format = nil)

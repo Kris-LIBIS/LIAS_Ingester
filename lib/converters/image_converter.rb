@@ -1,51 +1,85 @@
 require 'rubygems'
+require 'quick_magick'
 require 'RMagick'
 require 'converters/converter'
 
 class ImageConverter
   include Converter
 
-  attr_reader :source, :work
-  attr :quality
+  attr_reader :work
 
   def scale(percent)
-    @work.scale!(percent/100.0)
+    @work.append_to_settings('scale', percent)
   end
 
   def resize(geometry)
-    @work.resize_to_fit!(geometry)
+    @work.append_to_settings('resize',geometry)
   end
 
   def quality(value)
-    @quality = value
+    @work.append_to_settings('quality', value)
   end
 
-  def watermark(text)
-    watermark = Magick::Image.new @work.columns / 3, @work.rows/4
+  def get_watermark_file(dir, usage_type)
+    file = "#{dir}/watermark_#{usage_type}.png"
+  end
+
+  def create_watermark(text, dir, usage_type)
+ 
+    file = get_watermark_file(dir, usage_type)
+    return file if File.exist?(file)
+
+    watermark = Magick::Image.new(1000, 1000) { self.background_color = 'transparent' }
+
     
     gc = Magick::Draw.new
+    gc.fill = 'black'
+    gc.stroke = 'black'
     gc.gravity = Magick::CenterGravity
-    gc.pointsize = @work.columns / 50
+    gc.pointsize = 100
     gc.font_family = "Helvetica"
     gc.font_weight = Magick::BoldWeight
     gc.stroke = 'none'
     gc.rotate -20
-    gc.text 0, 0, (text or text == '' ? text : 'LIBIS')
+    gc.text 0, 0, (text.nil? ? ' (C) LIBIS' : text)
     
     gc.draw watermark
     
-    watermark = watermark.shade true, 310, 30
-    
-    @work.composite_tiled!(watermark, Magick::HardLightCompositeOp)
+#    watermark = watermark.shade true, 310, 30
+    watermark = watermark.blur_image 2.0, 1.0
+
+    watermark.write('png:' + file)
+
+    file
+
+  end
+
+  def watermark(source, target, watermark_image)
+
+    `#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/run_watermarker2.sh #{source} #{target} #{watermark_image} X2`
+    return
+    watermark = Magick::Image.read(watermark_image).first
+    watermark = watermark.transparent('white',Magick::TransparentOpacity)
+
+    image = Magick::Image.read(source).first
+    image_width  = image.columns
+    image_height = image.rows
+
+    width = image_width
+    width = image_height if image_width > image_height
+
+    canvas = Magick::Image.new(image_width, image_height)
+    watermark.resize_to_fit!(width)
+    canvas.composite_tiled!(watermark, Magick::OverCompositeOp)
+
+    image.watermark(canvas, 0.05, 0.25, Magick::CenterGravity).write(target)
 
   end
 
   protected
 
   def init(source)
-    @source = Magick::Image.read(source).first
-    @work   = @source.clone
-    @quality = 100
+    @work = QuickMagick::Image.read(source).first
     load_config Application.dir + '/config/converters/image_converter.yaml'
   end
 
@@ -66,6 +100,7 @@ class ImageConverter
       end
       FileUtils.rm(tmp_file)
     else
+      Application.info('ImageConverter') { "command: convert #{@work.command_line}" }
       @work.write(target) { self.quality = q; self.filename = target }
     end
   end

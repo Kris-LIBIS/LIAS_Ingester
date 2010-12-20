@@ -31,6 +31,7 @@ module CommonConfig
       property    :search_host,     DataMapper::Property::String
       property    :search_index,    DataMapper::Property::String
       property    :search_base,     DataMapper::Property::String
+      property    :search_match,    DataMapper::Property::Regexp
       property    :search_term,     DataMapper::Property::String
 
       # contol fields
@@ -49,6 +50,7 @@ module CommonConfig
           self.search_host      = 'http://opac.libis.be/X'
           self.search_index     = 'sig'
           self.search_base      = 'KADOC'
+          self.search_match     = nil
           self.search_term      = nil
           self.control_fields   = '[]'
         end
@@ -123,6 +125,8 @@ module CommonConfig
                 self.search_index   = v
               when :base
                 self.search_base    = v
+              when :match
+                self.search_match   = v
               when :term
                 self.search_term    = v
               when :file
@@ -197,6 +201,7 @@ module CommonConfig
         result[:target] = self.search_target  if self.search_target
         result[:base]   = self.search_base    if self.search_base
         result[:index]  = self.search_index   if self.search_index
+        result[:match]  = self.search_match   if self.search_match
         result[:term]   = self.search_term    if self.search_term
         result
       end
@@ -214,6 +219,15 @@ module CommonConfig
         end
         return self.ingest_run.get_protection(usage_type) if self.respond_to? :ingest_run and self.ingest_run
         nil
+      end
+
+      def get_protections
+        result = {}
+        result = slf.ingest_run.get_protections if self.respond_to? :ingest_run and self.ingest_run
+        self.protections.each do |p|
+          result[p.usage_type] = p
+        end
+        result
       end
 
       def get_objects

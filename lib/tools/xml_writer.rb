@@ -45,6 +45,8 @@ module XmlWriter
 
     node.namespaces.namespace = node.namespaces.find_by_prefix(node_ns) if node_ns
 
+    return node
+
   end
 
   def add_attributes( node, attributes )
@@ -52,6 +54,8 @@ module XmlWriter
     attributes.each do |name, value|
       XML::Attr.new node, name, value
     end
+
+    return node
 
   end
 

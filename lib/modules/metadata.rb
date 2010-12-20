@@ -14,17 +14,28 @@ class Metadata
     final_options = SearchOptions.merge options
     search_term = @obj.label
     if options[:term]
-      fname = @obj.file_name
-      fname =~ @obj.get_config.filename_match
-      search_term = eval options[:term]
+      if (options[:match])
+        search_term = @obj.file_name if @obj.file_name
+        if (search_term =~ options[:match])
+          search_term = eval options[:term]
+        end
+      end
     end
     record = load_record search_term, final_options
-    copy_metadata record
+    if record.nil?
+      Application.warn('Metadata') { "Could not find metadata for '#{search_term}'" }
+    else
+      copy_metadata record
+    end
   end
 
   def get_from_disk(metadata_file)
     record = read_record metadata_file
-    copy_metadata record
+    if record.nil?
+      Application.warn('Metadata') { "Could not find metadata in '#{metadata_file}'" }
+    else
+      copy_metadata record
+    end
   end
 
   private
@@ -66,13 +77,11 @@ class Metadata
   end
 
   def copy_metadata(record)
-    if record
-      @obj.metadata = "#{@obj.get_config.ingest_dir}/transform/dc_#{@obj.id}.xml"
-      File.open(@obj.metadata, "w") do |f|
-        f.puts "<records>"
-        f.puts record.to_dc.to_s.gsub(/\s*<\?.*\?>[\n]*/,'')
-        f.puts "</records>"
-      end
+    @obj.metadata = "#{@obj.get_config.ingest_dir}/transform/dc_#{@obj.id}.xml"
+    File.open(@obj.metadata, "w") do |f|
+      f.puts "<records>"
+      f.puts record.to_dc(@obj.label).to_s.gsub(/\s*<\?.*\?>[\n]*/,'')
+      f.puts "</records>"
     end
   end
 
