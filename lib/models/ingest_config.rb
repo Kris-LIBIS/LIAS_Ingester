@@ -60,7 +60,7 @@ class IngestConfig
     self.complex          = false
 #    self.complex_group    = ''
 #    self.complex_label    = ''
-    self.complex_utype    = 'VIEW_MAIN'
+    self.complex_utype    = 'COMPLEX_VIEW_MAIN'
 #    self.ingest_id        = ''
 #    self.ingest_dir       = ''
    
@@ -87,10 +87,10 @@ class IngestConfig
         value.key_strings_to_symbols!
         self.complex_group  = value[:group]
         self.complex_label  = value[:label]
-        self.complex_utype  = value[:usage_type].upcase if value[:usage_type]
+        self.complex_utype  = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]
         if value[:accessright]
           prot = Protection.from_value(value[:accessright])
-          prot.usage_type = 'COMPLEX_' + self.complex_utype
+          prot.usage_type = self.complex_utype
           self.protections << prot
         end
       end # case label
