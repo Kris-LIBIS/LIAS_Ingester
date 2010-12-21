@@ -11,8 +11,8 @@
   - :MANIFESTATION:   VIEW_MAIN
     :FORMAT:          :FLASH
     :OPTIONS:
-      :SCALE:         50
-      :QUALITY:       70
+      :SCALE:         50%
+      :QUALITY:       70%
 
   - :MANIFESTATION:   VIEW
     :FORMAT:          :FLASH

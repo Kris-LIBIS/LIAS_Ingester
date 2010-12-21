@@ -38,6 +38,8 @@ class PreIngester
     if cfg.status <= Status::PreProcessed
       error "Configuration ##{config_id} did not yet start PreIngest"
       return
+    elsif cfg.status == Status::PreIngestFailed
+      # continue
     elsif cfg.status >= Status::PreIngested
       error "Configuration ##{config_id} finished PreIngesting"
       return
@@ -86,7 +88,7 @@ class PreIngester
 
     # get metadata
     info 'Getting metadata'
-    get_metadata obj
+    result = get_metadata obj
 
     # copy stream to ingest_dir
     copy_stream obj
@@ -143,7 +145,7 @@ class PreIngester
       FileUtils.mkdir(cfg.work_dir) unless Dir.exist?(cfg.work_dir)
       cfg.ingest_dir = "#{cfg.work_dir}/load_#{cfg.ingest_id}"
       FileUtils.rm_r("#{load_dir}", :force => true) if clear_dir
-      FileUtils.ln_s(cfg.ingest_dir, load_dir, :force => true)
+      FileUtils.ln_s(cfg.ingest_dir, load_dir, :force => true) unless File.exist? load_dir
     else
       cfg.ingest_dir = load_dir
     end
@@ -178,11 +180,13 @@ class PreIngester
   def get_metadata( object )
     cfg = object.get_config
     md = Metadata.new(object)
+    result = false
     if mf = cfg.metadata_file
-      md.get_from_disk mf
+      result = md.get_from_disk mf
     else
-      md.get_from_aleph cfg.get_search_options
+      result = md.get_from_aleph cfg.get_search_options
     end
+    result
   end
 
   def copy_stream( object )
@@ -223,13 +227,14 @@ class PreIngester
       format = model.get_manifestation(manifestation.usage_type)[:FORMAT]
       converter = model.get_converter manifestation.file_stream
       if converter.respond_to?(:watermark)
-        converter.watermark p.pinfo
+        wm_file = p.pinfo
+        wm_file = converter.create_watermark(p.pinfo, cfg.ingest_dir, manifestation.usage_type) unless File.exist?(wm_file)
         new_file = File.dirname(manifestation.file_stream) + '/' +
           File.basename(manifestation.file_stream, '.*') + '_watermark.' +
           converter.type2ext(format)
-        converter.convert new_file
+        converter.watermark manifestation.file_stream, new_file, wm_file
         info "Created file #{new_file} for watermark protection of #{manifestation.usage_type}"
-        File.delete(manifestation.file_stream)
+#        File.delete(manifestation.file_stream)
         manifestation.file_stream = new_file
       else
         error 'Watermark requested, but not supported for the file type'

@@ -16,6 +16,7 @@ class IngestRun
   # packaging info
   property    :packaging,       Enum[:DIR, :ZIP, :RAR, :TAR, :TGZ, :TBZ]
   property    :location,        String
+  property    :recursive,       Boolean
   property    :selection,       Regexp
 
   has n,      :protections, :child_key => :ingest_run_id
@@ -56,6 +57,7 @@ class IngestRun
 
     self.packaging      = :DIR
     self.location       = '.'
+    self.recursive      = false
     self.selection      = Regexp.new(/.*/)
 
     if config[:common]
@@ -70,6 +72,8 @@ class IngestRun
               self.packaging  = v.upcase.to_sym
             when :location
               self.location   = v
+            when :recursive
+              self.recursive  = v
             when :selection
               self.selection  = v
             else

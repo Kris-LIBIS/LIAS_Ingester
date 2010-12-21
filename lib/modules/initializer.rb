@@ -35,7 +35,7 @@ class Initializer
     # TODO: unpack the container if necessary
 
     # get all the files
-    files = get_files(run.location, run.selection)
+    files = get_files(run.location, run.selection, run.recursive)
     info "Found #{files.size} files to process"
     files.each do |f|
       obj = IngestObject.new(f, run.checksum_type)
@@ -75,13 +75,13 @@ class Initializer
 
   private
 
-  def get_files(directory, match_expression)
+  def get_files(directory, match_expression, recursive)
     result = []
     file_list = Dir.glob "#{directory}/*"
     file_list.each do |f|
       next unless File.exist? f
       if File.directory? f
-        result += get_files(f, match_expression)
+        result += get_files(f, match_expression) if recursive
       else
         result << f if f.match(match_expression)
       end

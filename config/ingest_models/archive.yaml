@@ -18,5 +18,5 @@
     :FORMAT:          :JPEG
     :OPTIONS:
       :RESIZE:        107x150
-      :QUALITY:       50
+      :QUALITY:       50%
 
