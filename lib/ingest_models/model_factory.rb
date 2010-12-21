@@ -9,7 +9,7 @@ class ModelFactory
 
   attr :models
 
-  MANIFESTATIONS = [ 'ORIGINAL', 'ARCHIVE', 'VIEW', 'VIEW_MAIN', 'THUMBNAIL' ]
+  MANIFESTATIONS = [ 'ORIGINAL', 'VIEW_MAIN', 'ARCHIVE', 'VIEW', 'THUMBNAIL' ]
 
   public
 
