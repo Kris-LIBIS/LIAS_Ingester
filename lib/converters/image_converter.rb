@@ -94,9 +94,9 @@ class ImageConverter
       @work.write(tmp_file) { self.quality = q; self.filename = tmp_file }
       result = `j2kdriver -i #{tmp_file} -t jp2 -R 0 -w R53 -o #{target} 2>&1`
       if result.match(/error/i)
-        Application.error ('ImageConverter') { "JPEG2000 conversion failed: #{result}" }
+        Application.error('ImageConverter') { "JPEG2000 conversion failed: #{result}" }
       elsif result.match(/warning/i)
-        Application.warn ('ImageConverter') { "JPEG2000 conversion: #{result}" }
+        Application.warn('ImageConverter') { "JPEG2000 conversion: #{result}" }
       end
       FileUtils.rm(tmp_file)
     else

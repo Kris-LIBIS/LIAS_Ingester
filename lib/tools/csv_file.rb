@@ -29,22 +29,23 @@ class CsvFile
     file_info[:file_name] = file_name
     file_info[:label] = label
     case usage_type.upcase
-    when /^(COMPLEX_)?ORIGINAL$/
+    when /ORIGINAL$/
       file_info[:usage_type] = 'ARCHIVE'
       file_info[:preservation_level] = 'critical'
-    when /^((\d+|COMPLEX)_)?ARCHIVE$/
+    when /ARCHIVE$/
       file_info[:usage_type] = 'ARCHIVE'
       file_info[:preservation_level] = 'high'
-    when /^((\d+|COMPLEX)_)?VIEW_MAIN$/
+    when /VIEW_MAIN$/
       file_info[:usage_type] = 'VIEW_MAIN'
       file_info[:preservation_level] = 'any'
-    when /^((\d+|COMPLEX)_)?VIEW$/
+    when /VIEW$/
       file_info[:usage_type] = 'VIEW'
       file_info[:preservation_level] = 'any'
-    when /^((\d+|COMPLEX)_)?THUMBNAIL$/
+    when /THUMBNAIL$/
       file_info[:usage_type] = 'THUMBNAIL'
       file_info[:preservation_level] = 'any'
     else
+      Application.warn('CsvFile') {"Unknown usage type: '#{usage_type}'"}
       file_info[:preservation_level] = 'any'
     end
     file_info[:entity_type] = entity_type
@@ -109,6 +110,8 @@ class CsvFile
     0.upto(FixedHeader.size - 1) do |n|
       root << create_mapping( (n+1).to_s, FixedMapping[n] )
     end
+
+    root << create_mapping('1','stream_ref/file_id')
 
     doc.save file, :indent => true
 

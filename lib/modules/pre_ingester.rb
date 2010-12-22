@@ -41,8 +41,8 @@ class PreIngester
     elsif cfg.status == Status::PreIngestFailed
       # continue
     elsif cfg.status >= Status::PreIngested
-      error "Configuration ##{config_id} finished PreIngesting"
-      return
+      warn "Configuration ##{config_id} finished PreIngesting. Restarting ..."
+      cfg.status = Status::PreProcessed
     end
 
     process_config cfg, true
@@ -56,7 +56,7 @@ class PreIngester
 
     cfg.status = Status::PreIngesting
 
-    setup_ingest cfg, not(continue)
+    setup_ingest cfg, continue != true
 
     cfg.root_objects.each do |obj|
 
@@ -245,10 +245,10 @@ class PreIngester
 
   def add_to_csv( object )
     if (object.root? and object.parent?)
-      object.vpid = @csv.add_file File.basename(object.file_stream.to_s), object.label, '', 'COMPLEX'
+      object.vpid = @csv.add_complex_object object.label, object.usage_type
     else
       object.vpid = @csv.add_file File.basename(object.file_stream.to_s), object.label, object.usage_type, ''
-      @csv.set_relation object.vpid, 'part_of',       object.parent.vpid if object.child?
+      @csv.set_relation object.vpid, 'part_of', object.parent.vpid if object.child?
     end
     @csv.set_relation object.vpid, 'manifestation', object.master.vpid if object.manifestation?
     object.manifestations.each { |obj| add_to_csv obj }
