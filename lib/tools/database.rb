@@ -24,6 +24,8 @@ class Database
     end
     DataMapper.setup(:default, "sqlite3://#{ConfigFile['database']}")
     new_db = true unless File.exist?("#{ConfigFile['database']}")
+#    DataMapper.setup(:default, {:adapter => 'oracle', :user => 'ingester', :password => 'ingester', :host => 'aleph08', :port => 1521, :database => '/dtl3'} )
+    DataMapper.setup(:default, 'oracle://ingester:ingester@localhost:1521/?sid=dtl3')
     
     @handle = SQLite3::Database.new("#{ConfigFile['database']}")
 

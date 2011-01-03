@@ -69,7 +69,7 @@ class Application
   end
 
   def self.log_end(obj)
-    obj.save unless obj.nil?
+#    obj.save unless obj.nil?
     return false if self.instance.log_objects.empty?
     return (obj == self.instance.log_objects.pop) if (obj == nil or self.instance.log_objects[-1] == obj)
     false

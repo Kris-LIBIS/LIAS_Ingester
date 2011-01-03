@@ -106,7 +106,7 @@ class IngestConfig
       root.label = label
       root.status = Status::PreProcessed
       add_object root
-      save
+#      save
     end
     root
   end

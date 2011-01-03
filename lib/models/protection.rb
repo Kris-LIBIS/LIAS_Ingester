@@ -4,7 +4,7 @@ class Protection
   property    :id,              Serial, :key => true
   property    :usage_type,      String, :required => true
   property    :ptype,           Enum[ :ID, :WATERMARK, :CUSTOM ], :required => true, :default => :NONE
-  property    :pinfo,           Yaml
+  property    :pinfo,           Yaml, :length => 2000
   property    :negate,          Boolean
   property    :mid,             String, :required => false
 

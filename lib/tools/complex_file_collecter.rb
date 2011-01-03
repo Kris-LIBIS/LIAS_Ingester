@@ -34,13 +34,13 @@ class ComplexFileCollecter
 #        $stdout = STDOUT
 #      end
       obj.label = eval label
-      @config.root_object(eval(group)).add_child(obj).save
+      @config.root_object(eval(group)).add_child(obj)#.save
     else
       obj.message = "File '#{obj.file_name}' mismatched complex object criteria"
       result = false
     end
 
-    obj.save
+ #   obj.save
     result
 
   end

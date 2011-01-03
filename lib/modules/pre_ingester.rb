@@ -108,7 +108,7 @@ class PreIngester
     print_exception e
 
   ensure
-    obj.save
+#    obj.save
     Application.log_end(obj)
 
   end # process_object
@@ -132,7 +132,7 @@ class PreIngester
     @csv.write_mapping "#{cfg.ingest_dir}/transform/mapping.xml"
 
     cfg.status = Status::PreIngested if cfg.check_object_status(Status::PreIngested)
-    cfg.save
+#    cfg.save
 
   end
 
@@ -234,7 +234,7 @@ class PreIngester
           converter.type2ext(format)
         converter.watermark manifestation.file_stream, new_file, wm_file
         info "Created file #{new_file} for watermark protection of #{manifestation.usage_type}"
-#        File.delete(manifestation.file_stream)
+        File.delete(manifestation.file_stream)
         manifestation.file_stream = new_file
       else
         error 'Watermark requested, but not supported for the file type'

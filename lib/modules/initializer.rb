@@ -39,7 +39,7 @@ class Initializer
     info "Found #{files.size} files to process"
     files.each do |f|
       obj = IngestObject.new(f, run.checksum_type)
-      obj.save
+#      obj.save
       run.add_object obj
       Application.log_to(obj)
       info "New object ##{obj.id} for '#{f}'"
@@ -48,7 +48,7 @@ class Initializer
 
     run.status = Status::Initialized
     run.init_end = Time.now
-    run.save
+#    run.save
 
     info "Placed run ##{run.id} on the queue"
     result = run.id
@@ -56,11 +56,13 @@ class Initializer
   rescue Exception => e
     unless run.nil?
       run.status = Status::InitializeFailed
-      run.save
     end
     handle_exception e
 
   ensure
+    unless run.nil?
+      run.save
+    end
     Application.log_end(run)
     info 'Done'
 

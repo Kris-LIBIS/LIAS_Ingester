@@ -30,7 +30,6 @@ class PreProcessor
 
     info "Processing run ##{run.id}"
     run.status = Status::PreProcessing
-    run.save
 
     # for each configuration
     run.ingest_configs.each do |config|
@@ -40,7 +39,6 @@ class PreProcessor
       warn "#{run.ingest_objects.size} Objects remain unprocessed in run ##{run.id}"
     end
     run.status = Status::PreProcessed
-    run.save
 
   rescue Exception => e
     run.status = Status::PreProcessFailed
@@ -52,11 +50,12 @@ class PreProcessor
 
   end
 
+  private
+
   def process_config( config )
 
     Application.log_to(config)
     config.status = Status::PreProcessing
-    config.save
 
     @checker = FileChecker.new config
     @collecter = nil
@@ -67,6 +66,7 @@ class PreProcessor
     collected_objects.each do |object|
       process_object object, config
     end
+    config.save
     if config.get_objects.empty?
       config.status = Status::Idle
       warn "Config ##{config.id} did not match any objects"
@@ -84,7 +84,7 @@ class PreProcessor
 
   ensure
     Application.log_end(config)
-    config.ingest_run.save
+#    config.ingest_run.save
 
   end
 
@@ -98,29 +98,33 @@ class PreProcessor
     if not(@checker.match(object))
       object.status = Status::New
       object.message = nil
-      info "Object ##{object.id} did not match"
+      debug "Object ##{object.id} did not match"
     elsif not(@checker.check(object))
-      info "Object ##{object.id} failed tests: '#{object.message}'"
+      error "Object ##{object.id} failed tests: '#{object.message}'"
       object.status = Status::PreProcessFailed
     else
-      info "Object ##{object.id} passed tests"
+#      info "Object ##{object.id} passed tests"
       config.add_object(object)
+#      info "Object ##{object.id} added"
       object.status = Status::PreProcessed
+#      info "Object ##{object.id} updated status"
       unless @collecter.nil? or @collecter.check(object)
-        info "Object ##{object.id} failed building complex object"
+        error "Object ##{object.id} failed building complex object"
         object.status = Status::PreProcessFailed
       end
 
     end
 
-    object.get_run.save
+#    object.get_run.save
+#    info "Object ##{object.id} saved in the database"
 
   rescue Exception => e
     object.status = Status::PreProcessFailed
     handle_exception e
 
   ensure
-    object.save
+#    object.save
+    info "Object ##{object.id} preprocessed"
     Application.log_end(object)
 
   end

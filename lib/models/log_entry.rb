@@ -4,7 +4,7 @@ class LogEntry
   property    :id,              Serial, :key => true
   property    :created_at,      DateTime
   property    :severity,        String
-  property    :program,         String
+  property    :program,         String, :index => :program_idx
   property    :message,         String, :length => 1024
   
   belongs_to  :ingest_run,      :required => false

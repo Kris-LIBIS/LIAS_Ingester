@@ -35,7 +35,7 @@ module CommonConfig
       property    :search_term,     DataMapper::Property::String
 
       # contol fields
-      property    :control_fields,  DataMapper::Property::Yaml
+      property    :control_fields,  DataMapper::Property::Yaml, :length => 2000
 
       def common_config(config, apply_defaults = true)
 
