@@ -8,13 +8,13 @@ class IngestObject
   property    :created_at,      Date
   property    :updated_at,      Date
   property    :status,          Integer, :default => Status::New
-  property    :label,           String, :index => :label_idx
-  property    :usage_type,      String, :index => :usage_type_idx
+  property    :label,           String#, :index => :label_idx
+  property    :usage_type,      String#, :index => :usage_type_idx
   property    :metadata,        FilePath
 
   property    :file_stream,     FilePath
-  property    :vpid,            String, :index => :vpid_idx
-  property    :pid,             String, :index => :pid_idx
+  property    :vpid,            String#, :index => :vpid_idx
+  property    :pid,             String#, :index => :pid_idx
   property    :message,         String
   property    :more_info,       Text
 

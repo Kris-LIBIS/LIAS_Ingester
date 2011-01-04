@@ -100,7 +100,7 @@ class ImageConverter
       end
       FileUtils.rm(tmp_file)
     else
-      Application.info('ImageConverter') { "command: convert #{@work.command_line}" }
+      Application.debug('ImageConverter') { "command: convert #{@work.command_line}" }
       @work.write(target) { self.quality = q; self.filename = target }
     end
   end
