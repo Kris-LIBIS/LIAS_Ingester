@@ -25,7 +25,7 @@ class Metadata
     if record.nil?
       Application.warn('Metadata') { "Could not find metadata for '#{search_term}'" }
     else
-      copy_metadata record
+      copy_metadata_from_aleph record
     end
   end
 
@@ -34,7 +34,7 @@ class Metadata
     if record.nil?
       Application.warn('Metadata') { "Could not find metadata in '#{metadata_file}'" }
     else
-      copy_metadata record
+      copy_metadata_as_is record
     end
   end
 
@@ -76,11 +76,20 @@ class Metadata
     end
   end
 
-  def copy_metadata(record)
+  def copy_metadata_from_aleph(record)
     @obj.metadata = "#{@obj.get_config.ingest_dir}/transform/dc_#{@obj.id}.xml"
     File.open(@obj.metadata, "w") do |f|
       f.puts "<records>"
       f.puts record.to_dc(@obj.label).to_s.gsub(/\s*<\?.*\?>[\n]*/,'')
+      f.puts "</records>"
+    end
+  end
+
+  def copy_metadata_as_is(record)
+    @obj.metadata = "#{@obj.get_config.ingest_dir}/transform/dc_#{@obj.id}.xml"
+    File.open(@obj.metadata, "w") do |f|
+      f.puts "<records>"
+      f.puts record.to_s.gsub(/\s*<\?.*\?>[\n]*/,'')
       f.puts "</records>"
     end
   end
