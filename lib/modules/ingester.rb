@@ -36,12 +36,14 @@ class Ingester
     # assign pids to ingested objects
     assign_pids cfg
 
-    cfg.status = Status::Ingested if cfg.check_object_status(Status::Ingested)
-
+    cfg.status = Status::Ingested
+    
     if cfg.tasker_log.lines.grep(/COMPLETED - INGEST/).empty?
       error 'Ingest not completed'
       cfg.status = Status::IngestFailed
     end
+
+    warn 'Some objects failed during Ingest' unless cfg.check_object_status(Status::Ingested)
 
   rescue => e
     handle_exception e

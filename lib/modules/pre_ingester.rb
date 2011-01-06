@@ -56,6 +56,8 @@ class PreIngester
 
     cfg.status = Status::PreIngesting
 
+    failed_objects = []
+
     setup_ingest cfg, continue != true
 
     cfg.root_objects.each do |obj|
@@ -63,6 +65,8 @@ class PreIngester
       process_object obj if obj.status == Status::PreProcessed
 
       add_to_csv obj if obj.status == Status::PreIngested
+
+      failed_objects << obj if obj.status == Status::PreIngestFailed
 
     end # cfg.ingest_objects.each
 
@@ -75,6 +79,7 @@ class PreIngester
   ensure
     cfg.status = Status::PreIngested
     cfg.save
+    warn "#{failed_objects.size} objects failed during Pre-Ingest" unless failed_objects.empty?
     Application.log_end cfg
 
   end # process_config
@@ -131,9 +136,6 @@ class PreIngester
 
     # write mapping file
     @csv.write_mapping "#{cfg.ingest_dir}/transform/mapping.xml"
-
-    cfg.status = Status::PreIngested if cfg.check_object_status(Status::PreIngested)
-#    cfg.save
 
   end
 

@@ -34,6 +34,8 @@ class PostIngester
 
       cfg.status = Status::PostIngesting
 
+      failed_objects = []
+
 # For some strange reason the statement below does not work
 #      cfg.ingest_objects.all(:status => Status::Ingested) do |obj|
 
@@ -44,15 +46,18 @@ class PostIngester
 
         process_object obj
 
+        failed_objects << obj unless obj.status == Status::Done
+
       end # ingest_objects.all
 
-      cfg.status = Status::Done if cfg.check_object_status(Status::Done)
-
+      cfg.status = Status::Done
+      
     rescue => e
       handle_exception e
 
     ensure
       cfg.save
+      warn "#{failed_objects.size} objects failed during Post-Ingest" unless failed_objects.empty?
       Application.log_end(cfg)
 
   end # process_config
