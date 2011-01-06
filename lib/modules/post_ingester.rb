@@ -25,6 +25,8 @@ class PostIngester
 
   end # start
 
+  private
+
   def process_config(cfg)
 
     Application.log_to(cfg)
@@ -73,7 +75,7 @@ class PostIngester
     handle_exception e
    
   ensure
-    obj.save
+#    obj.save
     Application.log_end(obj)
 
   end # process_object
