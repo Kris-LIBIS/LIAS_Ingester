@@ -73,6 +73,7 @@ class PreIngester
     handle_exception e
 
   ensure
+    cfg.status = Status::PreIngested
     cfg.save
     Application.log_end cfg
 
