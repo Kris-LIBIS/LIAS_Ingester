@@ -1,4 +1,4 @@
-require 'converters/converter'
+require File.dirname(__FILE__) + '/converter'
 
 class ArchiveConverter
   include Converter

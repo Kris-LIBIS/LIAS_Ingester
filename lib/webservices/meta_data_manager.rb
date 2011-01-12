@@ -1,4 +1,4 @@
-require 'webservices/soap_client'
+require File.dirname(__FILE__) + '/soap_client'
 require 'singleton'
 require 'iconv'
 

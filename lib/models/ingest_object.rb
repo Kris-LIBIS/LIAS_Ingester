@@ -8,6 +8,7 @@ class IngestObject
   property    :created_at,      Date
   property    :updated_at,      Date
   property    :status,          Integer, :default => Status::New
+  property    :status_name,     String
   property    :label,           String#, :index => :label_idx
   property    :usage_type,      String#, :index => :usage_type_idx
   property    :metadata,        FilePath
@@ -41,7 +42,13 @@ class IngestObject
   before :save do
 #    self.debug_print
   end
+  
+  after :status= do
+    self.status_name = Status.to_string(self.status)
+  end
 
+  public
+  
   def get_config
     return self.ingest_config unless self.parent
     child = parent = self

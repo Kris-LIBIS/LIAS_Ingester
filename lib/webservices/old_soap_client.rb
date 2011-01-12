@@ -1,5 +1,5 @@
 require 'soap/rpc/driver'
-require 'tools/xml_writer'
+require 'lib/tools/xml_writer'
 
 class OldSoapClient
   include XmlWriter

@@ -1,6 +1,6 @@
 #require 'soap/wsdlDriver'
 require 'savon'
-require 'tools/xml_writer'
+require 'lib/tools/xml_writer'
 require 'htmlentities'
 
 class SoapClient

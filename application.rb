@@ -1,5 +1,4 @@
 $LOAD_PATH << File.dirname(__FILE__)
-$LOAD_PATH << File.dirname(__FILE__) + '/lib'
 
 require 'rubygems'
 require 'singleton'
@@ -44,13 +43,13 @@ module ApplicationTask
   end
 
 end
-require 'tools/database'
-require 'models/common/status'
-require 'modules/initializer'
-require 'modules/pre_processor'
-require 'modules/pre_ingester'
-require 'modules/ingester'
-require 'modules/post_ingester'
+require 'lib/tools/database'
+require 'lib/models/common/status'
+require 'lib/modules/initializer'
+require 'lib/modules/pre_processor'
+require 'lib/modules/pre_ingester'
+require 'lib/modules/ingester'
+require 'lib/modules/post_ingester'
 
 class Application
   include Singleton
@@ -58,6 +57,9 @@ class Application
   attr_reader :logger
   attr_reader :db_log_level
   attr_accessor :log_objects
+  attr_reader :log_file
+  attr_reader :options
+  attr_accessor :flush_counter
 
   def self.dir
     File.dirname(__FILE__)
@@ -76,6 +78,44 @@ class Application
   end
 
   def initialize
+    @options = {}
+    
+    OptionParser.new do |opts|
+      
+      opts.banner = "Usage: #{$0} [options] config ..."
+      opts.separator ""
+      opts.separator "Options:"
+      
+      @options[:config_file] = './config.yml'
+      opts.on('-c', '-- config_file FILE', "Use FILE instead of '#{@options[:config_file]}'") do |file|
+        @options[:config_file] = file
+      end
+      
+      @options[:run] = false
+      opts.on('-r', '--run_ingester [up_to]', 'Start the ingester', Integer,
+              '  optionally specify an endpoint:',
+              '    1 = initializer, 2 = preprocessor,',
+              '    3 = preingester, 4 = ingester,',
+              '    5 = postingester' ) do |up_to|
+        @options[:run] = true
+        @options[:end] = up_to || 99
+      end
+      
+      @options[:log_file] = nil
+      opts.on('-l', '--log_file FILE', 'Write all logging to FILE') do |file|
+        @options[:log_file] = file
+      end
+      
+      opts.on('-h', '--help', 'Show this help info') do
+        puts opts
+        exit
+      end
+      
+    end.parse!
+    
+  end
+  
+  def init
     @logger = Logger.new(STDOUT)
     @logger.level = Logger::INFO
     @logger.datetime_format = "%Y-%m-%d %H:%M:%S"
@@ -84,12 +124,29 @@ class Application
     @logger.formatter = proc { |severity, datetime, progname, msg|
       @logger.db_logger(severity, datetime, progname, msg)
     }
+    
     @logger.level = ConfigFile['log_level'] || 1
     @db_log_level = ConfigFile['log_to_db_level'] || 2
+    
+    @log_file = ConfigFile['log_file'] || nil
+    @log_file = options[:log_file] if options[:log_file]
+    
+    @log_file = File.open(@log_file,'w:utf-8') if @log_file
+    
+    @flush_counter = 0
   end
 
   def terminate
     @logger.close
+    @log_file.close if @log_file
+  end
+  
+  def self.write_log(severity, datetime, progname, msg)
+    return unless self.instance.log_file
+    self.instance.log_file.puts "[#{datetime.to_s}] #{severity} -- #{progname}: #{msg}"
+    self.instance.flush_counter = self.instance.flush_counter + 1
+    self.instance.log_file.flush if self.instance.flush_counter > 10
+    self.instance.flush_counter = 0 if self.instance.flush_counter > 10
   end
 
   def self.send_log(severity, datetime, progname, msg)
@@ -133,14 +190,12 @@ class Application
 
 end
 
-# to force initialization of the database
-@@app = Application.instance
-
 class Logger
   attr_accessor :db_log
 
   def db_logger(severity, datetime, progname, msg)
-    ::Application.send_log(severity,datetime,progname,msg) if @db_log
+    ::Application.write_log(severity, datetime, progname, msg)
+    ::Application.send_log(severity, datetime, progname, msg) if @db_log
     @default_formatter.call(severity, datetime, progname, msg)
   end
 end
@@ -148,3 +203,31 @@ end
 class AbortException < StandardError
 end
 
+# to force initialization of the database
+@@app = Application.instance
+@@app.init
+
+if @@app.options[:run]
+  if ARGV.size < 1
+    @@app.error 'A config file argument is required when you want to run the ingester'
+    exit
+  end
+    
+  initializer = Initializer.new
+  pre_processor = PreProcessor.new
+  pre_ingester = PreIngester.new
+  ingester = Ingester.new
+  post_ingester = PostIngester.new
+  ARGV.each do |config|
+    run_id = initializer.start config unless @@app.options[:end] < 1
+    configs = pre_processor.start_run run_id unless @@app.options[:end] < 2
+    configs.each do |cfg_id|
+      cfg_id = pre_ingester.start_config cfg_id unless @@app.options[:end] < 3
+      cfg_id = ingester.start_config cfg_id unless @@app.options[:end] < 4
+      cfg_id = post_ingester.start_config cfg_id unless @@app.options[:end] < 5
+    end
+  end
+  
+  @@app.terminate
+  exit
+end

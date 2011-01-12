@@ -1,10 +1,10 @@
 require 'cgi'
-require 'tools/string'
-require 'libis/record/aleph_sequential'
-require 'libis/record/aleph_hash'
-require 'libis/record/dublin_core'
-require 'libis/record/oai_pmh'
-require 'libis/holding/opac_search_holding'
+require 'lib/tools/string'
+require File.dirname(__FILE__) + '/record/aleph_sequential'
+require File.dirname(__FILE__) + '/record/aleph_hash'
+require File.dirname(__FILE__) + '/record/dublin_core'
+require File.dirname(__FILE__) + '/record/oai_pmh'
+require File.dirname(__FILE__) + '/holding/opac_search_holding'
 
 class Record
   FixFieldStruct = Struct.new(:datas)

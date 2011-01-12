@@ -6,6 +6,7 @@ class IngestRun
   include CommonConfig
 
   property    :status,          Integer, :default => Status::New
+  property    :status_name,     String
   property    :init_end,        DateTime
 
   # config file info
@@ -33,6 +34,12 @@ class IngestRun
     self.log_entries.destroy
     true
   end
+  
+  after :status= do
+    self.status_name = Status.to_string(self.status)
+  end
+
+  public
 
   def init(config_file)
 
@@ -41,25 +48,25 @@ class IngestRun
       raise BadConfigException.new("Configuratiebestand #{config_file} kan niet gevonden worden")
       return
     end
-
+    
     # config file info
     self.config_file    = config_file
     self.checksum       = Digest::MD5.hexdigest(File.read(config_file))
     self.mtime          = File.mtime(config_file)
-
+    
     config              = YAML::load_file(config_file)
     config.key_strings_to_symbols! :downcase => true
-
+    
     # common configuration
     common_config(config[:common])
-
+    
     # ingest_run specific configuration
-
+    
     self.packaging      = :DIR
     self.location       = '.'
     self.recursive      = false
     self.selection      = Regexp.new(/.*/)
-
+    
     if config[:common]
       config[:common].key_strings_to_symbols!
       config[:common].each do |k,v|
@@ -83,7 +90,7 @@ class IngestRun
         end # case
       end # config[:common].each
     end # if config[:common]
-
+    
     begin
       config[:configurations].each do |c|
         config = IngestConfig.new
@@ -93,8 +100,8 @@ class IngestRun
     rescue BadConfigException
       self.status       = Status::Failed
       raise
-    end 
-
+    end
+    
   end
 
   def add_object( object )

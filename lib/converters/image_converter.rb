@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'quick_magick'
 require 'RMagick'
-require 'converters/converter'
+require File.dirname(__FILE__) + '/converter'
 
 class ImageConverter
   include Converter

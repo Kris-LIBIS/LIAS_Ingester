@@ -2,39 +2,43 @@
 
 module Status
 
+  private
+
   Idle              = 0x0000
   Running           = 0x0001
-  Done              = 0x0002
-  Failed            = 0x0008
+  Failed            = 0x0004
+  Done              = 0x0008
+  
+  public
 
   New               = Idle + Running            # 1
 
   Initialize        = 0x0020                    # 32
   Initializing      = Initialize + Running      # 33
-  Initialized       = Initialize + Done         # 34
-  InitializeFailed  = Initialize + Failed       # 40
+  InitializeFailed  = Initialize + Failed       # 36
+  Initialized       = Initialize + Done         # 40
 
   PreProcess        = 0x0030                    # 48
   PreProcessing     = PreProcess + Running      # 49
-  PreProcessed      = PreProcess + Done         # 50
-  PreProcessFailed  = PreProcess + Failed       # 56
+  PreProcessFailed  = PreProcess + Failed       # 52
+  PreProcessed      = PreProcess + Done         # 56
 
   PreIngest         = 0x0040                    # 64
   PreIngesting      = PreIngest  + Running      # 65
-  PreIngested       = PreIngest  + Done         # 66
-  PreIngestFailed   = PreIngest  + Failed       # 72
+  PreIngestFailed   = PreIngest  + Failed       # 68
+  PreIngested       = PreIngest  + Done         # 72
 
   Ingest            = 0x0050                    # 80
   Ingesting         = Ingest     + Running      # 81
-  Ingested          = Ingest     + Done         # 82
-  IngestFailed      = Ingest     + Failed       # 88
+  IngestFailed      = Ingest     + Failed       # 84
+  Ingested          = Ingest     + Done         # 88
 
   PostIngest        = 0x0060                    # 96
   PostIngesting     = PostIngest + Running      # 97
-  PostIngested      = PostIngest + Done         # 98
-  PostIngestFailed  = PostIngest + Failed       # 104
+  PostIngestFailed  = PostIngest + Failed       # 100
+  PostIngested      = PostIngest + Done         # 104
 
-  Final             = 0x00F0     + Done         # 240
+  Finished          = 0x00F0     + Done         # 248
 
   StatusMap = {
     Idle              => 'Idle',
@@ -60,7 +64,7 @@ module Status
     PostIngesting     => 'PostIngesting',
     PostIngested      => 'PostIngested',
     PostIngestFailed  => 'PostIngestFailed',
-    Final             => 'Final'}
+    Finished          => 'Finished'}
 
   def self.running?(status)
     (status & Running) == Running

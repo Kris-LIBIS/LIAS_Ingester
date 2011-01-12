@@ -1,5 +1,5 @@
 require 'csv'
-require 'tools/xml_writer'
+require File.dirname(__FILE__) + '/xml_writer'
 
 class CsvFile
   include XmlWriter

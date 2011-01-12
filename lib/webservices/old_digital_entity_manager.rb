@@ -1,19 +1,22 @@
-require File.dirname(__FILE__) + '/soap_client'
+require File.dirname(__FILE__) + '/old_soap_client'
 require 'singleton'
 
-class DigitalEntityManager < SoapClient
+class DigitalEntityManager < OldSoapClient
   include Singleton
 
   def initialize
     super "DigitalEntityManager"
+    @client.add_method 'digitalEntityCall', 'general', 'digital_entity_call'
+    @client.add_method 'getAccessRights', 'userId', 'ip', 'listPids'
+    @client.add_method 'digitalEntityMdsSkeletonCall', 'pid'
+    @client.add_method 'formattedDigitalEntityCall', 'pid', 'schema_file'
+    @client.add_method 'digitalEntityWithRelationsCall', 'pid'
+    @client.add_method 'digitalEntityWithRelationsMdsSkeletonCall', 'pid'
   end
 
   def create_object( de_info )
     de_call = create_digital_entity_call de_info, 'create'
-    response = @client.digital_entity_call do |soap|
-      soap.body = { :general => general.to_s, :digital_entity_call => de_call.to_s }
-    end
-    parse_result(response)
+    parse_result(@client.digitalEntityCall(general.to_s, de_call.to_s))
   end
 
   def delete_object( pid )
@@ -21,24 +24,15 @@ class DigitalEntityManager < SoapClient
     de_options = { 'metadata' => 'all', 'relation' => 'all' }
     de_call1 = create_digital_entity_call de_info, 'update', de_options
     de_call2 = create_digital_entity_call de_info, 'delete'
-    response = @client.digital_entity_call do |soap|
-      soap.body = { :general => general.to_s, :digital_entity_call => de_call1.to_s }
-    end
-    result = parse_result(response)
+    result = parse_result(@client.digitalEntityCall(general.to_s, de_call1.to_s))
     return result if result[:error].size > 0
-    response = @client.digital_entity_call do |soap|
-      soap.body = { :general => general.to_s, :digital_entity_call => de_call2.to_s }
-    end
-    parse_result(response)
+    parse_result(@client.digitalEntityCall(general.to_s, de_call2.to_s))
   end
 
   def retrieve_object( pid )
     de_info = { 'pid' => pid }
     de_call = create_digital_entity_call de_info, 'retrieve'
-    response = @client.digital_entity_call do |soap|
-      soap.body = { :general => general.to_s, :digital_entity_call => de_call.to_s }
-    end
-    parse_result(response)
+    parse_result(@client.digitalEntityCall(general.to_s, de_call.to_s))
   end
 
   def link_dc(pid, mid)
@@ -63,10 +57,7 @@ class DigitalEntityManager < SoapClient
         'metadata' => [ { 'cmd' => 'insert', 'link_to_exists' => 'true', 'mid' => mid.to_s, 'name' => md_name, 'type' => md_type } ]}
     update_options = { 'metadata' => 'delta' }
     de_call = create_digital_entity_call de_info, 'update', update_options
-    response = @client.digital_entity_call do |soap|
-      soap.body = { :general => general.to_s, :digital_entity_call => de_call.to_s }
-    end
-    parse_result(response)
+    parse_result(@client.digitalEntityCall(general.to_s, de_call.to_s))
   end
 
   def unlink_md(pid, mid, md_name, md_type)
@@ -75,10 +66,7 @@ class DigitalEntityManager < SoapClient
         'metadata' => [ { 'cmd' => 'delete', 'shared' => 'true', 'mid' => mid.to_s, 'name' => md_name, 'type' => md_type } ]}
     update_options = { 'metadata' => 'delta' }
     de_call = create_digital_entity_call de_info, 'update', update_options
-    response = @client.digital_entity_call do |soap|
-      soap.body = { :general => general.to_s, :digital_entity_call => de_call.to_s }
-    end
-    parse_result(response)
+    parse_result(@client.digitalEntityCall(general.to_s, de_call.to_s))
   end
 
   private

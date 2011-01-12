@@ -4,7 +4,7 @@ require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
 require 'dm-migrations'
-require 'tools/config_file'
+require File.dirname(__FILE__) + '/config_file'
 
 class Database
   attr_reader :handle

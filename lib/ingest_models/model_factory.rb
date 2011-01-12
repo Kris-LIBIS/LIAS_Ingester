@@ -1,6 +1,6 @@
 require 'singleton'
 require 'yaml'
-require 'ingest_models/ingest_model'
+require File.dirname(__FILE__) + '/ingest_model'
 
 class ModelFactory
   include Singleton

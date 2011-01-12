@@ -1,7 +1,7 @@
 require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
-require 'tools/hash'
+require 'lib/tools/hash'
 require File.dirname(__FILE__) + '/bad_config_exception'
 require File.dirname(__FILE__) + '/status'
 
@@ -223,7 +223,7 @@ module CommonConfig
 
       def get_protections
         result = {}
-        result = slf.ingest_run.get_protections if self.respond_to? :ingest_run and self.ingest_run
+        result = self.ingest_run.get_protections if self.respond_to? :ingest_run and self.ingest_run
         self.protections.each do |p|
           result[p.usage_type] = p
         end

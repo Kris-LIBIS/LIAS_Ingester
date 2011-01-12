@@ -1,4 +1,4 @@
-require 'libis/holding/generic_search_holding'
+require File.dirname(__FILE__) + '/generic_search_holding'
 
 class OpacSearchHolding < GenericSearchHolding
   def retrieve

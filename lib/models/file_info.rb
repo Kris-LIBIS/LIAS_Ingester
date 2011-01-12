@@ -1,4 +1,4 @@
-require 'tools/mime_type'
+require 'lib/tools/mime_type'
 
 class FileInfo
   include DataMapper::Resource

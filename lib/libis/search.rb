@@ -1,5 +1,5 @@
-require 'libis/search/opac_search'
-require 'libis/search/primo_search'
+require File.dirname(__FILE__) + '/search/opac_search'
+require File.dirname(__FILE__) + '/search/primo_search'
 
 class SearchFactory
   def initialize(format)    

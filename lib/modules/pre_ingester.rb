@@ -1,148 +1,178 @@
-require 'application'
-require 'ingest_models/model_factory'
-require 'tools/ingest_settings'
-require 'tools/csv_file'
-require 'modules/metadata'
+require 'lib/ingest_models/model_factory'
+require 'lib/tools/ingest_settings'
+require 'lib/tools/csv_file'
+require File.dirname(__FILE__) + '/metadata'
 
 class PreIngester
   include ApplicationTask
-
+  
   def start
     info 'Starting'
-
+    
     cfg_queue = IngestConfig.all(:status => Status::PreProcessed)
-
+    
     cfg_queue.each do |cfg|
-
+      
       process_config cfg if cfg.status == Status::PreProcessed
-
+      
     end # cfg_queue.each
-
+    
   rescue Exception => e
     handle_exception e
-
+    
   ensure
     info 'Done'
-
+    
   end
-
-  def restart( config_id )
+  
+  def start_config( config_id )
     
     cfg = IngestConfig.first(:id => config_id)
-
+    
     if cfg.nil?
       error "Configuration ##{config_id} not found"
-      return
+      return nil
     end
-
+    
+    if cfg.status == Status::PreProcessed
+      # continue
+    elsif cfg.status == Status::PreIngestFailed
+      warn "Configuration ##{config_id} failed before and will now be restarted"
+      # continue
+    elsif cfg.status >= Status::PreIngested
+      warn "Configuration ##{config_id} allready finished PreIngesting."
+      return config_id
+    end
+    
+    process_config cfg, true
+    
+    return config_id
+    
+  end
+  
+  def restart_config( config_id )
+    
+    cfg = IngestConfig.first(:id => config_id)
+    
+    if cfg.nil?
+      error "Configuration ##{config_id} not found"
+      return nil
+    end
+    
     if cfg.status <= Status::PreProcessed
       error "Configuration ##{config_id} did not yet start PreIngest"
-      return
+      return nil
     elsif cfg.status == Status::PreIngestFailed
       # continue
     elsif cfg.status >= Status::PreIngested
       warn "Configuration ##{config_id} finished PreIngesting. Restarting ..."
       cfg.status = Status::PreProcessed
     end
-
+    
     process_config cfg, true
-
+    
+    return config_id
+    
   end
-
+  
+  private
+  
   def process_config( cfg, continue = false )
-
+    
     Application.log_to(cfg)
     info "Processing config ##{cfg.id}"
-
+    
     cfg.status = Status::PreIngesting
-
+    cfg.save
+    
     failed_objects = []
-
+    
     setup_ingest cfg, continue != true
-
+    
     cfg.root_objects.each do |obj|
-
+      
       process_object obj if obj.status == Status::PreProcessed
-
+      
       add_to_csv obj if obj.status == Status::PreIngested
-
+      
       failed_objects << obj if obj.status == Status::PreIngestFailed
-
+      
     end # cfg.ingest_objects.each
-
+    
     finalize_ingest cfg
-
+    
   rescue Exception => e
     cfg.status = Status::PreIngestFailed
     handle_exception e
-
+    
   ensure
     cfg.status = Status::PreIngested
     cfg.save
     warn "#{failed_objects.size} objects failed during Pre-Ingest" unless failed_objects.empty?
     Application.log_end cfg
-
+    
   end # process_config
-
+  
   def process_object( obj )
-
+    
     Application.log_to(obj)
-
+    
     info "Processing object ##{obj.id}"
-
+    
     obj.status = Status::PreIngesting
-
+    obj.save
+    
     # get metadata
     info 'Getting metadata'
     result = get_metadata obj
-
+    
     # copy stream to ingest_dir
     copy_stream obj
-
+    
     # create manifestations
     info 'Creating manifestations'
     create_manifestations obj
-
+    
     # watermark objects
     create_watermark obj
-
+    
     # set object status to preingested
     obj.set_status_recursive Status::PreIngested
-
+    
   rescue Exception => e
     obj.status = Status::PreIngestFailed
     print_exception e
-
+    
   ensure
-#    obj.save
+    obj.save
     Application.log_end(obj)
-
+    
   end # process_object
-
+  
   private
-
+  
   def setup_ingest( cfg, clear_dir )
     setup_ingest_dir cfg, clear_dir
     create_ingest_settings cfg
   end
-
+  
   def finalize_ingest( cfg )
-
+    
     # write ingest_settings
     @ingest_settings.write cfg.ingest_dir + '/ingest_settings.xml'
-
+    
     # write csv file
     @csv.write "#{cfg.ingest_dir}/transform/values.csv"
-
+    
     # write mapping file
     @csv.write_mapping "#{cfg.ingest_dir}/transform/mapping.xml"
-
+    
   end
-
+  
   def setup_ingest_dir( cfg, clear_dir )
-
+    
     cfg.ingest_id = "#{ConfigFile['ingest_name']}_#{format('%d',cfg.id)}"
-
+    
     load_dir = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_ingest_dir']}/load_#{cfg.ingest_id}"
     unless cfg.work_dir.nil?
       FileUtils.mkdir(cfg.work_dir) unless Dir.exist?(cfg.work_dir)
@@ -152,7 +182,7 @@ class PreIngester
     else
       cfg.ingest_dir = load_dir
     end
-
+    
     info "Setting up ingest directory: #{cfg.ingest_dir}"
     FileUtils.rm_r("#{cfg.ingest_dir}", :force => true) if clear_dir
     FileUtils.mkdir("#{cfg.ingest_dir}") unless Dir.exist?(cfg.ingest_dir)
@@ -169,17 +199,16 @@ class PreIngester
       dir = "#{cfg.ingest_dir}/#{d}"
       FileUtils.mkdir dir unless Dir.exist?(dir)
     end
-
+    
   end
-
+  
   def create_ingest_settings( cfg )
     info 'Preparing ingest settings'
     @ingest_settings = IngestSettings.new
     @ingest_settings.add_control_fields cfg.get_control_fields, ''
     @csv = CsvFile.new
-
   end
-
+  
   def get_metadata( object )
     cfg = object.get_config
     md = Metadata.new(object)
@@ -191,7 +220,7 @@ class PreIngester
     end
     result
   end
-
+  
   def copy_stream( object )
     if object.file_info
       info "Copying original stream '#{object.file_path}'"
@@ -200,7 +229,7 @@ class PreIngester
     end
     object.children.each { |child| copy_stream child }
   end
-
+  
   def create_manifestations( object )
     cfg = object.get_config
     model = ModelFactory.instance.get_model_for_config cfg
@@ -218,11 +247,11 @@ class PreIngester
     end
     object.children.each { |child| create_manifestations child }
   end
-
+  
   def create_watermark( object )
     cfg = object.get_config
     model = ModelFactory.instance.get_model_for_config cfg
-
+    
     # note: original will never be watermark protected
     object.manifestations.each do |manifestation|
       p = cfg.get_protection(manifestation.usage_type)
@@ -245,7 +274,7 @@ class PreIngester
     end
     object.children.each { |child| create_watermark child }
   end
-
+  
   def add_to_csv( object )
     if (object.root? and object.parent?)
       object.vpid = @csv.add_complex_object object.label, object.usage_type
@@ -256,6 +285,7 @@ class PreIngester
     @csv.set_relation object.vpid, 'manifestation', object.master.vpid if object.manifestation?
     object.manifestations.each { |obj| add_to_csv obj }
     object.children.each       { |obj| add_to_csv obj }
+    object.save
   end
-
+  
 end

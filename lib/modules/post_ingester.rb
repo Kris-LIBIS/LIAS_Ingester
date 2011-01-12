@@ -1,90 +1,118 @@
-require 'application'
-require 'webservices/digital_entity_manager'
-require 'webservices/meta_data_manager'
+require 'lib/webservices/digital_entity_manager'
+require 'lib/webservices/meta_data_manager'
 
 class PostIngester
   include ApplicationTask
-
+  
   def start
-
+    
     info 'Starting'
-
+    
     cfg_queue = IngestConfig.all(:status => Status::Ingested)
-
+    
     cfg_queue.each do |cfg|
-
+      
       process_config cfg
-
+      
     end # cfg_queue.each
-
+    
   rescue => e
     handle_exception e
-
+    
   ensure
     info 'Done'
-
+    
   end # start
-
+  
+  def start_config( config_id )
+    
+    cfg = IngestConfig.first(:id => config_id)
+    
+    if cfg.nil?
+      error "Configuration ##{config_id} not found"
+      return nil
+    end
+    
+    if cfg.status == Status::Ingested
+      # continue
+    elsif cfg.status == Status::PostIngestFailed
+      warn "Configuration ##{config_id} failed before and will now be restarted"
+      # continue
+    elsif cfg.status >= Status::PostIngested
+      warn "Configuration ##{config_id} allready finished PostIngesting."
+      return config_id
+    end
+    
+    process_config cfg
+    
+    return config_id
+    
+  end
+  
   private
-
+  
   def process_config(cfg)
-
+    
     Application.log_to(cfg)
-      info "Processing config ##{cfg.id}"
-
-      cfg.status = Status::PostIngesting
-
-      failed_objects = []
-
+    info "Processing config ##{cfg.id}"
+    
+    cfg.status = Status::PostIngesting
+    cfg.save
+    
+    failed_objects = []
+    
 # For some strange reason the statement below does not work
 #      cfg.ingest_objects.all(:status => Status::Ingested) do |obj|
-
 # But this does work !?!?:
-      cfg.root_objects.each do |obj|
-
-        next unless obj.status == Status::Ingested
-
-        process_object obj
-
-        failed_objects << obj unless obj.status == Status::Done
-
-      end # ingest_objects.all
-
-      cfg.status = Status::Done
+    cfg.root_objects.each do |obj|
       
-    rescue => e
-      handle_exception e
-
-    ensure
-      cfg.save
-      warn "#{failed_objects.size} objects failed during Post-Ingest" unless failed_objects.empty?
-      Application.log_end(cfg)
-
+      next unless obj.status == Status::Ingested
+      
+      process_object obj
+      
+      failed_objects << obj unless obj.status == Status::PostIngested
+      
+    end # ingest_objects.all
+    
+    cfg.status = Status::Finished
+    
+  rescue => e
+    cfg.status = Status::PostIngestFailed
+    handle_exception e
+    
+  ensure
+    cfg.save
+    warn "#{failed_objects.size} objects failed during Post-Ingest" unless failed_objects.empty?
+    Application.log_end(cfg)
+    
   end # process_config
 
   def process_object(obj)
-
+    
     Application.log_to(obj)
     info "Processing object ##{obj.id}"
-
+    
+    obj.status = Status::PostIngesting
+    obj.save
+    
     ### link the accessright records
     link_ar obj.get_config, obj
-
+    
     ### link the dc metadata records
     create_and_link_dc obj
-
-    obj.set_status_recursive Status::Done, Status::Ingested
-
+    
+    obj.set_status_recursive Status::PostIngested
+    
   rescue => e
-    obj.set_status_recursive Status::Done, Status::PostIngestFailed
+    obj.status = Status::PostIngestFailed
     handle_exception e
    
   ensure
-#    obj.save
+    obj.save
     Application.log_end(obj)
-
+    
   end # process_object
-
+  
   def link_ar(cfg, obj)
     return unless obj.pid
     ar = cfg.get_protection obj.usage_type
@@ -114,7 +142,7 @@ class PostIngester
     obj.manifestations.each { |m| link_ar cfg, m }
     obj.children.each       { |c| link_ar cfg, c }
   end
-
+  
   def create_and_link_dc( obj, mid = nil )
     return unless obj.metadata and obj.pid
     unless mid
@@ -138,5 +166,5 @@ class PostIngester
     obj.manifestations.each { |m| create_and_link_dc m, mid }
     obj.children.each       { |c| create_and_link_dc c, mid }
   end
-
+  
 end

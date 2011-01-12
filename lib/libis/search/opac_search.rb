@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'xml/libxml'
-require 'libis/search/generic_search'
+require File.dirname(__FILE__) + '/generic_search'
 require 'pp'
-require 'tools/hash'
+require 'lib/tools/hash'
 
 class OpacSearch < GenericSearch
  # attr_reader :xml_document

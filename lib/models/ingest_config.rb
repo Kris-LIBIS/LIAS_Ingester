@@ -6,6 +6,7 @@ class IngestConfig
   include CommonConfig
 
   property    :status,          Integer, :default => Status::New
+  property    :status_name,     String
 
   # file selection criteria
   property    :filename_match,  Regexp
@@ -40,16 +41,20 @@ class IngestConfig
     self.log_entries.destroy
     true
   end
+  
+  after :status= do
+    self.status_name = Status.to_string(self.status)
+  end
 
   public
 
   def init(config)
-
+    
     config.key_strings_to_symbols!
-
+    
     # common configuration
     common_config(config, false)
-
+    
     # ingest_config specific configuration
     
     self.filename_match   = Regexp.new('')
@@ -95,7 +100,7 @@ class IngestConfig
         end
       end # case label
     end # config.each
-
+    
   end
 
   def root_object(label)
@@ -127,7 +132,7 @@ class IngestConfig
   end
 
   def check_object_status( status )
-    ingest_objects.each do |obj|
+    self.ingest_objects.each do |obj|
       return false if obj.status < status
     end
     true
