@@ -49,6 +49,45 @@ class PostIngester
     
   end
   
+  def undo( config_id )
+    
+    cfg = IngestConfig.first(:id => config_id)
+    
+    if cfg.nil?
+      error "Configuration ##{config_id} not found"
+      return nil
+    end
+    
+    unless Status.phase(cfg.status) == Status.PostIngest
+      warn "Cannot undo configuration ##{config_id} because status is #{Status.to_string(cfg.status)}."
+      return cfg if cfg.status == Status::Ingested
+      return nil
+    end
+    
+    ##### TODO
+    error '\'undo\' not yet implemented'
+    return nil
+    
+    cfg
+    
+  end
+
+  def restart_config( config_id )
+    
+    if cfg = undo(config_id)
+      info "Restarting config ##{config_id}"
+      process_config cfg, true
+      return config_id
+    end
+    
+    nil
+    
+  end
+  
+  def continue( config_id )
+    error '\'continue\' not yet implemented'
+  end
+  
   private
   
   def process_config(cfg)

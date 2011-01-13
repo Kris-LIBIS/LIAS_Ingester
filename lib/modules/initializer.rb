@@ -49,47 +49,37 @@ class Initializer
   end
   
   def undo(run_id)
+    
     run = IngestRun.first(:id => run_id)
+
     if run.nil?
       error "Could not find run ##{run_id}"
       return nil
     end
-    unless Status.phase(run.status) == Status::Initialize or run.status == Status::New
-      warn "Cannot undo run ##{run_id} initialization because status is #{Status.to_string(run.status)}"
+
+    unless Status.phase(run.status) == Status::Initialize
+      warn "Cannot undo run ##{run_id} because status is #{Status.to_string(run.status)}"
+      return run if run.status == Status::New
       return nil
     end
+
     run.ingest_objects.destroy
     run.save
     info "Run ##{run_id} is reset"
+    
     run
+    
   end
   
-  def restart(run_id)
-    
-    result = nil
-    
-    info 'Restarting run ##{run_id}'
+  def restart_run(run_id)
     
     if run = undo(run_id)
+      info "Restarting run ##{run_id}"
       process_run run
-      result = run_id
+      return run_id
     end
     
-  rescue Exception => e
-    unless run.nil?
-      run.status = Status::InitializeFailed
-    end
-    handle_exception e
-    
-  ensure
-    unless run.nil?
-      run.save
-    end
-    Application.log_end(run)
-    
-    info 'Done'
-    
-    result
+    nil
     
   end
   

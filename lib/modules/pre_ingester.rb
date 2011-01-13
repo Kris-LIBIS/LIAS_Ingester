@@ -50,7 +50,7 @@ class PreIngester
     
   end
   
-  def restart_config( config_id )
+  def undo( config_id )
     
     cfg = IngestConfig.first(:id => config_id)
     
@@ -59,20 +59,34 @@ class PreIngester
       return nil
     end
     
-    if cfg.status <= Status::PreProcessed
-      error "Configuration ##{config_id} did not yet start PreIngest"
+    unless Status.phase(cfg.status) == Status.PreIngest
+      warn "Cannot undo configuration ##{config_id} because status is #{Status.to_string(cfg.status)}."
+      return cfg if cfg.status == Status::PreProcessed
       return nil
-    elsif cfg.status == Status::PreIngestFailed
-      # continue
-    elsif cfg.status >= Status::PreIngested
-      warn "Configuration ##{config_id} finished PreIngesting. Restarting ..."
-      cfg.status = Status::PreProcessed
     end
     
-    process_config cfg, true
+    ##### TODO
+    error '\'undo\' not yet implemented'
+    return nil
     
-    return config_id
+    cfg
+
+  end
+  
+  def restart_config( config_id )
     
+    if cfg = undo(config_id)
+      info "Restarting config ##{config_id}"
+      process_config cfg, true
+      return config_id
+    end
+    
+    nil
+    
+  end
+  
+  def continue( config_id )
+    error '\'continue\' not yet implemented'
   end
   
   private
