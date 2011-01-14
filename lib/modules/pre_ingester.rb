@@ -77,7 +77,7 @@ class PreIngester
     
     if cfg = undo(config_id)
       info "Restarting config ##{config_id}"
-      process_config cfg, true
+      process_config cfg, false
       return config_id
     end
     
@@ -104,7 +104,7 @@ class PreIngester
       return config_id
     end
     
-    process_config cfg, false
+    process_config cfg, true
     
     return config_id
     
