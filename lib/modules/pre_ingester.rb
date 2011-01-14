@@ -44,7 +44,7 @@ class PreIngester
       return config_id
     end
     
-    process_config cfg, true
+    process_config cfg, false
     
     return config_id
     
@@ -66,11 +66,11 @@ class PreIngester
     end
     
     ##### TODO
-    error '\'undo\' not yet implemented'
+    warn "\'undo\' not yet implemented"
     return nil
     
-    cfg
-
+    # cfg
+    
   end
   
   def restart_config( config_id )
@@ -86,7 +86,28 @@ class PreIngester
   end
   
   def continue( config_id )
-    error '\'continue\' not yet implemented'
+    
+    cfg = IngestConfig.first(:id => config_id)
+    
+    if cfg.nil?
+      error "Configuration ##{config_id} not found"
+      return nil
+    end
+    
+    if cfg.status == Status::PreProcessed
+      # continue
+    elsif cfg.status == Status::PreIngestFailed
+      warn "Configuration ##{config_id} failed before and will now be restarted"
+      # continue
+    elsif cfg.status >= Status::PreIngested
+      warn "Configuration ##{config_id} allready finished PreIngesting."
+      return config_id
+    end
+    
+    process_config cfg, false
+    
+    return config_id
+    
   end
   
   private
@@ -103,9 +124,15 @@ class PreIngester
     
     setup_ingest cfg, continue != true
     
+    valid_states = [Status::PreProcessed]
+    if continue
+      valid_states << Status::PreIngesting
+      valid_states << Status::PreIngestFailed
+    end
+    
     cfg.root_objects.each do |obj|
       
-      process_object obj if obj.status == Status::PreProcessed
+      process_object obj if valid_states.include?(obj.status)
       
       add_to_csv obj if obj.status == Status::PreIngested
       

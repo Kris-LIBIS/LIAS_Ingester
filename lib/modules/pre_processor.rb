@@ -63,7 +63,7 @@ class PreProcessor
     error '\'undo\' not yet implemented'
     return nil
     
-    cfg
+    # cfg
     
   end
   

@@ -65,7 +65,7 @@ class Ingester
     error '\'undo\' not yet implemented'
     return nil
     
-    cfg
+    # cfg
     
   end
   
