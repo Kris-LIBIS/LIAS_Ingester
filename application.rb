@@ -82,6 +82,8 @@ class Application
   def initialize
     @options = {}
     
+    begin
+    
     OptionParser.new do |opts|
       
       opts.banner = "Usage: #{$0} [options] config ..."
@@ -89,7 +91,7 @@ class Application
       opts.separator "Options:"
       
       @options[:config_file] = './config.yml'
-      opts.on('-c', '-- config_file FILE', "Use FILE instead of '#{@options[:config_file]}'") do |file|
+      opts.on('-c', '--config_file FILE', "Use FILE instead of '#{@options[:config_file]}'") do |file|
         @options[:config_file] = file
       end
       
@@ -114,6 +116,15 @@ class Application
       end
       
     end.parse!
+    
+    rescue OptionParser::InvalidOption => ex
+      puts "Error parsing command-line input: '#{ex.message}'"
+      puts "Use option '-h' to get help."
+      exit
+      
+    rescue
+      exit
+    end
     
   end
   
@@ -211,7 +222,7 @@ end
 
 if @@app.options[:run]
   if ARGV.size < 1
-    @@app.error 'A config file argument is required when you want to run the ingester'
+    Application.error 'A config file argument is required when you want to run the ingester'
     exit
   end
     
