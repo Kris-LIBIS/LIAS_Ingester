@@ -85,7 +85,7 @@ class PreIngester
     
   end
   
-  def continue( config_id )
+  def continue_config( config_id )
     
     cfg = IngestConfig.first(:id => config_id)
     
