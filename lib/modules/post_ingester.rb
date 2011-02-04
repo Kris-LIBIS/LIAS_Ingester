@@ -186,6 +186,8 @@ class PostIngester
   
   def link_ar(cfg, obj)
     return unless obj.pid
+    obj.manifestations.each { |m| link_ar cfg, m }
+    obj.children.each       { |c| link_ar cfg, c }
     ar = cfg.get_protection obj.usage_type
     return if ar.nil?
     case ar.ptype
@@ -218,12 +220,10 @@ class PostIngester
     else
       info "Linked accessright #{ar.mid} to object #{obj.pid}"
     end
-    obj.manifestations.each { |m| link_ar cfg, m }
-    obj.children.each       { |c| link_ar cfg, c }
   end
   
   def create_and_link_dc( obj, mid = nil )
-    return unless obj.metadata and obj.pid
+    return unless (obj.metadata or mid) and obj.pid
     unless mid
       result = MetaDataManager.instance.create_dc_from_xml(obj.metadata)
       result[:error].each { |e| error "Error calling web service: #{e}"}
