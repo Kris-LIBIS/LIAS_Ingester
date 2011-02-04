@@ -1,5 +1,4 @@
 require 'lib/tools/exceptions'
-require 'lib/application'
 require 'chronic_duration'
 
 module ApplicationTask
