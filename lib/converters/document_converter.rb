@@ -1,7 +1,6 @@
 require File.dirname(__FILE__) + '/converter'
 
-class DocumentConverter
-  include Converter
+class DocumentConverter < Converter
   
   protected
 

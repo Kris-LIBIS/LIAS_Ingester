@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/common/config'
-require File.dirname(__FILE__) + '/common/status'
+require_relative 'common/config'
+require_relative 'common/status'
 
 class IngestConfig
   include DataMapper::Resource
@@ -14,8 +14,8 @@ class IngestConfig
 
   # ingest options
   property    :ingest_model,    String
-  property    :media_type,      Enum[:IMAGE, :DOCUMENT, :ARCHIVE, :CONTAINER, :AUDIO, :VIDEO]
-  property    :quality,         Enum[:ARCHIVE, :HIGH, :LOW]
+  property    :media_type,      Enum[:IMAGE, :DOCUMENT, :ARCHIVE, :CONTAINER, :AUDIO, :VIDEO, :ANY]
+  property    :quality,         Enum[:ARCHIVE, :HIGH, :LOW, :STORAGE]
 
   # complex options
   property    :complex,         Boolean
@@ -36,7 +36,8 @@ class IngestConfig
   has n,      :log_entries, :child_key => :ingest_config_id
 
   before :destroy do
-    self.ingest_object.destroy
+    self.root_objects.each { |o| o.delete }
+    self.ingest_objects.clear
     self.protections.destroy
     self.log_entries.destroy
     true
@@ -72,9 +73,9 @@ class IngestConfig
     config.each do |label,value|
       case label
       when :match
-        self.filename_match = value
+        self.filename_match = Regexp.new(value)
       when :mime_type
-        self.mime_type      = value
+        self.mime_type      = Regexp.new(value)
       when :ingest_model
         value.key_strings_to_symbols!
         value.each do |k,v|
@@ -123,11 +124,11 @@ class IngestConfig
 
   def add_object( obj )
     self.ingest_objects << obj
-    obj.ingest_config = self
+#    obj.ingest_config = self
   end
 
   def del_object( obj )
-    self.ingest_objects.delete obj
+#    self.ingest_objects.delete obj
     obj.ingest_config = nil
   end
 

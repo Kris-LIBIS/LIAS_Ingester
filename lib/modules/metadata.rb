@@ -1,7 +1,9 @@
+require 'lib/application_task'
 require 'lib/libis/record'
 require 'lib/libis/search'
 
 class Metadata
+  include ApplicationTask
   
   SearchOptions = {:host => 'http://opac.libis.be/X', :target => 'Opac', :base => 'KADOC', :index => 'sig'}
   

@@ -21,7 +21,7 @@ class FileInfo
     self.file_path  = file_path
     self.mtime      = File.mtime file_path
     self.mime_type  = MimeType.get file_path
-    self.checksum_infos  << ChecksumInfo.new(file_path, checksum_type)
+    self.checksum_infos  << ChecksumInfo.new(file_path, checksum_type) if checksum_type
   end
 
   def file_name

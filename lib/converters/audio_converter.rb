@@ -1,7 +1,6 @@
-require File.dirname(__FILE__) + '/converter'
+require_relative 'converter'
 
-class AudioConverter
-  include Converter
+class AudioConverter < Converter
   
   protected
 

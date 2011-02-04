@@ -1,4 +1,5 @@
-require File.dirname(__FILE__) + '/file_checker'
+require 'lib/application_task'
+require_relative 'file_checker'
 require 'lib/tools/complex_file_collecter'
 
 class PreProcessor
@@ -6,7 +7,7 @@ class PreProcessor
   
   public
   
-  def start
+  def start_queue
     info 'Starting'
     
       run_queue = IngestRun.all(:status => Status::Initialized)
@@ -23,70 +24,91 @@ class PreProcessor
       
   end
   
-  def start_run( run_id )
+  def start( run_id )
     
-    result = []
+    begin
+      error "Run ##{run_id} not found"
+      return []
+    end unless run = IngestRun.first(:id => run_id)
     
-    if run = IngestRun.first(:id => run_id)
+    begin
       
-      if run.status == Status::Initialized
+      Application.log_to run
+      
+      case run.status
+      when Status::Idle ... Status::Initialized
+        error "Cannot yet PreProcess run ##{run_id}. Status is '#{Status.to_string(run.status)}'"
+      when Status::Initialized ... Status::PreProcessing
+        # continue
         process_run run
-        run.ingest_configs.each do |cfg|
-          result << cfg.id if cfg.status == Status::PreProcessed
-        end 
-      else
-        error "Failed to start run ##{run_id} because status is '#{Status.to_string(run.status)}'"
+      when Status::PreProcessing ... Status::PreProcessed
+        warn "Restarting PreProcess of run #{run_id} with status is '#{Status.to_string(run.status)}'"
+        restart_run run_id
+      when Status::PreProcessed .. Status::Finished
+        warn "Skipping preprocessing of run ##{run_id} because status is '#{Status.to_string(run.status)}'"
       end
+      
+    ensure
+      Application.log_end run
       
     end
     
-    result
+    collect_configs run
     
   end
   
   def undo( run_id )
     
-    cfg = IngestConfig.first(:id => config_id)
+    begin
+      error "Run ##{run_id} not found"
+      return nil
+    end unless run = IngestRun.first(:id => run_id)
     
-    if cfg.nil?
-      error "Configuration ##{config_id} not found"
+    unless Status.phase(run.status) == Status::PreProcess
+      warn "Cannot undo run ##{run_id} because status is #{Status.to_string(run.status)}."
+      return run if run.status == Status::Initialized
       return nil
     end
     
-    unless Status.phase(cfg.status) == Status.PreProcess
-      warn "Cannot undo configuration ##{config_id} because status is #{Status.to_string(cfg.status)}."
-      return cfg if cfg.status == Status::New
-      return nil
-    end
+    undo_run run
     
-    ##### TODO
-    error '\'undo\' not yet implemented'
-    return nil
-    
-    # cfg
+    run
     
   end
   
-  def restart_config( config_id )
+  def restart( run_id )
     
-    if cfg = undo(config_id)
-      info "Restarting config ##{config_id}"
-      process_config cfg, true
-      return config_id
+    if run = undo(run_id)
+      info "Restarting run ##{run_id}"
+      process_run run
+      return collect_configs(run)
     end
     
     nil
     
   end
   
-  def continue( config_id )
-    error '\'continue\' not yet implemented'
+  def continue( run_id )
+    
+    begin
+      error "Run ##{run_id} not found"
+      return []
+    end unless run = IngestRun.first(:id => run_id)
+    
+    process_run( run )
+    collect_configs run
+    
   end
   
   private
   
+  def collect_configs( run )
+    run.ingest_configs.collect { |cfg| cfg.status >= Status::PreProcessed ? cfg.id : nil }.compact
+  end
+  
   def process_run( run )
     
+    start_time = Time.now
     Application.log_to(run)
     
     info "Processing run ##{run.id}"
@@ -104,10 +126,11 @@ class PreProcessor
     
   rescue Exception => e
     run.status = Status::PreProcessFailed
-    handle_exception e
+    print_exception e
     
   ensure
     run.save
+    info "Run ##{run.id} processed. Elapsed time: #{elapsed_time(start_time)}."
     Application.log_end(run)
     
   end
@@ -136,6 +159,8 @@ class PreProcessor
     else
       # all files that matched the config criteria are now part of the config
       # these files should be removed from the run
+      # Note: do not attempt to remove them from the run set in process_object
+      # as Ruby does not allow to change a set while iterating over it
       config.ingest_run.ingest_objects -= config.ingest_objects
       config.status = Status::PreProcessed if config.check_object_status(Status::PreProcessed)
       info "Placed config ##{config.id} on the queue."
@@ -155,21 +180,27 @@ class PreProcessor
     
     Application.log_to(object)
     
+    if (object.status == Status::PreProcessed)
+      info "Skipping object ##{object.id}."
+      Application.log_end(object)
+      return
+    end
+    
     info "Processing object ##{object.id}: '#{object.file_path}'"
     object.status = Status::PreProcessing
     object.save
     
     if not(@checker.match(object))
+      debug "Object ##{object.id} did not match: #{object.message}"
       object.status = Status::New
       object.message = nil
-      debug "Object ##{object.id} did not match"
     elsif not(@checker.check(object))
       error "Object ##{object.id} failed tests: '#{object.message}'"
       object.status = Status::PreProcessFailed
     else
       debug "Object ##{object.id} passed tests"
       config.add_object(object)
-      debug "Object ##{object.id} added"
+      info "Object ##{object.id} added"
       object.status = Status::PreProcessed
       debug "Object ##{object.id} updated status"
       unless @collecter.nil? or @collecter.check(object)
@@ -184,9 +215,62 @@ class PreProcessor
     handle_exception e
     
   ensure
+    object.save
     info "Object ##{object.id} preprocessed"
     Application.log_end(object)
     
   end
   
+  def undo_run( run )
+    
+    info "Undo run ##{run.id} PreProcess."
+    
+    run.ingest_configs.each do |cfg|
+      undo_config cfg
+    end
+    
+    run.status = Status::Initialized
+    run.save
+    
+    info "Run ##{run.id} PreProcess undone."
+    
+  end
+  
+  def undo_config( cfg )
+    
+    start_time = Time.now
+    info "Undo configuration ##{cfg.id} PreProcess."
+    
+    cfg.ingest_objects.each do |obj|
+      undo_object obj
+    end
+    
+    cfg.status = Status::New
+    cfg.save
+    
+    info "Configuration ##{cfg.id} PreProcess undone. Elapsed time: #{elapsed_time(start_time)}."
+    
+  end
+  
+  def undo_object( obj )
+    
+    info "Undo object ##{obj.id} PreProcess."
+    
+    obj.children.each { |child| undo_object child }
+    
+    unless obj.usage_type == 'ORIGINAL'
+      debug "Deleting object ##{obj.id} from database"
+      obj.destroy
+      return
+    end
+    
+    debug "Returning object ##{obj.id} to run."
+    obj.get_run.add_object obj
+    obj.get_config.del_object obj
+    obj.status = Status::Initialized
+    
+    info "Object ##{obj.id} PreProcess undone."
+    
+  end
+
 end

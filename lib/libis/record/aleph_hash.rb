@@ -1,14 +1,14 @@
 module AlephHash
   def to_h
     record = {}
-    doc_number = xml_get_text(@xml_document.root.find('//doc_number'))
-    oai_marc   = @xml_document.root.find('//oai_marc').first   
+    doc_number = xml_get_text(@xml_document.root.xpath('//doc_number'))
+    oai_marc   = @xml_document.root.xpath('//oai_marc').first
     
-    fixfields = oai_marc.find('//fixfield')
-    varfields = oai_marc.find('//varfield') 
+    fixfields = oai_marc.xpath('//fixfield')
+    varfields = oai_marc.xpath('//varfield')
     
-    fixfields.each do |f|        
-      tag = f.attributes['id']      
+    fixfields.each do |f|
+      tag = f['id']
       datas = f.content
 
       record_datas = []
@@ -18,18 +18,18 @@ module AlephHash
       
       record_datas << {:ind1 => '', :ind2 => '', :subfields => {}, :datas => datas}
       record[tag] = record_datas
-    end           
+    end
     
     varfields.each do |v|
       subfields = {}
       
-      tag = v.attributes['id']
-      ind1 = v.attributes['i1']
-      ind2 = v.attributes['i2']
+      tag = v['id']
+      ind1 = v['i1']
+      ind2 = v['i2']
       
-      subfields_data = v.find('subfield')
+      subfields_data = v.xpath('subfield')
       subfields_data.each do |s|
-        subfields.store(s.attributes['label'], s.content)
+        subfields.store(s['label'], s.content)
       end
       record_datas = []
       if record.include?(tag)

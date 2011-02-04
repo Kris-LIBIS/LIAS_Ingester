@@ -99,24 +99,24 @@ class IngestSettings
 
   def write( file )
     doc = create_document
-
+    
     root = create_node('ingest_settings',
                        :namespaces => {
       :node_ns => 'xb',
       'xb' => 'http://com/exlibris/digitool/common/jobs/xmlbeans' })
     doc.root = root
-
+    
     node = create_node('transformer_task',
                        :attributes =>{
       'name' => 'Comma separated value (.csv) file',
       'class_name' => 'com.exlibris.digitool.ingest.transformer.valuebased.CsvTransformer'})
     root << node
-
+    
     node << create_node('param',
                         :attributes => { 'name' => 'template_file', 'value' => 'values.csv' })
     node << create_node('param',
                         :attributes => { 'name' => 'mapping_file', 'value' => 'mapping.xml' })
-
+    
     i = 0
     chain = create_node('tasks_chain',
                         :attributes => { 'name' => 'Task Chain' })
@@ -125,12 +125,12 @@ class IngestSettings
       i += 1
     end
     root << chain if i > 0
-
+    
     root << create_node('ingest_task',
                         :attributes => { 'name' => 'LIAS_ingester' })
-
-    doc.save file, :indent => true
-
+    
+    save_document doc, file
+    
   end
 
   def write_task( task, nr )
@@ -140,7 +140,7 @@ class IngestSettings
       'id'        => nr.to_s,
       'task_name' => task[:task_name],
       'name'      => task[:name] })
-
+    
     TaskParamOrder[task[:task_name]].each do |p|
       param = task[:params][p]
       node << create_node('param',

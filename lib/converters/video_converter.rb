@@ -1,7 +1,6 @@
-require File.dirname(__FILE__) + '/converter'
+require_relative 'converter'
 
-class VideoConverter
-  include Converter
+class VideoConverter < Converter
   
   protected
 

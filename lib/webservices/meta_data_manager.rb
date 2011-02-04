@@ -1,23 +1,14 @@
-require File.dirname(__FILE__) + '/soap_client'
+require_relative 'soap_client'
 require 'singleton'
 require 'iconv'
 
 class MetaDataManager < SoapClient
   include Singleton
-
+  
   def initialize
     super "MetaDataManager"
-#    @client.add_method 'createMetaDataEntry', 'general', 'description', 'name', 'type', 'value'
-#    @client.add_method 'updateMetaDataEntry', 'mid', 'general', 'description', 'name', 'type', 'value'
-#    @client.add_method 'deleteMetaDataEntry', 'mid', 'general'
-#    @client.add_method 'retrieveMetaDataEntry', 'mid', 'general'
-#    @client.add_method 'searchMetaData', 'general', 'name', 'type', 'searchBy', 'searchTerm', 'orderBy', 'queryFrom', 'queryTo'
   end
-
-  def get_dc(mid)
-    parse_result(@client.retrieveMetaDataEntry(mid.to_s,general.to_s))
-  end
-
+  
   def create_dc( dc )
     f = File.new('dc.out','w')
     f.syswrite(dc)
@@ -25,59 +16,42 @@ class MetaDataManager < SoapClient
     dc_string = dc.to_s
     dc_string.force_encoding("UTF-8")
     dc_string.gsub(/<\?xml[^\?]*\?>(\n)*/x,'')
-#    parse_result(@client.createMetaDataEntry(general.to_s, nil, 'descriptive', 'dc', dc.to_s))
-    response = @client.create_meta_data_entry do |soap|
-      soap.body = { :general => general.to_s, :description => nil, :name => 'descriptive', :type => 'dc', :value => dc_string }
-    end
-    parse_result(response)
+    request :create_meta_data_entry, :general => general.to_s, :description => nil, :name => 'descriptive', :type => 'dc', :value => dc_string
   end
-
+  
   def create_dc_from_xml( xml_doc )
     dc = create_dc_record_from_xml xml_doc
   end
-
+  
   def update_dc( mid, dc )
-    response = @client.update_meta_data_entry do |soap|
-      soap.body = { :mid => mid.to_s, :general => general.to_s, :description => nil, :name => 'descriptive', :type => 'dc', :value => dc.to_s}
-    end
-    parse_result(response)
+    request :update_meta_data_entry, :mid => mid.to_s, :general => general.to_s, :description => nil, :name => 'descriptive', :type => 'dc', :value => dc.to_s
   end
-
+  
   def create_acl( acl )
-    response = @client.create_meta_data_entry do |soap|
-      soap.body = { :general => general.to_s, :description => nil, :name => 'accessrights', :type => 'rights_md', :value => acl.to_s }
-    end
-    parse_result(response)
+    request :create_meta_data_entry, :general => general.to_s, :description => nil, :name => 'accessrights', :type => 'rights_md', :value => acl.to_s
   end
-
+  
   def update_acl( mid, acl )
-    response = @client.update_meta_data_entry do |soap|
-      soap.body = { :mid => mid.to_s, :general => general.to_s, :description => nil, :name => 'accessrights', :type => 'rights_md', :value => acl.to_s }
-    end
-    parse_result(response)
+    request :update_meta_data_entry, :mid => mid.to_s, :general => general.to_s, :description => nil, :name => 'accessrights', :type => 'rights_md', :value => acl.to_s
   end
-
+  
   def delete( mid )
-    response = @client.delete_meta_data_entry do |soap|
-      soap.body = { :mid => mid.to_s, :general => general.to_s }
-    end
-    parse_result(response)
+    request :delete_meta_data_entry, :mid => mid.to_s, :general => general.to_s
   end
-
+  
   def retrieve( mid )
-    response = @client.retrieve_meta_data_entry do |soap|
-      soap.body = { :mid => mid.to_s, :general => general.to_s }
-    end
-    parse_result(response)
+    request :retrieve_meta_data_entry, :mid => mid.to_s, :general => general.to_s
   end
-
+  
   def create_dc_record_from_xml(xml_doc)
-    src_doc = XML::Document.file(xml_doc)
-    records = src_doc.find('/records/record')
+    f = File.open(xml_doc)
+    src_doc = Nokogiri::XML(f)
+    f.close
+    records = src_doc.xpath('/records/record')
     return nil unless records.size > 0
     create_dc(records[0])
   end
-
+  
   def create_dc_record(dc_info)
     doc = create_document
     doc.root = create_node('record',
@@ -92,7 +66,7 @@ class MetaDataManager < SoapClient
     end
     doc
   end
-
+  
   def create_acl_record(acl_info = nil)
     doc = create_document
     doc.root = create_node('access_right_md',
@@ -112,10 +86,10 @@ class MetaDataManager < SoapClient
     end
     doc
   end
-
+  
   def add_acl_copyright(doc, text_file, required = true)
     root = doc.root
-    top = root.find('ar_copyrigths')
+    top = root.xpath('ar_copyrigths')
     if top.empty?
       top = create_node('ar_copyrights')
       root << top
@@ -123,13 +97,13 @@ class MetaDataManager < SoapClient
       top = top[0]
     end
     top['required'] = required.to_s if required
-    child = top.find('text_file')
+    child = top.xpath('text_file')
     child = child.empty? ? create_node('text_file') : top[0]
     child.content = text_file
     top << child
     doc
   end
-
+  
   def add_acl_user_group_ip(doc, user, group, iprange, negate = false)
     expressions = []
     user.split.each {|u| expressions << create_acl_expression_user(u)} if user
@@ -137,28 +111,28 @@ class MetaDataManager < SoapClient
     iprange.split.each {|i| expressions << create_acl_expression_iprange(i)} if iprange
     add_acl_condition(doc,expressions,negate)
   end
-
+  
   def add_acl_user(doc, user, negate = false)
     expressions = Array.new
     user.split.each {|u| expressions << create_acl_expression_user(u)}
     add_acl_condition doc, expressions
   end
-
+  
   def add_acl_group(doc, group, negate = false)
     expressions = Array.new
     group.split.each {|g| expressions << create_acl_expression_group(g)}
     add_acl_condition doc, expressions
   end
-
+  
   def add_acl_iprange(doc, iprange, negate = false)
     expressions = Array.new
     iprange.split.each {|i| expressions << create_acl_expression_iprange(i)}
     add_acl_condition doc, expressions
   end
-
+  
   def add_acl_condition(doc, expressions, negate = false)
     root = doc.root
-    top = root.find('ar_conditions')
+    top = root.xpath('ar_conditions')
     if (top.empty?)
       top = create_node('ar_conditions')
       root << top
@@ -178,7 +152,7 @@ class MetaDataManager < SoapClient
     end
     doc
   end
-
+  
   def create_acl_expression_user(user, negate = false)
     { :operation  => 'eq',
       :negate     => negate.to_s,
@@ -186,7 +160,7 @@ class MetaDataManager < SoapClient
       :val1       => user.to_s
     }
   end
-
+  
   def create_acl_expression_group(group, negate = false)
     { :operation  => 'eq',
       :negate     => negate.to_s,
@@ -194,7 +168,7 @@ class MetaDataManager < SoapClient
       :val1       => group.to_s
     }
   end
-
+  
   def create_acl_expression_iprange(iprange, negate = false)
     return nil unless iprange =~ /(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)/
     { :operation  => 'within',
@@ -204,5 +178,6 @@ class MetaDataManager < SoapClient
       :val2       => $2
     }
   end
-
+  
 end
+

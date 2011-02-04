@@ -1,0 +1,2 @@
+class AbortException < StandardError
+end

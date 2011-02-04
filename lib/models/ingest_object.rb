@@ -1,5 +1,6 @@
 require 'dm-is-tree'
-require File.dirname(__FILE__) + '/common/status'
+require 'fileutils'
+require_relative 'common/status'
 
 class IngestObject
   include DataMapper::Resource
@@ -12,6 +13,7 @@ class IngestObject
   property    :label,           String#, :index => :label_idx
   property    :usage_type,      String#, :index => :usage_type_idx
   property    :metadata,        FilePath
+  property    :metadata_mid,    Integer
 
   property    :file_stream,     FilePath
   property    :vpid,            String#, :index => :vpid_idx
@@ -30,17 +32,15 @@ class IngestObject
   belongs_to  :ingest_run,      :required => false
   belongs_to  :ingest_config,   :required => false
   belongs_to  :master,          :model => "IngestObject", :child_key => :master_id, :required => false
-
+  
   before :destroy do
-    self.file_info.destroy
-    self.children.destroy
     self.manifestations.destroy
-    self.log_entries.destroy
+    self.clear_filestream
+    self.clear_metadata
+    self.file_info.destroy if self.file_info
+    self.log_entries.destroy if self.log_entries
+    self.children.clear
     true
-  end
-
-  before :save do
-#    self.debug_print
   end
   
   after :status= do
@@ -48,6 +48,21 @@ class IngestObject
   end
 
   public
+  
+  def delete
+    self.children.destroy
+    self.destroy
+  end
+  
+  def clear_filestream
+    FileUtils.rm(self.file_stream) if self.file_stream and File.exists?(self.file_stream)
+    self.file_stream = nil
+  end
+  
+  def clear_metadata
+    FileUtils.rm(self.metadata) if self.metadata and File.exists?(self.metadata)
+    self.metadata = nil
+  end
   
   def get_config
     return self.ingest_config unless self.parent

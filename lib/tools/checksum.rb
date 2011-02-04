@@ -2,6 +2,8 @@ require 'digest/md5'
 require 'digest/sha1'
 require 'digest/sha2'
 
+require 'lib/tools/exceptions'
+
 class Checksum
   ChecksumTypes = [:MD5, :SHA1, :SHA256, :SHA384, :SHA512]
   ChecksumTypesString = %w(MD5 SHA1 SHA256 SHA384 SHA512)
@@ -10,7 +12,7 @@ class Checksum
   attr :type, :hasher
 
   def initialize(type)
-    throw StandardError.new("Checksum: bad checksum type: '#{type}' - should be one of #{ChecksumTypes.inspect}") unless ChecksumTypes.include? type
+    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{ChecksumTypes.inspect}") unless ChecksumTypes.include? type
     @type   = type
     @hasher = case type
              when :MD5
@@ -32,7 +34,7 @@ class Checksum
   end
 
   def self.type_to_string(type)
-    throw StandardError.new("Checksum: bad checksum type: '#{type}' - should be one of #{ChecksumTypes.inspect}") unless ChecksumTypes.include? type
+    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{ChecksumTypes.inspect}") unless ChecksumTypes.include? type
     return ChecksumTypesString[ChecksumTypes.index(type)]
   end
 

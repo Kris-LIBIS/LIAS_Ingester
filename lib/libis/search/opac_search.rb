@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'xml/libxml'
+require 'nokogiri'
 require File.dirname(__FILE__) + '/generic_search'
 require 'pp'
 require 'lib/tools/hash'
@@ -23,9 +23,9 @@ class OpacSearch < GenericSearch
     
     response = execute_http_query("op=find&code=#{@index}&request=#{@term}&base=#{@base}")
     if response
-      @set_number = xml_get_text(response.find('//find/set_number'))
-      @num_records = xml_get_text(response.find('//find/no_records')).to_i
-      @session_id = xml_get_text(response.find('//find/session-id'))    
+      @set_number = xml_get_text(response.xpath('//find/set_number'))
+      @num_records = xml_get_text(response.xpath('//find/no_records')).to_i
+      @session_id = xml_get_text(response.xpath('//find/session-id'))    
     end
     
   end
@@ -48,11 +48,11 @@ class OpacSearch < GenericSearch
         response = execute_http_query("op=present&set_entry=#{@record_pointer}&set_number=#{@set_number}&base=#{@base}")
         
         if response
-          response.root << element = XML::Node.new('search')
+          response.root << element = Nokogiri::XML::Node.new('search', response)
           element['type'] = 'opac'
           element['host'] = @host
           element['base'] = @base
-          set_entry  = xml_get_text(response.root.find('//set_entry')).to_i
+          set_entry  = xml_get_text(response.root.xpath('//set_entry')).to_i
           if set_entry == @record_pointer
             add_item_data(response)
             yield response
@@ -71,11 +71,10 @@ private
 
   def str_to_xml(str)
     error = ''
-    xml_parser = XML::Parser.string(str)
-    xml_document  = xml_parser.parse
+    xml_document = Nokogiri::XML(str)
 
     if xml_document
-      error = xml_get_text(xml_document.find('//error'))
+      error = xml_get_text(xml_document.xpath('//error'))
     end
 
     return xml_document, error
@@ -93,31 +92,31 @@ private
   
   def add_item_data(xml_document)
     
-    doc_number = xml_get_text(xml_document.root.find('//doc_number'))
+    doc_number = xml_get_text(xml_document.root.xpath('//doc_number'))
     response = execute_http_query("op=item-data&base=#{@base}&doc-number=#{doc_number}")
     
     if response
-      oai_marc = xml_document.root.find('//oai_marc').first
+      oai_marc = xml_document.root.xpath('//oai_marc').first
       
-      response.root.find('//item').each do |r| 
-        collection     = r.find('//collection').first.content
-        location       = r.find('//sub-library').first.content
-        classification = r.find('//call-no-1').first.content
+      response.root.xpath('//item').each do |r| 
+        collection     = r.xpath('//collection').first.content
+        location       = r.xpath('//sub-library').first.content
+        classification = r.xpath('//call-no-1').first.content
         
-         varfield = XML::Node.new('varfield')
+         varfield = Nokogiri::XML::Node.new('varfield', xml_document)
          varfield['id'] = '852'
          varfield['i1'] = ' '
          varfield['i2'] = ' '
          
-         subfield_b = XML::Node.new('subfield')
+         subfield_b = Nokogiri::XML::Node.new('subfield', xml_document)
          subfield_b['label'] = 'b'
          subfield_b.content = collection
 
-         subfield_c = XML::Node.new('subfield')
+         subfield_c = Nokogiri::XML::Node.new('subfield', xml_document)
          subfield_c['label'] = 'c'
          subfield_c.content = location
 
-         subfield_h = XML::Node.new('subfield')
+         subfield_h = Nokogiri::XML::Node.new('subfield', xml_document)
          subfield_h['label'] = 'h'
          subfield_h.content = classification.gsub('$$h', '')
                   
@@ -140,12 +139,17 @@ private
     begin
       xml_document = nil
       redo_search = false
-      response = Net::HTTP.fetch(@host, :data => data, :action => :post)
-    
+      redo_count = 10
+      begin
+        redo_count = redo_count - 1
+        sleep_time = 0.1 # in minutes
+        
+        response = Net::HTTP.fetch(@host, :data => data, :action => :post)
+   
       if response.is_a?(Net::HTTPOK)
         xml_document, error = str_to_xml(response.body)
         if xml_document && error.size == 0
-          #puts " Found #{xml_get_text(xml_document.find('//find/no_records'))} records"
+          #puts " Found #{xml_get_text(xml_document.xpath('//find/no_records'))} records"
           nil
         else
           puts
@@ -153,13 +157,25 @@ private
           puts
           if error =~ /license/
             redo_search = true
-            sleep 5
           end          
         end
       else
         puts response.error!
       end
-    end until redo_search == false
+      rescue Exception => ex
+        sleep_time = 2
+        if ex.message =~ /503 "Service Temporarily Unavailable"/
+          sleep_time = 30
+          Application.warn('OPAC_Search') {"OPAC Service temporarily unavailable - retrying after #{sleep_time} minutes"}
+        else
+          Application.error('OPAC_Search') {"Problem with OPAC: '#{ex.message}' - retrying after #{sleep_time} minutes"}
+        end
+        redo_search = true
+      end
+        
+      sleep sleep_time * 60 if redo_search
+      
+    end until redo_search == false or redo_count < 0
     
     return xml_document
   end

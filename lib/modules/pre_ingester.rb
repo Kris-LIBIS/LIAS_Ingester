@@ -1,19 +1,20 @@
+require 'lib/application_task'
 require 'lib/ingest_models/model_factory'
 require 'lib/tools/ingest_settings'
 require 'lib/tools/csv_file'
-require File.dirname(__FILE__) + '/metadata'
+require_relative 'metadata'
 
 class PreIngester
   include ApplicationTask
   
-  def start
+  def start_queue
     info 'Starting'
     
     cfg_queue = IngestConfig.all(:status => Status::PreProcessed)
     
     cfg_queue.each do |cfg|
       
-      process_config cfg if cfg.status == Status::PreProcessed
+      process_config cfg, false
       
     end # cfg_queue.each
     
@@ -25,28 +26,46 @@ class PreIngester
     
   end
   
-  def start_config( config_id )
+  def start( config_id )
     
-    cfg = IngestConfig.first(:id => config_id)
-    
-    if cfg.nil?
+    begin
       error "Configuration ##{config_id} not found"
       return nil
+    end unless cfg = IngestConfig.first(:id => config_id)
+    
+    begin
+      
+      Application.log_to cfg.ingest_run
+      Application.log_to cfg
+      
+      case cfg.status
+      when Status::Idle ... Status::PreProcessed
+        # Oops! Not yet ready.
+        error "Cannot yet PreIngest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+      when Status::PreProcessed ... Status::PreIngesting
+        # Excellent! Continue ...
+        process_config cfg, false
+      when Status::PreIngesting ... Status::PreIngested
+        info "PreIngest of configuration ##{config_id} failed the last time. The current status is unreliable, so we restart."
+        process_config cfg, false
+      when Status::PreIngested ... Status::Ingesting
+        if cfg.root_objects.all? { |obj| obj.status >= Status::PreIngested }
+          warn "Skipping PreIngest of configuration ##{config_id} because all objects are PreIngested."
+        else
+          info "Continuing PreIngest of configuration #{config_id}. Some objects are not yet PreIngested."
+          continue cfg
+        end
+      when Status::Ingesting .. Status::Finished
+        warn "Skipping PreIngest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+      end
+      
+    ensure
+      Application.log_end cfg
+      Application.log_end cfg.ingest_run
+      
     end
     
-    if cfg.status == Status::PreProcessed
-      # continue
-    elsif cfg.status == Status::PreIngestFailed
-      warn "Configuration ##{config_id} failed before and will now be restarted"
-      # continue
-    elsif cfg.status >= Status::PreIngested
-      warn "Configuration ##{config_id} allready finished PreIngesting."
-      return config_id
-    end
-    
-    process_config cfg, false
-    
-    return config_id
+    config_id
     
   end
   
@@ -59,25 +78,29 @@ class PreIngester
       return nil
     end
     
-    unless Status.phase(cfg.status) == Status.PreIngest
-      warn "Cannot undo configuration ##{config_id} because status is #{Status.to_string(cfg.status)}."
+    unless Status.phase(cfg.status) == Status::PreIngest
+      Application.log_to cfg.ingest_run
+      Application.log_to cfg
+      warn "Cannot undo configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+      Application.log_end cfg
+      Application.log_end cfg.ingest_run
       return cfg if cfg.status == Status::PreProcessed
       return nil
     end
     
-    ##### TODO
-    warn "\'undo\' not yet implemented"
-    return nil
-    
-    # cfg
+    undo_config cfg
     
   end
   
-  def restart_config( config_id )
+  def restart( config_id )
     
     if cfg = undo(config_id)
+      Application.log_to cfg.ingest_run
+      Application.log_to cfg
       info "Restarting config ##{config_id}"
       process_config cfg, false
+      Application.log_end cfg
+      Application.log_end cfg.ingest_run
       return config_id
     end
     
@@ -85,7 +108,7 @@ class PreIngester
     
   end
   
-  def continue_config( config_id )
+  def continue( config_id )
     
     cfg = IngestConfig.first(:id => config_id)
     
@@ -94,17 +117,27 @@ class PreIngester
       return nil
     end
     
-    if cfg.status == Status::PreProcessed
-      # continue
-    elsif cfg.status == Status::PreIngestFailed
-      warn "Configuration ##{config_id} failed before and will now be restarted"
-      # continue
-    elsif cfg.status >= Status::PreIngested
-      warn "Configuration ##{config_id} allready finished PreIngesting."
-      return config_id
+    begin
+      
+      Application.log_to cfg.ingest_run
+      Application.log_to cfg
+      
+      case cfg.status
+      when Status::Idle ... Status::PreProcessed
+        error "Configuration ##{config_id} not yet ready for PreIngest. Status is '#{Status.to_string(cfg.status)}'."
+        config_id = nil
+      when Status::PreProcessed .. Status::PreIngested
+        # OK, continue the PreIngest
+        continue cfg
+      else
+        warn "Configuration ##{config_id} allready finished PreIngesting."
+      end
+      
+    ensure
+      Application.log_end cfg
+      Application.log_end cfg.ingest_run
+      
     end
-    
-    process_config cfg, true
     
     return config_id
     
@@ -112,8 +145,15 @@ class PreIngester
   
   private
   
+  
+  def continue( cfg )
+    process_config cfg, true
+  end
+  
   def process_config( cfg, continue = false )
     
+    start_time = Time.now
+    Application.log_to cfg.ingest_run
     Application.log_to(cfg)
     info "Processing config ##{cfg.id}"
     
@@ -142,15 +182,18 @@ class PreIngester
     
     finalize_ingest cfg
     
+    cfg.status = Status::PreIngested
+    
   rescue Exception => e
     cfg.status = Status::PreIngestFailed
     handle_exception e
     
   ensure
-    cfg.status = Status::PreIngested
     cfg.save
     warn "#{failed_objects.size} objects failed during Pre-Ingest" unless failed_objects.empty?
+    info "Config ##{cfg.id} processed. Elapsed time: #{elapsed_time(start_time)}."
     Application.log_end cfg
+    Application.log_end cfg.ingest_run
     
   end # process_config
   
@@ -307,7 +350,7 @@ class PreIngester
           converter.type2ext(format)
         converter.watermark manifestation.file_stream, new_file, wm_file
         info "Created file #{new_file} for watermark protection of #{manifestation.usage_type}"
-        File.delete(manifestation.file_stream)
+#        File.delete(manifestation.file_stream)
         manifestation.file_stream = new_file
       else
         error 'Watermark requested, but not supported for the file type'
@@ -327,6 +370,32 @@ class PreIngester
     object.manifestations.each { |obj| add_to_csv obj }
     object.children.each       { |obj| add_to_csv obj }
     object.save
+  end
+  
+  def undo_config( cfg )
+    start_time = Time.now
+    info "Undo configuration ##{cfg.id} PreIngest."
+    cfg.root_objects.each do |obj|
+      undo_object obj
+    end
+    FileUtils.rm_r("#{cfg.ingest_dir}", :force => true)
+    cfg.ingest_dir = nil
+    cfg.status = Status::PreProcessed
+    cfg.save
+    info "Configuration ##{cfg.id} PreIngest undone. Elapsed time: #{elapsed_time(start_time)}."
+    cfg
+  end
+  
+  def undo_object( obj )
+    info "Undo object ##{obj.id} PreIngest."
+    obj.vpid = nil
+    obj.children.each { |child| undo_object child }
+    obj.manifestations.each { |m| m.delete }
+    obj.status = Status::PreProcessed
+    obj.clear_metadata
+    obj.clear_filestream
+    obj.save
+    info "Object ##{obj.id} PreIngest undone."
   end
   
 end

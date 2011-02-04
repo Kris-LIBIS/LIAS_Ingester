@@ -1,5 +1,11 @@
-module Converter
+class Converter
 
+  @@converters = []
+  
+  def self.inherited( klass )
+    @@converters << klass
+  end
+  
   def type2mime(t)
     return @type2mime_map[t]
   end
@@ -9,17 +15,14 @@ module Converter
   end
 
   def mime2type(mime)
-    @type2mime_map.each do |k,v|
-      return k if (v == mime)
-    end
-    return nil
+    @type2mime_map.revert[mime]
   end
 
   def ext2type(ext)
     @type2ext_map.each do |k,v|
       return k if v.include? ext
     end
-    return nil
+    nil
   end
 
   def initialize(source)
@@ -28,6 +31,14 @@ module Converter
 
   def convert(target, format = nil)
     do_convert(target, format)
+  end
+  
+  def support_mimetype?(mimetype)
+    @type2mime_map.has_value? mimetype
+  end
+  
+  def support_extension?(extension)
+    ext2type extension
   end
 
   protected

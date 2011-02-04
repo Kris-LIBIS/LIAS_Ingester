@@ -7,9 +7,13 @@ end
 class IngestModel
 
   attr_reader :config
+  attr_reader :converters
 
   def initialize(config)
     @config = config
+    @@logger.debug(self.class) {"Creating ingest model: #{config}"}
+    @converters = {}
+    
   end
 
   def get_manifestation(manifestation)
@@ -41,7 +45,12 @@ class IngestModel
   end
 
   def get_converter(file)
+    
     case @config[:MEDIA]
+    when :ANY
+      mime_type = MimeType.get(file)
+      converter = Converter.converters.detect { |c| c.support_mimetype? mime_type }
+      return converter.new(file) if converter
     when :IMAGE
       return ImageConverter.new(file)
     when :AUDIO

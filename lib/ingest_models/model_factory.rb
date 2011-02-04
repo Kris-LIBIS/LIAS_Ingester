@@ -1,6 +1,6 @@
 require 'singleton'
 require 'yaml'
-require File.dirname(__FILE__) + '/ingest_model'
+require_relative 'ingest_model'
 
 class ModelFactory
   include Singleton
@@ -29,7 +29,7 @@ class ModelFactory
   def initialize
     @models = {}
     Dir.glob("#{Application.dir}/config/ingest_models/*.yaml").each do |m|
-#      @@logger.info "Loading ingest model: #{m}"
+      @@logger.debug(self.class) {"Loading ingest model: #{m}"}
       model = YAML.load(File.open(m))
       @models[model[:NAME].downcase] = model
     end

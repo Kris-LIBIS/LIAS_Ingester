@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/common/config'
-require File.dirname(__FILE__) + '/common/status'
+require_relative 'common/config'
+require_relative 'common/status'
 
 class IngestRun
   include DataMapper::Resource
@@ -40,6 +40,13 @@ class IngestRun
   end
 
   public
+  
+  def reset
+    self.ingest_configs.destroy
+    self.ingest_objects.destroy
+    self.protections.destroy
+    self.log_entries.destroy
+  end
 
   def init(config_file)
 
@@ -69,22 +76,22 @@ class IngestRun
     
     if config[:common]
       config[:common].key_strings_to_symbols!
-      config[:common].each do |k,v|
-        case k
+      config[:common].each do |k1,v1|
+        case k1
         when :packaging
-          v.key_strings_to_symbols!
-          v.each do |k,v|
-            case k
+          v1.key_strings_to_symbols!
+          v1.each do |k2,v2|
+            case k2
             when :type
-              self.packaging  = v.upcase.to_sym
+              self.packaging  = v2.upcase.to_sym
             when :location
-              self.location   = v
+              self.location   = v2
             when :recursive
-              self.recursive  = v
+              self.recursive  = v2
             when :selection
-              self.selection  = v
+              self.selection  = Regexp.new(v2)
             else
-              Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
+              Application.warn('Configuration') { "Ongekende optie '#{k2.to_s}' opgegeven in sectie '#{label.to_s}'" }
             end # case
           end # v.each
         end # case
@@ -106,11 +113,11 @@ class IngestRun
 
   def add_object( object )
     self.ingest_objects << object
-    object.ingest_run = self
+#    object.ingest_run = self
   end
 
   def del_object( object )
-    self.ingest_objects.delete object
+#    self.ingest_objects.delete object
     object.ingest_run = nil
   end
 

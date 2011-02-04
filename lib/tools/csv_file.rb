@@ -113,7 +113,7 @@ class CsvFile
 
     root << create_mapping('1','stream_ref/file_id')
 
-    doc.save file, :indent => true
+    save_document doc, file
 
   end
 

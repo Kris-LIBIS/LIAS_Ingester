@@ -1,20 +1,20 @@
 module AlephSequential
   def to_aseq
     record = ''
-    doc_number = xml_get_text(@xml_document.root.find('//doc_number'))
-    oai_marc   = @xml_document.root.find('//oai_marc').first    
+    doc_number = xml_get_text(@xml_document.root.xpath('//doc_number'))
+    oai_marc   = @xml_document.root.xpath('//oai_marc').first    
 
-    fixfields = oai_marc.find('//fixfield')
-    varfields = oai_marc.find('//varfield')
+    fixfields = oai_marc.xpath('//fixfield')
+    varfields = oai_marc.xpath('//varfield')
 
     fixfields.each do |f|        
-      record += "#{format("%09s",doc_number)} #{f.attributes['id']}   L #{f.content}\n"
+      record += "#{format("%09s",doc_number)} #{f['id']}   L #{f.content}\n"
     end
     varfields.each do |v|
-      head = "#{format("%09s",doc_number)} #{v.attributes['id']}#{v.attributes['i1']}#{v.attributes['i2']} L "
-      subfields = v.find('subfield')
+      head = "#{format("%09s",doc_number)} #{v['id']}#{v['i1']}#{v['i2']} L "
+      subfields = v.xpath('subfield')
       subfields.each do |s|
-        head += "$$#{s.attributes['label']}#{s.content}"
+        head += "$$#{s['label']}#{s.content}"
       end
       record += head + "\n"
     end    

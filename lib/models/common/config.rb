@@ -2,8 +2,8 @@ require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
 require 'lib/tools/hash'
-require File.dirname(__FILE__) + '/bad_config_exception'
-require File.dirname(__FILE__) + '/status'
+require_relative 'bad_config_exception'
+require_relative 'status'
 
 module CommonConfig
 
@@ -126,7 +126,7 @@ module CommonConfig
               when :base
                 self.search_base    = v
               when :match
-                self.search_match   = v
+                self.search_match   = Regexp.new(v)
               when :term
                 self.search_term    = v
               when :file

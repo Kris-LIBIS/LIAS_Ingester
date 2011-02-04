@@ -7,27 +7,44 @@ require 'dm-migrations'
 require File.dirname(__FILE__) + '/config_file'
 
 class Database
+  attr_reader :db_engine
   attr_reader :handle
   attr_reader :logger
 
   def info(msg)
     @logger << "INFO -- Database: #{msg}" if @logger && @logger.level <= DataMapper::Logger::Levels[:info]
   end
-  
+
+  def error(msg)
+    @logger << "INFO -- Database: #{msg}" if @logger && @logger.level <= DataMapper::Logger::Levels[:error]
+  end
+    
   def initialize
     new_db = false
     if ConfigFile['db_logging']
       lvl = :warn
       lvl = ConfigFile['db_logging_level'].to_s.downcase.to_sym if ConfigFile['db_logging_level']
-      @logger = DataMapper::Logger.new STDOUT
-      @logger.set_log(STDOUT, lvl, '', true)
+      @logger = DataMapper::Logger.new('db_log.txt', lvl, '', true)
+#      @logger.set_log(STDOUT, lvl, '', true)
     end
-    DataMapper.setup(:default, "sqlite3://#{ConfigFile['database']}")
-    new_db = true unless File.exist?("#{ConfigFile['database']}")
-#    DataMapper.setup(:default, {:adapter => 'oracle', :user => 'ingester', :password => 'ingester', :host => 'aleph08', :port => 1521, :database => '/dtl3'} )
+    @db_engine = ConfigFile['db_engine'] || 'SQLITE3'
+    @db_engine = @db_engine.to_s.downcase.to_sym
+    case @db_engine
+    when :sqlite3
+      DataMapper.setup(:default, "sqlite3://#{ConfigFile['database']}")
+      new_db = true unless File.exist?("#{ConfigFile['database']}")
+      @handle = SQLite3::Database.new("#{ConfigFile['database']}")
+      puts "Database set to SQLite3 '#{ConfigFile['database']}'"
+    when :oracle
+      DataMapper.setup(:default, {:adapter => 'oracle', :user => ConfigFile['db_user'], :password => ConfigFile['db_password'], :host => ConfigFile['db_host'], :port => 1521, :database => ConfigFile['db_database']} )
+      puts "Database set to ORACLE"
+    when :redis
+      DataMapper.setup(:default, {:adapter => 'redis', :host => ConfigFile['db_host'], :port => 6379, :thread_safe => true})
+      puts "Database set to REDIS"
+    else
+      puts $STDERR, "Unknown engine type: '#{@db_engine}'"
+    end
     
-    @handle = SQLite3::Database.new("#{ConfigFile['database']}")
-
     DataMapper::Model.raise_on_save_failure = true
     
     load_models
@@ -54,7 +71,7 @@ class Database
 private
 
   def load_models
-    if @handle
+   if @db_engine != :sqlite3 || @handle
       dir = File.dirname(__FILE__) + '/../models'
       dir = File.absolute_path(dir)
       models = Dir.glob("#{dir}/*.rb")
@@ -63,7 +80,7 @@ private
         require "#{m}"
       end
     else
-      raise "No database handle found. Cannot load models"
-    end
+       raise "No database handle found. Cannot load models"
+   end
   end
 end

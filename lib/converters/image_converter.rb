@@ -1,10 +1,9 @@
 require 'rubygems'
 require 'quick_magick'
 require 'RMagick'
-require File.dirname(__FILE__) + '/converter'
+require_relative 'converter'
 
-class ImageConverter
-  include Converter
+class ImageConverter < Converter
 
   attr_reader :work
 
@@ -25,12 +24,11 @@ class ImageConverter
   end
 
   def create_watermark(text, dir, usage_type)
- 
+    
     file = get_watermark_file(dir, usage_type)
     return file if File.exist?(file)
-
+    
     watermark = Magick::Image.new(1000, 1000) { self.background_color = 'transparent' }
-
     
     gc = Magick::Draw.new
     gc.fill = 'black'
@@ -40,7 +38,7 @@ class ImageConverter
     gc.font_family = "Helvetica"
     gc.font_weight = Magick::BoldWeight
     gc.stroke = 'none'
-    gc.rotate -20
+    gc.rotate(-20)
     gc.text 0, 0, (text.nil? ? ' (C) LIBIS' : text)
     
     gc.draw watermark
@@ -49,31 +47,14 @@ class ImageConverter
     watermark = watermark.blur_image 2.0, 1.0
 
     watermark.write('png:' + file)
-
+    
     file
-
+    
   end
 
   def watermark(source, target, watermark_image)
-
+    
     `#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/run_watermarker2.sh #{source} #{target} #{watermark_image} X2`
-    return
-    watermark = Magick::Image.read(watermark_image).first
-    watermark = watermark.transparent('white',Magick::TransparentOpacity)
-
-    image = Magick::Image.read(source).first
-    image_width  = image.columns
-    image_height = image.rows
-
-    width = image_width
-    width = image_height if image_width > image_height
-
-    canvas = Magick::Image.new(image_width, image_height)
-    watermark.resize_to_fit!(width)
-    canvas.composite_tiled!(watermark, Magick::OverCompositeOp)
-
-    image.watermark(canvas, 0.05, 0.25, Magick::CenterGravity).write(target)
-
   end
 
   protected

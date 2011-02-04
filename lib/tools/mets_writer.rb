@@ -32,17 +32,18 @@ class METSWriter
   end
 
   def add_file(file_name, label, usage_type, entity_type = nil, extra_options = {})
-    return nil unless object.file_info
-    file_group = @references
-    case object.usage_type
-    when /ORIGINAL$/i
-      file_group = @archives
-    when 'ARCHIVE'
-      file_group = 
-
-
+    # TODOOOOO
+#    return nil unless object.file_info
+#    file_group = @references
+#    case object.usage_type
+#    when /ORIGINAL$/i
+#      file_group = @archives
+#    when 'ARCHIVE'
+#      file_group =
+  end
+  
   def write(file_name)
-    @document.save file_name, :indent => true
+    save_document @document, file_name
   end
 
 end
