@@ -1,5 +1,5 @@
 require 'csv'
-require File.dirname(__FILE__) + '/xml_writer'
+require_relative 'xml_writer'
 
 class CsvFile
   include XmlWriter
@@ -90,31 +90,37 @@ class CsvFile
 
   def write_mapping( file )
     doc = create_document
-
+    
     root = create_node('x_mapping',
                        :namespaces => { :node_ns  =>  'tm',
                                         'tm'      =>  'http://com/exlibris/digitool/repository/transMap/xmlbeans'
                                       },
                        :attributes => { 'start_from_line' => '2' }
                       )
-
+    
     doc.root = root
-
+    
     stream_map = create_node 'x_map'
     stream_map << create_text_node('x_target', 'stream_ref')
     stream_map << create_text_node('x_attr',   'store_command')
     stream_map << create_text_node('x_default','copy')
-
+    
     root << stream_map
-
+    
+    stream_map = create_node 'x_map'
+    stream_map << create_text_node('x_target', 'stream_ref/directory_path')
+    stream_map << create_text_node('x_default','default')
+    
+    root << stream_map
+    
     0.upto(FixedHeader.size - 1) do |n|
       root << create_mapping( (n+1).to_s, FixedMapping[n] )
     end
-
-    root << create_mapping('1','stream_ref/file_id')
-
+    
+    root << create_mapping('4','stream_ref/file_id')
+    
     save_document doc, file
-
+    
   end
 
 end

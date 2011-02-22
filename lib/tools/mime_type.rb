@@ -6,6 +6,7 @@ class MimeType
       x =  %x(identify -format "%m" #{file_path}).split[0].strip
       result = 'image/jp2' if x.eql?('JP2')
     end
+    result = result[0...-1] if result[-1] == ';'
     result
   end
   

@@ -36,7 +36,7 @@ class ModelFactory
   end
 
   def get_model1(description)
-    return IngestModel.new(@models[description.downcase])
+    return ( IngestModel.new @models[description.downcase] )
   end
 
   def get_model2(media, quality)

@@ -1,7 +1,6 @@
 require 'lib/application_task'
 require 'lib/ingest_models/model_factory'
-require 'lib/tools/ingest_settings'
-require 'lib/tools/csv_file'
+require 'lib/tools/ingester_setup'
 require_relative 'metadata'
 
 class PreIngester
@@ -128,7 +127,7 @@ class PreIngester
         config_id = nil
       when Status::PreProcessed .. Status::PreIngested
         # OK, continue the PreIngest
-        continue cfg
+        process_config cfg, true
       else
         warn "Configuration ##{config_id} allready finished PreIngesting."
       end
@@ -144,11 +143,6 @@ class PreIngester
   end
   
   private
-  
-  
-  def continue( cfg )
-    process_config cfg, true
-  end
   
   def process_config( cfg, continue = false )
     
@@ -174,7 +168,7 @@ class PreIngester
       
       process_object obj if valid_states.include?(obj.status)
       
-      add_to_csv obj if obj.status == Status::PreIngested
+      add_to_ingest obj if obj.status == Status::PreIngested
       
       failed_objects << obj if obj.status == Status::PreIngestFailed
       
@@ -186,7 +180,7 @@ class PreIngester
     
   rescue Exception => e
     cfg.status = Status::PreIngestFailed
-    handle_exception e
+    print_exception e
     
   ensure
     cfg.save
@@ -237,19 +231,12 @@ class PreIngester
   
   def setup_ingest( cfg, clear_dir )
     setup_ingest_dir cfg, clear_dir
-    create_ingest_settings cfg
+    create_ingester_setup cfg
   end
   
   def finalize_ingest( cfg )
     
-    # write ingest_settings
-    @ingest_settings.write cfg.ingest_dir + '/ingest_settings.xml'
-    
-    # write csv file
-    @csv.write "#{cfg.ingest_dir}/transform/values.csv"
-    
-    # write mapping file
-    @csv.write_mapping "#{cfg.ingest_dir}/transform/mapping.xml"
+    @ingester_setup.finalize_setup cfg.ingest_dir
     
   end
   
@@ -286,11 +273,10 @@ class PreIngester
     
   end
   
-  def create_ingest_settings( cfg )
-    info 'Preparing ingest settings'
-    @ingest_settings = IngestSettings.new
-    @ingest_settings.add_control_fields cfg.get_control_fields, ''
-    @csv = CsvFile.new
+  def create_ingester_setup( cfg )
+    info 'Preparing ingester setup'
+    @ingester_setup = IngesterSetup.new
+    @ingester_setup.add_control_fields cfg.get_control_fields, ''
   end
   
   def get_metadata( object )
@@ -308,7 +294,8 @@ class PreIngester
   def copy_stream( object )
     if object.file_info
       info "Copying original stream '#{object.file_path}'"
-      object.file_stream = "#{object.get_config.ingest_dir}/transform/streams/#{object.file_name}"
+      object.file_stream = "#{object.get_config.ingest_dir}/transform/streams/#{object.flattened_relative}"
+#      FileUtils.mkdir_p File.dirname(object.file_stream)
       FileUtils.cp_r object.file_path, object.file_stream
     end
     object.children.each { |child| copy_stream child }
@@ -321,7 +308,7 @@ class PreIngester
       file = model.create_manifestation object, m, "#{cfg.ingest_dir}/transform/streams/"
       if file
         info "Created manifestation file: #{file}"
-        mobj = IngestObject.new
+        mobj = IngestObject.new file, :MD5
         mobj.file_stream = file
         mobj.usage_type = m
         mobj.label = object.label
@@ -340,8 +327,8 @@ class PreIngester
     object.manifestations.each do |manifestation|
       p = cfg.get_protection(manifestation.usage_type)
       next unless p and p.ptype == :WATERMARK # only watermark protection is done at this stage
-      format = model.get_manifestation(manifestation.usage_type)[:FORMAT]
       converter = model.get_converter manifestation.file_stream
+      format = model.get_manifestation(manifestation.usage_type, converter.media_type)[:FORMAT]
       if converter.respond_to?(:watermark)
         wm_file = p.pinfo
         wm_file = converter.create_watermark(p.pinfo, cfg.ingest_dir, manifestation.usage_type) unless File.exist?(wm_file)
@@ -350,8 +337,9 @@ class PreIngester
           converter.type2ext(format)
         converter.watermark manifestation.file_stream, new_file, wm_file
         info "Created file #{new_file} for watermark protection of #{manifestation.usage_type}"
-#        File.delete(manifestation.file_stream)
+        File.delete(manifestation.file_stream)
         manifestation.file_stream = new_file
+        manifestation.file_info.file_path = new_file if manifestation.file_info
       else
         error 'Watermark requested, but not supported for the file type'
       end
@@ -359,17 +347,25 @@ class PreIngester
     object.children.each { |child| create_watermark child }
   end
   
-  def add_to_csv( object )
+  def add_to_ingest( object )
     if (object.root? and object.parent?)
-      object.vpid = @csv.add_complex_object object.label, object.usage_type
+      object.vpid = @ingester_setup.add_complex_object object.label, object.usage_type
     else
-      object.vpid = @csv.add_file File.basename(object.file_stream.to_s), object.label, object.usage_type, ''
-      @csv.set_relation object.vpid, 'part_of', object.parent.vpid if object.child?
+      object.vpid = @ingester_setup.add_file object.label, object.usage_type, '', object
+      @ingester_setup.set_relation object.vpid, 'part_of', object.parent.vpid if object.child?
     end
-    @csv.set_relation object.vpid, 'manifestation', object.master.vpid if object.manifestation?
-    object.manifestations.each { |obj| add_to_csv obj }
-    object.children.each       { |obj| add_to_csv obj }
+    @ingester_setup.set_relation object.vpid, 'manifestation', object.master.vpid if object.manifestation?
+    object.manifestations.each { |obj| add_to_ingest obj }
+    object.children.each       { |obj| add_to_ingest obj }
     object.save
+  end
+  
+  def delete_ingest_dir( cfg )
+    load_dir = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_ingest_dir']}/load_#{cfg.ingest_id}"
+      FileUtils.rm_r "#{load_dir}", :force => true
+      if load_dir != cfg.ingest_dir
+        FileUtils.rm_r cfg.ingest_dir, :force => true
+      end
   end
   
   def undo_config( cfg )
@@ -378,7 +374,7 @@ class PreIngester
     cfg.root_objects.each do |obj|
       undo_object obj
     end
-    FileUtils.rm_r("#{cfg.ingest_dir}", :force => true)
+    delete_ingest_dir cfg
     cfg.ingest_dir = nil
     cfg.status = Status::PreProcessed
     cfg.save

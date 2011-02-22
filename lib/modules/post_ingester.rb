@@ -185,9 +185,9 @@ class PostIngester
   end # process_object
   
   def link_ar(cfg, obj)
+    obj.children.each       { |c| link_ar cfg, c }
     return unless obj.pid
     obj.manifestations.each { |m| link_ar cfg, m }
-    obj.children.each       { |c| link_ar cfg, c }
     ar = cfg.get_protection obj.usage_type
     return if ar.nil?
     case ar.ptype
@@ -271,9 +271,9 @@ class PostIngester
   end
   
   def unlink_and_delete_dc( obj )
-    obj.manifestations.each { |m| unlink_and_delete_dc m }
     obj.children.each       { |c| unlink_and_delete_dc c }
     return unless obj.pid and obj.metadata_mid
+    obj.manifestations.each { |m| unlink_and_delete_dc m }
     mid = obj.metadata_mid
     result = DigitalEntityManager.instance.unlink_dc obj.pid, mid
     result[:error].each { |error| error "Error calling web service: #{error}"}
@@ -294,9 +294,9 @@ class PostIngester
   end
   
   def unlink_ar(cfg, obj)
-    obj.manifestations.each { |m| unlink_ar cfg, m }
     obj.children.each       { |c| unlink_ar cfg, c }
     return unless obj.pid
+    obj.manifestations.each { |m| unlink_ar cfg, m }
     ar = cfg.get_protection obj.usage_type
     return if ar.nil?
     return if ar.mid.nil?

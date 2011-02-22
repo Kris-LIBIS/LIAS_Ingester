@@ -2,8 +2,14 @@ class Converter
 
   @@converters = []
   
+  attr_reader :media_type
+  
   def self.inherited( klass )
     @@converters << klass
+  end
+  
+  def self.get_converters
+    @@converters
   end
   
   def type2mime(t)
@@ -40,6 +46,10 @@ class Converter
   def support_extension?(extension)
     ext2type extension
   end
+  
+  def get_media_type
+    
+  end
 
   protected
 
@@ -49,6 +59,7 @@ class Converter
     @type2options_map = {}
 
     config = YAML.load_file file
+    @media_type = config[:MEDIA]
     config[:TYPES].each do |t|
       type = t[:TYPE]
       @type2mime_map[type] = t[:MIME]

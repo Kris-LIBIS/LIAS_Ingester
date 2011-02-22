@@ -145,7 +145,7 @@ class PreProcessor
     
     @checker = FileChecker.new config
     @collecter = nil
-    @collecter = ComplexFileCollecter.new(config) if config.complex
+    @collecter = ComplexFileCollecter.new(config) if config.complex or config.mets
     
     info "Processing config ##{config.id}"
     collected_objects = config.ingest_run.ingest_objects
@@ -178,11 +178,11 @@ class PreProcessor
   
   def process_object( object, config )
     
-    Application.log_to(object)
+    Application.log_to object
     
-    if (object.status == Status::PreProcessed)
+    if object.status == Status::PreProcessed
       info "Skipping object ##{object.id}."
-      Application.log_end(object)
+      Application.log_end object
       return
     end
     
@@ -190,20 +190,20 @@ class PreProcessor
     object.status = Status::PreProcessing
     object.save
     
-    if not(@checker.match(object))
+    if not @checker.match object
       debug "Object ##{object.id} did not match: #{object.message}"
-      object.status = Status::New
+      object.status = Status::Initialized
       object.message = nil
-    elsif not(@checker.check(object))
+    elsif not @checker.check object
       error "Object ##{object.id} failed tests: '#{object.message}'"
       object.status = Status::PreProcessFailed
     else
       debug "Object ##{object.id} passed tests"
-      config.add_object(object)
+      config.add_object object
       info "Object ##{object.id} added"
       object.status = Status::PreProcessed
       debug "Object ##{object.id} updated status"
-      unless @collecter.nil? or @collecter.check(object)
+      unless @collecter.nil? or @collecter.check object
         error "Object ##{object.id} failed building complex object"
         object.status = Status::PreProcessFailed
       end
@@ -217,7 +217,7 @@ class PreProcessor
   ensure
     object.save
     info "Object ##{object.id} preprocessed"
-    Application.log_end(object)
+    Application.log_end object
     
   end
   
@@ -248,7 +248,7 @@ class PreProcessor
     cfg.status = Status::New
     cfg.save
     
-    info "Configuration ##{cfg.id} PreProcess undone. Elapsed time: #{elapsed_time(start_time)}."
+    info "Configuration ##{cfg.id} PreProcess undone. Elapsed time: #{elapsed_time start_time}."
     
   end
   

@@ -66,7 +66,7 @@ class FileChecker
     filter = @config.filename_match
     raise(FileCheckException, "#{filter} is not a regular expression") unless filter.is_a? Regexp
     
-    result = (filter.nil? or obj.file_name =~ filter)
+    result = (filter.nil? or obj.file_name =~ filter or obj.file_path.to_s =~ filter)
     obj.message = "File '#{obj.file_name}' does not match the filter '#{filter.inspect}'" unless result
     
     check_throw result, obj

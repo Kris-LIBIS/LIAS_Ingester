@@ -1,0 +1,11 @@
+:MEDIA:         :VIDEO
+:TYPES:
+  - :TYPE:          :MSDOC
+    :MIME:          application/msword
+    :EXTENSIONS:    doc,docx
+  - :TYPE:          :PDF
+    :MIME:          application/pdf
+    :EXTENSIONS:    pdf
+  - :TYPE:          :PDFA
+    :MIME:          application/pdfa
+    :EXTENSIONS:    pdfa

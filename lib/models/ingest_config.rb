@@ -22,6 +22,9 @@ class IngestConfig
   property    :complex_group,   String
   property    :complex_label,   String
   property    :complex_utype,   String
+  
+  # mets options
+  property    :mets,            Boolean
 
   # ingest info
   property    :ingest_id,       String
@@ -69,6 +72,7 @@ class IngestConfig
     self.complex_utype    = 'COMPLEX_VIEW_MAIN'
 #    self.ingest_id        = ''
 #    self.ingest_dir       = ''
+    self.mets             = false
    
     config.each do |label,value|
       case label
@@ -99,23 +103,42 @@ class IngestConfig
           prot.usage_type = self.complex_utype
           self.protections << prot
         end
+      when :mets
+        self.mets = true
+        value.key_strings_to_symbols!
+        self.complex_group  = value[:group]
+        self.complex_label  = value[:label]
+        self.complex_utype  = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]
+        if value[:accessright]
+          prot = Protection.from_value(value[:accessright])
+          prot.usage_type = self.complex_utype
+          self.protections << prot
+        end
       end # case label
     end # config.each
     
   end
 
-  def root_object(label)
-    root = root_objects.first(:label => label)
-    unless root
-      root = IngestObject.new
-      root.usage_type = self.complex_utype
-      root.label = label
-      root.status = Status::PreProcessed
-      add_object root
-      root.save
-#      save
+  def get_or_create_object( label )
+    label = [ label ] unless label.kind_of? Array
+    parent = nil
+    label.each { |l| parent = get_or_create_child_object parent, l }
+    return parent
+  end
+  
+  def get_or_create_child_object( parent, label )
+    lookup_pool = ( parent ? parent.children : root_objects )
+    found = lookup_pool.first :label => label
+    unless found
+      found = IngestObject.new
+      found.usage_type = self.complex_utype
+      found.label = label
+      found.status = Status::PreProcessed
+      add_object found
+      found.parent = parent
+      found.save
     end
-    root
+    return found
   end
 
   def root_objects

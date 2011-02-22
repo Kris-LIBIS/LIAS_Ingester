@@ -3,22 +3,19 @@ require File.dirname(__FILE__) + '/xml_writer'
 
 class IngestSettings
   include XmlWriter
-
+  
   attr_reader :tasks
-
+  
   TaskParamOrder = {
-    'MetadataInserter' =>     [ :Link, :Mddesc, :Mdfilename, :Mid, :ComplexOnly,
-                                :Extension, :Size ],
-    'AttributeAssignment' =>  [ :Name1, :Value1, :Name2, :Value2, :Name3, :Value3,
-                                :apply_to_parent_only, :extension],
+    'MetadataInserter' =>     [ :Link, :Mddesc, :Mdfilename, :Mid, :ComplexOnly, :Extension, :Size ],
+    'AttributeAssignment' =>  [ :Name1, :Value1, :Name2, :Value2, :Name3, :Value3, :apply_to_parent_only, :extension],
     'FullText' =>             [ :Encoding, :Extension ]
   }
-
-
+  
   def initialize
     @tasks = Array.new
   end
-
+  
   def add_metadata( options = {} )
     task              = Hash.new
     task[:task_name]  = 'MetadataInserter'
@@ -37,25 +34,27 @@ class IngestSettings
     end
     @tasks << task
   end
-
+  
   def add_acl( id, options = {} )
-    add_metadata({
-      :Mddesc => 'accessrights rights_md',
-      :Link => 'true',
-      :Mid => id.to_s
-    }.merge!(options))
+    add_metadata( {:Mddesc => 'accessrights rights_md',
+                   :Link => 'true',
+                   :Mid => id.to_s
+                   }.merge!(options)
+                 )
   end
-
+  
   def add_dc( file_name, options = {} )
-    add_metadata({
-      :Mddesc => 'descriptive dc',
-      :Link => 'true',
-      :Mdfilename => file_name
-    }.merge!(options))
+    add_metadata( {:Mddesc => 'descriptive dc',
+                   :Link => 'true',
+                   :Mdfilename => file_name
+                   }.merge!(options)
+                 )
   end
-
+  
   def add_control_fields( name_values, extension, options = {} )
+    
     return unless name_values
+    
     keys = name_values.keys
     until keys.empty?
       task              = Hash.new
@@ -81,8 +80,9 @@ class IngestSettings
       end
       @tasks << task
     end
+    
   end
-
+  
   def full_text_extraction( options = {} )
     task              = Hash.new
     task[:task_name]  = 'FullText'
@@ -96,7 +96,7 @@ class IngestSettings
     end
     @tasks << task
   end
-
+  
   def write( file )
     doc = create_document
     
@@ -106,48 +106,50 @@ class IngestSettings
       'xb' => 'http://com/exlibris/digitool/common/jobs/xmlbeans' })
     doc.root = root
     
-    node = create_node('transformer_task',
-                       :attributes =>{
+    attr = {
       'name' => 'Comma separated value (.csv) file',
-      'class_name' => 'com.exlibris.digitool.ingest.transformer.valuebased.CsvTransformer'})
-    root << node
+      'class_name' => 'com.exlibris.digitool.ingest.transformer.valuebased.CsvTransformer'
+      }
     
-    node << create_node('param',
-                        :attributes => { 'name' => 'template_file', 'value' => 'values.csv' })
-    node << create_node('param',
-                        :attributes => { 'name' => 'mapping_file', 'value' => 'mapping.xml' })
+    root << ( node = create_node 'transformer_task', :attributes => attr )
+    
+    node << ( create_node 'param', :attributes => { 'name' => 'template_file', 'value' => 'values.csv' } )
+    node << ( create_node 'param', :attributes => { 'name' => 'mapping_file', 'value' => 'mapping.xml' } )
     
     i = 0
-    chain = create_node('tasks_chain',
-                        :attributes => { 'name' => 'Task Chain' })
+    chain = create_node 'tasks_chain', :attributes => { 'name' => 'Task Chain' }
+    
     @tasks.each do |task|
-      chain << write_task(task, i)
+      chain << ( write_task task, i )
       i += 1
     end
-    root << chain if i > 0
     
-    root << create_node('ingest_task',
-                        :attributes => { 'name' => 'LIAS_ingester' })
+    ( root << chain ) if i > 0
+    
+    root << ( create_node 'ingest_task', :attributes => { 'name' => 'LIAS_ingester' } )
     
     save_document doc, file
     
   end
 
   def write_task( task, nr )
-
-    node = create_node('task_settings',
-                       :attributes => {
+    
+    attr = {
       'id'        => nr.to_s,
       'task_name' => task[:task_name],
-      'name'      => task[:name] })
+      'name'      => task[:name]
+      }
+    
+    node = create_node 'task_settings', :attributes => attr
     
     TaskParamOrder[task[:task_name]].each do |p|
       param = task[:params][p]
-      node << create_node('param',
-                          :attributes => { 'name' => p.to_s, 'value' => param.to_s })
+      attr = { 'name' => p.to_s, 'value' => param.to_s }
+      node << ( create_node 'param', :attributes => attr )
     end
+    
     return node
+    
   end
 
 end
-
