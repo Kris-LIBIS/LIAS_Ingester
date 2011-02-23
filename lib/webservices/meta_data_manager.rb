@@ -1,7 +1,7 @@
 require_relative 'soap_client'
 require 'singleton'
 require 'iconv'
-require 'htmlentities'
+#require 'htmlentities'
 
 class MetaDataManager < SoapClient
   include Singleton
@@ -16,8 +16,9 @@ class MetaDataManager < SoapClient
     f.close
     dc_string = dc.to_s
     dc_string.force_encoding("UTF-8")
-    dc_string.gsub(/<\?xml[^\?]*\?>(\n)*/x,'')
-    dc_string = HTMLEntities.new.encode(dc_string, :named)
+    dc_string.gsub!(/<\?xml[^\?]*\?>(\n)*/x,'')
+    dc_string.gsub!('&','&amp;').gsub!('<', '&lt;')
+#    dc_string = HTMLEntities.new.encode(dc_string, :named)
     request :create_meta_data_entry, :general => general.to_s, :description => nil, :name => 'descriptive', :type => 'dc', :value => dc_string
   end
   
