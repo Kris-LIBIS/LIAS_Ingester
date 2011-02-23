@@ -182,7 +182,7 @@ class Ingester
   
   def fix_pidlist( pid_list, cfg )
   	fixed_pid_list = {}
-  	pidlist.each do |xmlnr, pid|
+  	pid_list.each do |xmlnr, pid|
   	  file_name = cfg.ingest_dir + "/ingest/digital_entities/#{xmlnr}.xml"
   	  doc = XmlReader::parse_file file_name
   	  vpid_node = filesec.xpath('//xb:digital_entity/vpid').first
