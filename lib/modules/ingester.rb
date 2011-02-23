@@ -181,13 +181,13 @@ class Ingester
   end
   
   def fix_pidlist( pid_list, cfg )
-  	fixed_pid_list = {}
-  	pid_list.each do |xmlnr, pid|
-  	  file_name = cfg.ingest_dir + "/ingest/digital_entities/#{xmlnr}.xml"
-  	  doc = XmlReader::parse_file file_name
-  	  vpid_node = filesec.xpath('//xb:digital_entity/vpid').first
-  	  error "Cannot detect assigned PID: failed to find <vpid> entry in #{file_name}." unless vpid_node
-	    fixed_pid_list[vpid_node.content] = pid if vpid_node
+    fixed_pid_list = {}
+    pid_list.each do |xmlnr, pid|
+      file_name = cfg.ingest_dir + "/ingest/digital_entities/#{xmlnr}.xml"
+      doc = XmlReader::parse_file file_name
+      vpid_node = doc.xpath('//xb:digital_entity/vpid').first
+      error "Cannot detect assigned PID: failed to find <vpid> entry in #{file_name}." unless vpid_node
+      fixed_pid_list[vpid_node.content] = pid if vpid_node
 	  end
 	  return fixed_pid_list
   end
