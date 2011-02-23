@@ -123,8 +123,8 @@ class IngesterSetup
     file_info = Hash.new
     @last_id += 1
     file_info[:vpid] = @last_id
-#    file_info[:file_name] = obj.relative_stream.to_s if obj and obj.file_stream
-    file_info[:file_name] = obj.flattened_path if obj and obj.file_stream
+    file_info[:file_name] = obj.relative_stream.to_s if obj and obj.file_stream
+#    file_info[:file_name] = obj.flattened_path if obj and obj.file_stream
     file_info[:label] = label
     case usage_type.upcase
     when /^(COMPLEX_)?ORIGINAL$/
