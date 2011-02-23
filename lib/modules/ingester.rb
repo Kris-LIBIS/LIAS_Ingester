@@ -211,6 +211,7 @@ class Ingester
       cfg.tasker_log.scan(/Ingesting: (\d+).*?\n?.*?Pid=(\d+) Success/) do
         pid_list[$1]=$2
       end
+      pid_list = fix_pidlist pid_list, cfg
       if cfg.mets
         pid_list = fix_pidlist_for_mets pid_list, cfg
       end
