@@ -25,7 +25,7 @@ class Metadata
     end
     record = load_record search_term, final_options
     if record.nil?
-      Application.warn('Metadata') { "Could not find metadata for '#{search_term}'" }
+      Application.warn('Metadata') { "Could not find metadata for '#{search_term}'" } if obj.root?
     else
       copy_metadata_from_aleph record
     end
@@ -34,7 +34,7 @@ class Metadata
   def get_from_disk(metadata_file)
     record = read_record metadata_file
     if record.nil? or record.empty?
-      Application.warn('Metadata') { "Could not find metadata in '#{metadata_file}'" }
+      Application.warn('Metadata') { "Could not find metadata in '#{metadata_file}'" } if obj.root?
     else
       copy_metadata_as_is record
     end

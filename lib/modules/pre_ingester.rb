@@ -288,6 +288,7 @@ class PreIngester
     else
       result = md.get_from_aleph cfg.get_search_options
     end
+    object.children.each{ |child| get_metadata child }
     result
   end
   
