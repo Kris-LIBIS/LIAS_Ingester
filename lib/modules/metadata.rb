@@ -82,7 +82,7 @@ class Metadata
     @obj.metadata = "#{@obj.get_config.ingest_dir}/transform/dc_#{@obj.id}.xml"
     File.open(@obj.metadata, "w") do |f|
       f.puts "<records>"
-      f.puts record.to_dc(@obj.label).to_s.gsub(/\s*<\?.*\?>[\n]*/,'')
+      f.puts record.to_dc(@obj.label)
       f.puts "</records>"
     end
   end
@@ -92,7 +92,7 @@ class Metadata
     begin
       File.open(@obj.metadata, "w") do |f|
         f.puts "<records>"
-        f.puts record.to_s.gsub(/\s*<\?.*\?>[\n]*/,'')
+        f.puts record.to_s
         f.puts "</records>"
       end
     rescue Exception => e

@@ -1,3 +1,7 @@
 config.yml
 .fuse*
 .*.swp
+*.komodoproject
+.project
+*.db
+*-libxml.rb
