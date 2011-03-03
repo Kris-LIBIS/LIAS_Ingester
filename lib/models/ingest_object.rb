@@ -171,10 +171,14 @@ class IngestObject
     return nil
   end
   
-  def metadata
-    return super if super
-    return self.master.metadata if self.master
-    return nil
+  def label_path
+    path = label
+    node = self.master ? self.master.parent : self.parent
+    while node
+      path = node.label + "/" + path
+      node = node.parent
+    end
+    return path
   end
   
   def get_checksum( checksum_type )

@@ -223,30 +223,34 @@ class PostIngester
   end
   
   def create_and_link_dc( obj, mid = nil )
-    return unless (obj.metadata or mid) and obj.pid
-    unless mid
-      result = MetaDataManager.instance.create_dc_from_xml(obj.metadata)
-      result[:error].each { |e| error "Error calling web service: #{e}"}
-      if result[:mids].empty?
-        error "Failed to create DC metadata for object #{obj.pid}"
-        obj.status = Status::PostIngestFailed
-        return
+    if obj.metadata
+      unless obj.pid
+        warn "Ignoring metadata on virtual object ##{obj.id}: '#{obj.label_path}'"
+      else
+        result = MetaDataManager.instance.create_dc_from_xml(obj.metadata)
+        result[:error].each { |e| error "Error calling web service: #{e}"}
+        if result[:mids].empty?
+          error "Failed to create DC metadata for object #{obj.pid}"
+          obj.status = Status::PostIngestFailed
+          return
+        end
+        mid = result[:mids].first
+        info "Created DC metadata record nr #{mid}"
       end
-      mid = result[:mids].first
-      info "Created DC metadata record nr #{mid}"
     end
-    return unless mid
-    result = DigitalEntityManager.instance.link_dc obj.pid, mid
-    result[:error].each { |error| error "Error calling web service: #{error}"}
-    unless result[:error].empty?
-      error "Failed to link metadata record #{mid} to object #{obj.pid}"
-      obj.status = Status::PostIngestFailed
-    else
-      info "Attached DC metadata #{mid} to object #{obj.pid}"
-      obj.metadata_mid = mid
+    if mid and obj.pid
+      result = DigitalEntityManager.instance.link_dc obj.pid, mid
+      unless result[:error].empty?
+        result[:error].each { |e| error "Error calling web service: #{e}"}
+        error "Failed to link metadata record #{mid} to object #{obj.pid}"
+        obj.status = Status::PostIngestFailed
+      else
+        info "Attached DC metadata #{mid} to object #{obj.pid}"
+        obj.metadata_mid = mid
+      end
     end
     obj.manifestations.each { |m| create_and_link_dc m, mid }
-    obj.children.each       { |c| create_and_link_dc c, mid }
+    obj.children.each       { |c| create_and_link_dc c }
   end
   
   def undo_config( cfg )
