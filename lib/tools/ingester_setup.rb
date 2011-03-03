@@ -410,7 +410,9 @@ class IngesterSetup
     
     this_node = add_node file, parent_node
     
-    get_related( :part_of, file[:vpid] ).each { |vpid, f| add_node_recursive f, this_node }
+    get_related( :part_of, file[:vpid] ).each { |vpid, f| add_node_recursive f, this_node unless f[:object] and f[:object].leaf? }
+    
+    get_related( :part_of, file[:vpid] ).each { |vpid, f| add_node_recursive f, this_node if f[:object] and f[:object].leaf? }
     
   end
   
