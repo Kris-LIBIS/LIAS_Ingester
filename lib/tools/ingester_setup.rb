@@ -295,7 +295,7 @@ class IngesterSetup
       root << ( create_mapping((i+1).to_s, mapping[1]) )
     end
     
-    root << ( create_mapping '4','stream_ref/file_id' )
+    root << ( create_mapping '1','stream_ref/file_id' )
     
     save_document doc, file
     
