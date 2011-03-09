@@ -144,14 +144,10 @@ class Initializer
   def get_files( directory, match_expression, recursive )
     result = []
     file_list = Dir.glob "#{directory}/*"
-    file_list.each do |f|
-      next unless File.exist? f
-      if File.directory? f
-        result += get_files f, match_expression, recursive if recursive
-      else
-        result << f if f.match match_expression
-      end
-    end
+    dirs, files = file_list.partition { |f| test(?d, f) }
+    files.each { |f| result << f if f.match match_expression }
+    result.sort!
+    dirs.each { |d| result += get_files d, match_expression, recursive if recursive }
     result
   end
   
