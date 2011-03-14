@@ -58,9 +58,11 @@ class Metadata
   end
   
   def read_record(metadata_file)
+    search_term = @obj.label
+    search_term = @obj.file_name if @obj.file_name
     File.open(metadata_file, 'r').each_line do |line|
       fields = line.split
-      if fields.first =~ /(.*\/)?#{@obj.file_name}/
+      if fields.first =~ /(.*\/)?#{search_term}/
         return File.open(fields.last, 'r:utf-8').readlines.join
       end
     end
