@@ -27,42 +27,39 @@ class Record
   def tag(t)
     tag = t[0..2]
     
-    ind1 = (t[3].chr if t.size > 3) || ''
-    ind2 = (t[4].chr if t.size > 4) || ''
+    ind1 = t[3] || ''
+    ind2 = t[4] || ''
     
     ind1_xpath = ind1.size > 0 ? "and @i1='#{ind1}'" : ''
     ind2_xpath = ind2.size > 0 ? "and @i2='#{ind2}'" : ''
     
     result = []
     result1 = @xml_document.root.xpath("//fixfield[@id='#{tag}']")
-    if result1.size > 0
-      result1.each do |n|
-        result << FixFieldStruct.new(CGI::escapeHTML(n.content))
-      end
+    result1.each do |n|
+      result << FixFieldStruct.new(CGI::escapeHTML(n.content))
     end
     
-    return result if result1.size > 0
+    return result unless result.empty?
+    
     query ="//varfield[@id='#{tag}' #{ind1_xpath} #{ind2_xpath}]"
     
     result2 = @xml_document.root.xpath(query)
-    if result2.size > 0
-      result2.each do |n|  
-        subfields = {}
-        subfields.default = ''
-        n.xpath('subfield').each do |s|
+    result2.each do |n|  
+      subfields = {}
+      subfields.default = ''
+      n.xpath('subfield').each do |s|
 #bug in XService
-	  content_array = s.content.split('$$')
-	  content = content_array.shift || ''
+    	  content_array = s.content.split('$$')
+        content = content_array.shift || ''
 #bug in XService
-          subfields.store(s['label'], CGI::escapeHTML(content))
+        subfields[s['label']] = CGI::escapeHTML(content)
 	  
-	  content_array.each do |c|
-            subfields.store(c[0], CGI::escapeHTML(c[1..c.length]))
-          end
+	      content_array.each do |c|
+          subfields[c[0]] = CGI::escapeHTML(c[1..-1])
         end
-        
-        result << VarFieldStruct.new(n['i1'], n['i2'], subfields)
       end
+        
+      result << VarFieldStruct.new(n['i1'], n['i2'], subfields)
     end
     
     if result.empty? && tag.eql?('001')
