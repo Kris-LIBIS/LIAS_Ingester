@@ -2,7 +2,26 @@ require 'rubygems'
 require 'nokogiri'
 require 'cgi'
 
+class Array
+  def add( element, condition = nil )
+    if condition
+      self << element unless element == condition
+    else
+      self << element unless element.empty?
+    end
+    self
+  end
+  
+  def collapse!( separator )
+    x = self.join( separator )
+    self.clear
+    self.add x
+  end
+  
+end
+
 module DublinCore
+  
   def to_dc(label)
     aleph_record = self
     
@@ -26,95 +45,85 @@ module DublinCore
         # ######## DC:TITLE
         aleph_record.tag('245').each do |t|
           tTitle = []
-          tTitle << t.subfield['a']
-          tTitle << t.subfield['b']
-          tTitle << "[#{t.subfield['h'].gsub(/\[|\]/,'')}]" if t.subfield['h']
+          tTitle.add t.subfield['a']
+          tTitle.add t.subfield['b'] 
+          tTitle.add "[#{t.subfield['h'].gsub(/\[|\]/,'')}]" '[]'
+          x = tTitle.join(' ')
           
-          xml['dc'].title tTitle.join(' ')
+          xml['dc'].title x unless x.empty?
         end
         
         # ######## DC:CREATOR
         aleph_record.tag('700').each do |t|
           tCreator = []
-          tCreator << t.subfield['a']
-          tCreator << t.subfield['b']
-          tCreator << t.subfield['c']
-          tCreator << t.subfield['d']
-          tCreator << t.subfield['g']
+          tCreator.add t.subfield['a']
+          tCreator.add t.subfield['b']
+          tCreator.add t.subfield['c']
+          tCreator.add t.subfield['d']
+          tCreator.add t.subfield['g']
+          tCreator.collapse! ','
           
-          tCreator.compact!
-          tCreator.delete_if {|i| i.blank? }
+          tCreator.add "(#{t.subfield['4']})", '()'
+          tCreator.add aleph_record.tag('710').first.subfield['4'] unless aleph_record.tag('710').empty? || !aleph_record.tag('710').first.subfield['4'].eql?('cph')
+          tCreator.collapse! ' '
           
-          sCreator = tCreator.compact.join(',')
-          sCreator += " (#{t.subfield['4']})" unless t.subfield['4'].blank?
-          sCreator += " #{aleph_record.tag('710').first.subfield['4']}" if !aleph_record.tag('710').empty? && aleph_record.tag('710').first.subfield['4'].eql?('cph')
-          sCreator += ", #{t.subfield['e']}" unless t.subfield['e'].blank?
+          tCreator.add t.subfield['e']
+          x = tCreator.join(', ')
           
-          unless sCreator.blank?
-            xml['dc'].creator do |creator|
-              creator << sCreator
-            end
-          end
+          xml['dc'].creator x unless x.empty?
         end
         
         aleph_record.tag('710').each do |t|
           relator = ''
           tCreator = []
-          tCreator << t.subfield['a']
-          relator += " (#{t.subfield['4']})" if t.subfield['4'].eql?('cph')
-          tCreator << t.subfield['g'] + relator
-          tCreator << t.subfield['e']
+          tCreator.add t.subfield['a']
+          relator = []
+          relator.add t.subfield['g']
+          relator.add "(#{t.subfield['4']})" if t.subfield['4'].eql?('cph')
+          tCreator.add relator.join(' ')
+          tCreator.add t.subfield['e']
+          x = tCreator.join(',')
           
-          tCreator.delete_if {|i| i.blank?}
-          
-          unless tCreator.compact.join(',').blank?
-            xml['dc'].creator tCreator.compact.join(',')
-          end
+          xml['dc'].creator x unless x.empty?
         end
         
         aleph_record.tag('711').each do |t|
           tCreator = []
-          tCreator << t.subfield['a']
-          tCreator << t.subfield['b']
-          tCreator << t.subfield['c']
-          tCreator << t.subfield['d']
-          tCreator << t.subfield['4']
+          tCreator.add t.subfield['a']
+          tCreator.add t.subfield['b']
+          tCreator.add t.subfield['c']
+          tCreator.add t.subfield['d']
+          tCreator.add t.subfield['4']
+          x = tCreator.join(',')
           
-          tCreator.delete_if {|i| i.blank? }
-          
-          unless tCreator.compact.join(',').blank?
-            xml['dc'].creator tCreator.compact.join(',')
-          end
+          xml['dc'].creator x unless x.empty?
         end
         
         # ######## DC:SUBJECT
         aleph_record.tag('69002').each do |t|
-          xml['dc'].subject t.subfield['a']
+          x = t.subfield['a']
+          xml['dc'].subject x unless x.empty?
         end
         
         # ######## DC:DESCRIPTION
         aleph_record.tag('598').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].description t.subfield['a']
-          end
+          x = t.subfield['a']
+          xml['dc'].description x unless x.empty?
         end
         
         aleph_record.tag('597').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].description t.subfield['a']
-          end
+          x = t.subfield['a']
+          xml['dc'].description x unless x.empty?
         end
         
         aleph_record.tag('500').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].description t.subfield['a']
-          end
+          x = t.subfield['a']
+          xml['dc'].description x unless x.empty?
         end
         
         aleph_record.tag('520').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].description t.subfield['a']
-          end
+          x = t.subfield['a']
+          xml['dc'].description x unless x.empty?
         end
         
         # ######## DC:PROVENANCE
@@ -123,78 +132,52 @@ module DublinCore
         # ######## DC:PUBLISHER
         aleph_record.tag('260').each do |t|
           pub = []
-          pub << t.subfield['b']
-          pub << t.subfield['a']
-          pub << ','  if !t.subfield['c'].blank? && (!t.subfield['b'].blank? || !t.subfield['a'].blank?)
-          pub << t.subfield['c']
+          pub.add t.subfield['b'] 
+          pub.add t.subfield['a']
+          pub.collapse! ' '
+          pub.add t.subfield['c'] unless pub.size == 0
+          x = pub.join(', ')
           
-          pub.delete_if {|i| i.blank?}
+          xml['dc'].publisher x unless x.empty?
           
-          unless pub.compact.join(' ').blank?
-            xml['dc'].publisher pub.compact.join(' ')
-          end
         end
         
         aleph_record.tag('260').each do |t|
           pub = []
-          place_of_manufacture = ''
-          pub << t.subfield['f']
-          place_of_manufacture = t.subfield['e']
-          place_of_manufacture += ', '  if !t.subfield['g'].blank? && (!t.subfield['f'].blank? || !t.subfield['e'].blank?)
-          pub << place_of_manufacture
-          pub << t.subfield['g']
+          pub.add t.subfield['f']
+          pub.add t.subfield['e']
+          pub.collapse! ' '  
+          pub.add t.subfield['g']
+          x = pub.join(', ')
           
-          pub.compact!
-          pub.delete_if {|i| i.blank?}
-          
-          unless pub.compact.join(' ').blank?
-            xml['dc'].publisher pub.compact.join(' ')
-          end
+          xml['dc'].publisher x unless x.empty?
         end
         
         # ######## DC:DATE
         tagDate = aleph_record.tag('008').first.datas.gsub(/\^/, ' ').gsub(/u/,'X')
-        tagDateFrom = tagDate[7..10]
-        tagDateTo   = tagDate[11..14]
+        date = []
+        date.add tagDate[7..10].strip
+        date.add '-' + tagDate[11..14].strip '-'
+        date_string = date.join('')
         
-        date_string = "#{tagDateFrom}".strip
-        date_string += "-#{tagDateTo}".strip if tagDateTo.strip.size > 0
-        
-        xml['dc'].date date_string.strip
+        xml['dc'].date date_string unless date_string.empty?
         
         # ######## DC:TYPE
         aleph_record.tag('655 9').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].type t.subfield['a']
-          end
+          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
         end
         
         aleph_record.tag('088 9').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].type t.subfield['a']
-          end
+          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
         end
         
         aleph_record.tag('655 4').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].type t.subfield['a']
-          end
+          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
         end
         
         aleph_record.tag('955  ').each do |t|
-          unless t.subfield['a'].blank?
-            xml['dc'].type t.subfield['a']
-          end
+          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
         end
-        
-        #      tagType = aleph_record.tag('69002')
-        #      tagType.each do |t|
-        #        unless t.subfield['a'].blank? || !t.subfield['0'].eql?('ODIS-GEN')
-        #          xml['dc'].type do |type|
-        #            type << t.subfield['a']
-        #          end
-        #        end
-        #      end
         
         aleph_record.tag('69002').each do |t|
           odis_url = 'http://www.odis.be/lnk/'
@@ -209,9 +192,8 @@ module DublinCore
               end
             end
             
-            unless t.subfield['a'].blank?
-              odis_url += "##{CGI::escape(t.subfield['a'])}"      
-            end
+            x = t.subfield['a']
+            odis_url += "##{CGI::escape(x)}" unless x.empty?
             
             xml['dc'].identifier('xsi:type' => 'dcterms:URI').text(odis_url)
           end
@@ -237,43 +219,27 @@ module DublinCore
         # ######## DC:FORMAT
         tag340 = []
         aleph_record.tag('340').each do |t|
-          unless t.subfield['a'].blank?
-            #      xml['dc'].format do |format|
-            tag340 << t.subfield['a']
-            #      end
-          end
+          tag340.add t.subfield['a']
         end
-        
-        tag340.delete_if {|i| i.blank?}
         
         tag339 = []
         aleph_record.tag('339').each do |t|
-          tag339 << t.subfield['a']
+          tag339.add t.subfield['a']
         end
-        
-        tag339.delete_if {|i| i.blank?}
         
         tag319 = []
         aleph_record.tag('319').each do |t|
-          unless t.subfield['a'].blank?
-            #   xml['dc'].format do |format|
-            tag319 << t.subfield['a']
-            #    end
-          end
+          tag319.add t.subfield['a']
         end
-        
-        tag319.delete_if {|i| i.blank?}
         
         tag300 = []
         aleph_record.tag('3009').each do |t|
           format = []
-          format << t.subfield['b'].gsub(';','')
-          format << t.subfield['c']
-          format << t.subfield['9']
+          format.add t.subfield['b'].gsub(';','')
+          format.add t.subfield['c']
+          format.add t.subfield['9']
           
-          format.delete_if {|i| i.blank?}
-          
-          tag300 << format.compact.join(';')
+          tag300 << format.join(';')
         end
         
         lines = []
@@ -296,41 +262,21 @@ module DublinCore
           xml['dc'].format line
         end
         
-        #
-        #      highest = tag339.size
-        #      highest = tag300.size if highest < tag300.size
-        #
-        #      highest.times do |i|
-        #        line = []
-        #        line << tag339[i] if i < tag339.size
-        #        line << tag300[i] if i < tag300.size
-        #
-        #        line.delete_if {|i| i.blank?}
-        #        line.compact!
-        #
-        #        unless line.compact.join(':').blank?
-        #          xml['dc'].format do |format|
-        #            format << line.compact.join(':')
-        #          end
-        #        end
-        #      end
-        
         # ######## DC:SOURCE
         sources = []
         aleph_record.tag('852').each do |t|
           s = []
           
           if t.subfield['b'].eql?(t.subfield['c'])
-            s << t.subfield['b']
+            s.add t.subfield['b'] 
           else
-            s << t.subfield['b']
-            s << t.subfield['c']
+            s.add t.subfield['b']
+            s.add t.subfield['c']
           end
           
-          s << t.subfield['h']
-          s << t.subfield['l']
+          s.add t.subfield['h']
+          s.add t.subfield['l']
           
-          s.delete_if {|i| i.blank?}
           sources << s.join(' ')
         end
         
@@ -344,16 +290,15 @@ module DublinCore
           s = []
           archief_url = ''
           
-          s << t.subfield['y']
+          s.add t.subfield['y']
           
-          unless t.subfield['u'].blank?
+          unless t.subfield['u'].empty?
             archief_url << t.subfield['u']
             archief_url += "##{CGI::escape(t.subfield['y'])}"
           end
           
           xml['dc'].identifier('xsi:type' => 'dcterms:URI').text(archief_url)
           
-          s.delete_if {|i| i.blank?}
           sources << s.join('')
         end
         
@@ -367,9 +312,7 @@ module DublinCore
         xml['dc'].language "#{tagLang[35..37]}".strip
         
         tagLang = aleph_record.tag('041').first
-        unless tagLang.nil?
-          xml['dc'].language tagLang.subfield['a']
-        end
+        xml['dc'].language tagLang.subfield['a'] unless tagLang.nil?
         
         # ######## DC:RIGHTS
         rights = {'adp' => 'adaptor', 'rpy' => 'verantwoordelijke uitgever', 'dsr' => 'ontwerper', 'pht' => 'fotograaf',
