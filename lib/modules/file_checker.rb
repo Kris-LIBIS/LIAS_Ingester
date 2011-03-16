@@ -141,7 +141,7 @@ class FileChecker
     
     obj.message = "File '#{obj.file_path}' already ingested" if result
     
-    result = not(result)
+    result = !result
     
     check_throw result, obj
     
