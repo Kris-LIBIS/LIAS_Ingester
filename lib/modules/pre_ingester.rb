@@ -163,6 +163,9 @@ class PreIngester
       valid_states << Status::PreIngesting
       valid_states << Status::PreIngestFailed
     end
+
+    @model = ModelFactory.instance.get_model_for_config cfg
+    @metadata = Metadata.new cfg
     
     cfg.root_objects.each do |obj|
       
@@ -236,6 +239,8 @@ class PreIngester
   
   def finalize_ingest( cfg )
     
+    cfg.mets = @ingester_setup.requires_mets
+    cfg.complex = !cfg.mets
     @ingester_setup.finalize_setup cfg.ingest_dir
     
   end
@@ -280,14 +285,7 @@ class PreIngester
   end
   
   def get_metadata( object )
-    cfg = object.get_config
-    md = Metadata.new(object)
-    result = false
-    if mf = cfg.metadata_file
-      result = md.get_from_disk mf
-    else
-      result = md.get_from_aleph cfg.get_search_options
-    end
+    result = @metadata.get_dc_record(object)
     object.children.each{ |child| get_metadata child }
     result
   end
@@ -304,9 +302,8 @@ class PreIngester
   
   def create_manifestations( object )
     cfg = object.get_config
-    model = ModelFactory.instance.get_model_for_config cfg
     ModelFactory.generated_manifestations.each do |m|
-      file = model.create_manifestation object, m, "#{cfg.ingest_dir}/transform/streams/"
+      file = @model.create_manifestation object, m, "#{cfg.ingest_dir}/transform/streams/"
       if file
         info "Created manifestation file: #{file}"
         mobj = IngestObject.new file, :MD5
@@ -322,20 +319,17 @@ class PreIngester
   
   def create_watermark( object )
     cfg = object.get_config
-    model = ModelFactory.instance.get_model_for_config cfg
     
     # note: original will never be watermark protected
     object.manifestations.each do |manifestation|
       p = cfg.get_protection(manifestation.usage_type)
       next unless p and p.ptype == :WATERMARK # only watermark protection is done at this stage
-      converter = model.get_converter manifestation.file_stream
-      format = model.get_manifestation(manifestation.usage_type, converter.media_type)[:FORMAT]
+      converter = @model.get_converter manifestation.file_stream
       if converter.respond_to?(:watermark)
         wm_file = p.pinfo
         wm_file = converter.create_watermark(p.pinfo, cfg.ingest_dir, manifestation.usage_type) unless File.exist?(wm_file)
         new_file = File.dirname(manifestation.file_stream) + '/' +
-          File.basename(manifestation.file_stream, '.*') + '_watermark.' +
-          converter.type2ext(format)
+          File.basename(manifestation.file_stream, '.*') + '_watermark' + File.extname(manifestation.file_stream)
         converter.watermark manifestation.file_stream, new_file, wm_file
         info "Created file #{new_file} for watermark protection of #{manifestation.usage_type}"
         File.delete(manifestation.file_stream)

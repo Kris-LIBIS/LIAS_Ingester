@@ -1,6 +1,7 @@
 require 'singleton'
 require 'yaml'
 require_relative 'ingest_model'
+require_relative 'ingest_model_dispatcher'
 
 class ModelFactory
   include Singleton
@@ -49,6 +50,7 @@ class ModelFactory
   end
 
   def get_model_for_config(config)
+    return IngestModelDispatcher.new(config.ingest_model_map, config.ingest_run.location) if config.ingest_model_map
     return get_model1(config.ingest_model) if config.ingest_model
     return get_model2(config.media_type, config.quality)
   end

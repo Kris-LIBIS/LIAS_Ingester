@@ -14,6 +14,7 @@ class IngestConfig
 
   # ingest options
   property    :ingest_model,    String
+  property    :ingest_model_map,String
   property    :media_type,      Enum[:IMAGE, :DOCUMENT, :ARCHIVE, :CONTAINER, :AUDIO, :VIDEO, :ANY]
   property    :quality,         Enum[:ARCHIVE, :HIGH, :LOW, :STORAGE]
 
@@ -84,6 +85,8 @@ class IngestConfig
         value.key_strings_to_symbols!
         value.each do |k,v|
           case k
+          when :file
+            self.ingest_model_map = v
           when :model
             self.ingest_model   = v
           when :media_type
