@@ -249,7 +249,7 @@ class IngesterSetup
     ######### the on-the-fly METS creator in the delevery module?)
     @files.each { |vpid, f| f[:usage_type] = 'VIEW' if f[:usage_type] == 'VIEW_MAIN' } if @is_complex
     
-    CSV.open( file, 'w') do |csv|
+    CSV.open( file, 'w:utf-8') do |csv|
       csv << LABELMAPPING.keys
       @files.each do |vpid,file_info|
         row = Array.new
