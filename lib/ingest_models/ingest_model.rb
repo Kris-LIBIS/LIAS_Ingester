@@ -7,12 +7,10 @@ end
 class IngestModel
   
   attr_reader :config
-  attr_reader :converters
   
   def initialize(config)
     @config = config
     @@logger.debug(self.class) {"Creating ingest model: #{config}"}
-    @converters = {}
     
   end
   
@@ -55,7 +53,7 @@ class IngestModel
     
     return nil unless src_file_path and src_mime_type
     
-    return make_manifestation(src_file_path, src_mime_type, manifestation, workdir, tgt_file_name)
+    return make_manifestation(src_file_path.to_s, src_mime_type, manifestation, workdir, tgt_file_name)
     
   end
   
