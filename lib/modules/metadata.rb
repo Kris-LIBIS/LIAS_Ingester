@@ -12,6 +12,7 @@ class Metadata
     raise StandardError.new("input #{cfg} is not an IngestConfig") unless cfg.is_a?(IngestConfig)
     @cfg = cfg
     
+    @metadata_map = {}
     if mf = @cfg.metadata_file
       @metadata_map = JSON.parse File.open(mf, 'r:utf-8').readlines.join
     end
