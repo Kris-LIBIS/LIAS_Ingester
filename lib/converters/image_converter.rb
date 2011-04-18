@@ -6,6 +6,10 @@ require_relative 'converter'
 class ImageConverter < Converter
 
   attr_reader :work
+  
+  def initialized?
+    return @work != nil
+  end
 
   def scale(percent)
     @work.append_to_settings('scale', percent)
@@ -53,7 +57,6 @@ class ImageConverter < Converter
   end
 
   def watermark(source, target, watermark_image)
-    
     `#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/run_watermarker2.sh #{source} #{target} #{watermark_image} X2`
   end
 
@@ -61,6 +64,7 @@ class ImageConverter < Converter
 
   def init(source)
     @work = QuickMagick::Image.read(source).first
+    Application.error('ImageConverter') { "QuickMagick cannot open image file '#{source}'."}
     load_config Application.dir + '/config/converters/image_converter.yaml'
   end
 

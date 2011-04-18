@@ -85,6 +85,8 @@ class IngestModel
     target = tgt_dir + (tgt_file_name.nil? ? File.basename(src_file_path, '.*') : tgt_file_name)
     
     converter = get_converter src_file_path
+    return nil unless converter && converter.initialized?
+    
     m = get_manifestation(manifestation, converter.media_type)
     
     return nil if m.nil? or (converter.type2mime(m[:FORMAT]) == src_mime_type && m[:OPTIONS].nil?)
