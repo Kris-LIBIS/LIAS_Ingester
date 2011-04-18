@@ -157,7 +157,7 @@ module DublinCore
         tagDate = aleph_record.tag('008').first.datas.gsub(/\^/, ' ').gsub(/u/,'X')
         date = []
         date.add tagDate[7..10].strip
-        date.add '-' + tagDate[11..14].strip('-')
+        date.add('-' + tagDate[11..14].strip, '-')
         date_string = date.join('')
         
         xml['dc'].date date_string unless date_string.empty?
