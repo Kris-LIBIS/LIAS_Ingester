@@ -44,57 +44,56 @@ module DublinCore
         
         # ######## DC:TITLE
         aleph_record.tag('245').each do |t|
-          tTitle = []
-          tTitle.add t.subfield['a']
-          tTitle.add t.subfield['b'] 
-          tTitle.add "[#{t.subfield['h'].gsub(/\[|\]/,'')}]" '[]'
-          x = tTitle.join(' ')
+          tag_title = []
+          tag_title.add t.subfield['a']
+          tag_title.add t.subfield['b'] 
+          tag_title.add("[#{t.subfield['h'].gsub(/\[|\]/,'')}]", '[]')
+          x = tag_title.join(' ')
           
           xml['dc'].title x unless x.empty?
         end
         
         # ######## DC:CREATOR
         aleph_record.tag('700').each do |t|
-          tCreator = []
-          tCreator.add t.subfield['a']
-          tCreator.add t.subfield['b']
-          tCreator.add t.subfield['c']
-          tCreator.add t.subfield['d']
-          tCreator.add t.subfield['g']
-          tCreator.collapse! ','
+          tag_creator = []
+          tag_creator.add t.subfield['a']
+          tag_creator.add t.subfield['b']
+          tag_creator.add t.subfield['c']
+          tag_creator.add t.subfield['d']
+          tag_creator.add t.subfield['g']
+          tag_creator.collapse! ','
           
-          tCreator.add "(#{t.subfield['4']})", '()'
-          tCreator.add aleph_record.tag('710').first.subfield['4'] unless aleph_record.tag('710').empty? || !aleph_record.tag('710').first.subfield['4'].eql?('cph')
-          tCreator.collapse! ' '
+          tag_creator.add "(#{t.subfield['4']})", '()'
+          tag_creator.add(aleph_record.tag('710').first.subfield['4']) unless aleph_record.tag('710').empty? || !aleph_record.tag('710').first.subfield['4'].eql?('cph')
+          tag_creator.collapse! ' '
           
-          tCreator.add t.subfield['e']
-          x = tCreator.join(', ')
+          tag_creator.add t.subfield['e']
+          x = tag_creator.join(', ')
           
           xml['dc'].creator x unless x.empty?
         end
         
         aleph_record.tag('710').each do |t|
-          relator = ''
-          tCreator = []
-          tCreator.add t.subfield['a']
+          tag_creator = []
+          tag_creator.add t.subfield['a']
           relator = []
           relator.add t.subfield['g']
-          relator.add "(#{t.subfield['4']})" if t.subfield['4'].eql?('cph')
-          tCreator.add relator.join(' ')
-          tCreator.add t.subfield['e']
-          x = tCreator.join(',')
+          relator.add("(#{t.subfield['4']})") if t.subfield['4'].eql?('cph')
+          tag_creator.add relator.join(' ')
+          tag_creator.add t.subfield['e']
+          x = tag_creator.join(',')
           
           xml['dc'].creator x unless x.empty?
         end
         
         aleph_record.tag('711').each do |t|
-          tCreator = []
-          tCreator.add t.subfield['a']
-          tCreator.add t.subfield['b']
-          tCreator.add t.subfield['c']
-          tCreator.add t.subfield['d']
-          tCreator.add t.subfield['4']
-          x = tCreator.join(',')
+          tag_creator = []
+          tag_creator.add t.subfield['a']
+          tag_creator.add t.subfield['b']
+          tag_creator.add t.subfield['c']
+          tag_creator.add t.subfield['d']
+          tag_creator.add t.subfield['4']
+          x = tag_creator.join(',')
           
           xml['dc'].creator x unless x.empty?
         end
@@ -154,10 +153,10 @@ module DublinCore
         end
         
         # ######## DC:DATE
-        tagDate = aleph_record.tag('008').first.datas.gsub(/\^/, ' ').gsub(/u/,'X')
+        tag_date = aleph_record.tag('008').first.datas.gsub(/\^/, ' ').gsub(/u/,'X')
         date = []
-        date.add tagDate[7..10].strip
-        date.add('-' + tagDate[11..14].strip, '-')
+        date.add tag_date[7..10].strip
+        date.add('-' + tag_date[11..14].strip, '-')
         date_string = date.join('')
         
         xml['dc'].date date_string unless date_string.empty?
@@ -308,17 +307,14 @@ module DublinCore
         end
         
         # ######## DC:LANGUAGE
-        tagLang = aleph_record.tag('008').first.datas.gsub('^', ' ')
-        xml['dc'].language "#{tagLang[35..37]}".strip
+        tag_lang = aleph_record.tag('008').first.datas.gsub('^', ' ')
+        xml['dc'].language "#{tag_lang[35..37]}".strip
         
-        tagLang = aleph_record.tag('041').first
-        xml['dc'].language tagLang.subfield['a'] unless tagLang.nil?
+        tag_lang = aleph_record.tag('041').first
+        xml['dc'].language tag_lang.subfield['a'] unless tag_lang.nil?
         
         # ######## DC:RIGHTS
-        rights = {'adp' => 'adaptor', 'rpy' => 'verantwoordelijke uitgever', 'dsr' => 'ontwerper', 'pht' => 'fotograaf',
-          'cph' => 'copyright', 'ill' => 'illustrator', 'ive' => 'geinterviewde', 'ivr' => 'interviewer',
-          'aut' => 'auteur', 'ccp' => 'concept'}
-        
+
         aleph_record.tag('700').each do |t|
           if t.subfield['4'].eql?('cph')
             xml['dc'].source t.subfield['a']
