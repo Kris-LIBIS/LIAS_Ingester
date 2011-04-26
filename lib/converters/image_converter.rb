@@ -5,10 +5,12 @@ require_relative 'converter'
 
 class ImageConverter < Converter
 
+  include Magick
+
   attr_reader :work
   
   def initialized?
-    return @work != nil
+    @work != nil
   end
 
   def scale(percent)
@@ -24,25 +26,25 @@ class ImageConverter < Converter
   end
 
   def get_watermark_file(dir, usage_type)
-    file = "#{dir}/watermark_#{usage_type}.png"
+    "#{dir}/watermark_#{usage_type}.png"
   end
 
   def create_watermark(text, dir, usage_type)
     
     file = get_watermark_file(dir, usage_type)
     return file if File.exist?(file)
+
+    watermark = Image.new(1000, 1000) { |p| p.background_color = 'transparent' }
     
-    watermark = Magick::Image.new(1000, 1000) { self.background_color = 'transparent' }
-    
-    gc = Magick::Draw.new
-    gc.fill = 'black'
-    gc.stroke = 'black'
-    gc.gravity = Magick::CenterGravity
-    gc.pointsize = 100
-    gc.font_family = "Helvetica"
-    gc.font_weight = Magick::BoldWeight
-    gc.stroke = 'none'
-    gc.rotate(-20)
+    gc = Draw.new
+    gc.fill 'black'
+    gc.stroke 'black'
+    gc.gravity CenterGravity
+    gc.pointsize 100
+    gc.font_family "Helvetica"
+    gc.font_weight BoldWeight
+    gc.stroke 'none'
+    gc.rotate -20
     gc.text 0, 0, (text.nil? ? ' (C) LIBIS' : text)
     
     gc.draw watermark
@@ -64,7 +66,7 @@ class ImageConverter < Converter
 
   def init(source)
     @work = QuickMagick::Image.read(source).first
-    Application.error('ImageConverter') { "QuickMagick cannot open image file '#{source}'."}
+    Application.error('ImageConverter') { "QuickMagick cannot open image file '#{source}'."} unless @work
     load_config Application.dir + '/config/converters/image_converter.yaml'
   end
 
@@ -75,8 +77,8 @@ class ImageConverter < Converter
     q = @quality
     if format == :JP2
       @work.format = "BMP"
-      tmp_file = target + '.tmp.bmp' if format == :JP2
-      @work.write(tmp_file) { self.quality = q; self.filename = tmp_file }
+      tmp_file = target + '.tmp.bmp'
+      @work.write(tmp_file) { |f| f.quality = q; f.filename = tmp_file }
       result = `j2kdriver -i #{tmp_file} -t jp2 -R 0 -w R53 -o #{target} 2>&1`
       if result.match(/error/i)
         Application.error('ImageConverter') { "JPEG2000 conversion failed: #{result}" }
@@ -86,7 +88,7 @@ class ImageConverter < Converter
       FileUtils.rm(tmp_file)
     else
       Application.debug('ImageConverter') { "command: convert #{@work.command_line}" }
-      @work.write(target) { self.quality = q; self.filename = target }
+      @work.write(target) { |f|  f.quality = q; f.filename = target }
     end
   end
 
