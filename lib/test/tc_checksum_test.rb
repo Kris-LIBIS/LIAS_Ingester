@@ -18,7 +18,8 @@ class ChecksumTest < Test::Unit::TestCase
   end
 
   def test_initialize
-
+    cs = Checksum.new(:MD5)
+    assert_equal(:MD5, cs.type)
   end
   # Fake test
   def test_fail

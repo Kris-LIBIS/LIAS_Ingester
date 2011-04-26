@@ -1,5 +1,5 @@
-require 'lib/application_task'
-require 'lib/tools/checksum'
+require_relative '../application_task'
+require_relative '../tools/checksum'
 
 class Initializer
   include ApplicationTask

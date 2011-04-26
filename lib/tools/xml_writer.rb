@@ -9,7 +9,7 @@ module XmlWriter
     @document = Nokogiri::XML::Document.new
     @document.encoding = encoding
     
-    return @document
+    @document
     
   end
   
@@ -37,7 +37,7 @@ module XmlWriter
     attributes = options.delete :attributes
     add_attributes( node, attributes ) if attributes
 
-    return node
+    node
 
   end
 
@@ -51,7 +51,7 @@ module XmlWriter
 
     node.name = node_ns + ':' + node.name if node_ns
 
-    return node
+    node
 
   end
 
@@ -61,7 +61,7 @@ module XmlWriter
       node.set_attribute name, value
     end
 
-    return node
+    node
 
   end
 

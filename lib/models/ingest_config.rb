@@ -126,7 +126,7 @@ class IngestConfig
     label = [ label ] unless label.kind_of? Array
     parent = nil
     label.each { |l| parent = get_or_create_child_object parent, l }
-    return parent
+    parent
   end
   
   def get_or_create_child_object( parent, label )
@@ -141,7 +141,7 @@ class IngestConfig
       found.parent = parent
       found.save
     end
-    return found
+    found
   end
 
   def root_objects

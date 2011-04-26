@@ -15,11 +15,9 @@ class IngesterSetup
     :label              => 'control/label'
     }
   
-  attr_reader :requires_mets
-  
   attr_reader :tasks
   
-  TaskParamOrder = {
+  TASK_PARAMETER_ORDER = {
     'MetadataInserter' =>     [ :Link, :Mddesc, :Mdfilename, :Mid, :ComplexOnly, :Extension, :Size ],
     'AttributeAssignment' =>  [ :Name1, :Value1, :Name2, :Value2, :Name3, :Value3, :apply_to_parent_only, :extension],
     'FullText' =>             [ :Encoding, :Extension ]
@@ -31,6 +29,10 @@ class IngesterSetup
     @is_complex = false
     @requires_mets = false
     @tasks = Array.new
+  end
+
+  def requires_mets?
+    @requires_mets
   end
   
   def add_metadata( options = {} )
@@ -234,7 +236,7 @@ class IngesterSetup
       'task_name' => task[:task_name],
       'name'      => task[:name] }
     
-    TaskParamOrder[task[:task_name]].each do |p|
+    TASK_PARAMETER_ORDER[task[:task_name]].each do |p|
       param = task[:params][p]
       node << ( create_node 'param', :attributes => { 'name' => p.to_s, 'value' => param.to_s } )
     end
@@ -368,7 +370,9 @@ class IngesterSetup
     save_document doc, target_file
     
   end
-  
+
+  private
+
   def add_node( file, parent_node )
     
     # First create the div node

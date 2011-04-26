@@ -1,4 +1,5 @@
-require 'lib/tools/mime_type'
+require 'dm-core'
+require_relative '../tools/mime_type'
 
 class FileInfo
   include DataMapper::Resource
@@ -36,16 +37,16 @@ class FileInfo
     checksum = self.checksum_infos.all(:checksum_type => checksum_type)
     return checksum[0].checksum unless(checksum.empty?)
     self.checksum_infos << (c = ChecksumInfo.new(self.file_path, checksum_type))
-    return c.checksum
+    c.checksum
   end
   
   def recalculate_checksums
-    checksum_infos.each { |c| c.recalculate self.file_path }
+    self.checksum_infos.each { |c| c.recalculate self.file_path }
   end
   
   def debug_print( indent = 0 )
     p ' ' * indent + self.inspect
-    checksum_infos.each { |c| c.debug_info indent + 2 }
+    self.checksum_infos.each { |c| c.debug_info indent + 2 }
   end
   
 end

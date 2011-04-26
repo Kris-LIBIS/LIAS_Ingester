@@ -1,6 +1,6 @@
-require 'lib/application_task'
-require 'lib/webservices/digital_entity_manager'
-require 'lib/tools/xml_reader'
+require_relative '../application_task'
+require_relative '../webservices/digital_entity_manager'
+require_relative '../tools/xml_reader'
 require 'awesome_print'
 
 class Ingester
@@ -47,7 +47,7 @@ class Ingester
         process_config cfg
       when Status::Ingesting ... Status::Ingested
         warn "Restarting Ingest of configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
-        restart_config config_id
+        restart config_id
       when Status::Ingested .. Status::Finished
         warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
       end

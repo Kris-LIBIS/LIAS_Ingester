@@ -1,5 +1,7 @@
 class BadConfigException < StandardError
+
   attr :error, :fix
+
   def initialize(error, fix)
     @error = error
     @fix = fix
@@ -10,4 +12,5 @@ class BadConfigException < StandardError
     @@logger.error(message)
     super
   end
+
 end

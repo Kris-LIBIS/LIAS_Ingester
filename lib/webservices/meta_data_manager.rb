@@ -25,7 +25,7 @@ class MetaDataManager < SoapClient
   end
   
   def create_dc_from_xml( xml_doc )
-    dc = create_dc_record_from_xml xml_doc
+    create_dc_record_from_xml xml_doc
   end
   
   def update_dc( mid, dc )
@@ -119,19 +119,19 @@ class MetaDataManager < SoapClient
   
   def add_acl_user(doc, user, negate = false)
     expressions = Array.new
-    user.split.each {|u| expressions << create_acl_expression_user(u)}
+    user.split.each {|u| expressions << create_acl_expression_user(u, negate)}
     add_acl_condition doc, expressions
   end
   
   def add_acl_group(doc, group, negate = false)
     expressions = Array.new
-    group.split.each {|g| expressions << create_acl_expression_group(g)}
+    group.split.each {|g| expressions << create_acl_expression_group(g, negate)}
     add_acl_condition doc, expressions
   end
   
   def add_acl_iprange(doc, iprange, negate = false)
     expressions = Array.new
-    iprange.split.each {|i| expressions << create_acl_expression_iprange(i)}
+    iprange.split.each {|i| expressions << create_acl_expression_iprange(i, negate)}
     add_acl_condition doc, expressions
   end
   

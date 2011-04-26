@@ -3,21 +3,18 @@ require 'singleton'
 require 'logger'
 require 'optparse'
 
-require 'lib/tools/database'
+require_relative 'tools/database'
 #require 'lib/models/common/status'
-require 'lib/modules/initializer'
-require 'lib/modules/pre_processor'
-require 'lib/modules/pre_ingester'
-require 'lib/modules/ingester'
-require 'lib/modules/post_ingester'
+require_relative 'modules/initializer'
+require_relative 'modules/pre_processor'
+require_relative 'modules/pre_ingester'
+require_relative 'modules/ingester'
+require_relative 'modules/post_ingester'
 
 class Application
   include Singleton
 
   attr_reader :logger
-  attr_reader :db_log_level
-  attr_accessor :log_objects
-  attr_reader :log_file
   attr_reader :options
   attr_accessor :flush_counter
 

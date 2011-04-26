@@ -4,11 +4,10 @@ require_relative 'xml_writer'
 class CsvFile
   include XmlWriter
 
-  FixedHeader  = ['vpid', 'file_name', 'relation_type', 'related_to', 'usage_type', 'preservation_level', 'entity_type', 'label']
-  FixedMapping = ['vpid', 'stream_ref/file_name', 'relations/relation/type', 'relations/relation/vpid', 'control/usage_type', 'control/preservation_level', 'control/entity_type', 'control/label']
+  FIXED_HEADER  = ['vpid', 'file_name', 'relation_type', 'related_to', 'usage_type', 'preservation_level', 'entity_type', 'label']
+  FIXED_MAPPING = ['vpid', 'stream_ref/file_name', 'relations/relation/type', 'relations/relation/vpid', 'control/usage_type', 'control/preservation_level', 'control/entity_type', 'control/label']
 #  FixedOptions = [:file_name, :usage_type, :preservation_level, :entity_type, :label]
 
-  attr_reader :next_id
   attr_reader :header
   attr_reader :files
 #  attr_reader :extra_header
@@ -16,7 +15,7 @@ class CsvFile
 
   def initialize
     @next_id = 0
-    @header = FixedHeader
+    @header = FIXED_HEADER
     @files = Hash.new
   end
 
@@ -24,7 +23,7 @@ class CsvFile
     add_file '', name, usage_type, 'COMPLEX'
   end
 
-  def add_file( file_name, label, usage_type, entity_type = nil, extra_options = {} )
+  def add_file( file_name, label, usage_type, entity_type = nil )
     file_info = Hash.new
     file_info[:file_name] = file_name
     file_info[:label] = label
@@ -51,7 +50,7 @@ class CsvFile
     file_info[:entity_type] = entity_type
     @files[@next_id] = file_info
     @next_id += 1
-    return @next_id - 1
+    @next_id - 1
   end
 
   def set_relation( vpid, relation_type, to_vpid )
@@ -61,17 +60,17 @@ class CsvFile
     return false if ( to_vpid < 0 or to_vpid >= vpid )
     @files[vpid][:relation_type] = relation_type
     @files[vpid][:related_to] = to_vpid
-    return true
+    true
   end
 
   def write( file )
     CSV.open( file, 'w') do |csv|
       csv << @header
-      0.upto(@next_id-1) do |n|
+      0.upto(@next_id - 1) do |n|
         file_info = @files[n]
         row = Array.new
         row << n
-        FixedHeader[1..-1].each do |tag|
+        FIXED_HEADER[1..-1].each do |tag|
           element = file_info[tag.to_sym] ? file_info[tag.to_sym] : ''
           row << element
         end
@@ -85,7 +84,7 @@ class CsvFile
     x_map << create_node('x_source',
                          :attributes => { 'position' => position })
     x_map << create_text_node( 'x_target', target)
-    return x_map
+    x_map
   end
 
   def write_mapping( file )
@@ -113,8 +112,8 @@ class CsvFile
     
     root << stream_map
     
-    0.upto(FixedHeader.size - 1) do |n|
-      root << create_mapping( (n+1).to_s, FixedMapping[n] )
+    0.upto(FIXED_HEADER.size - 1) do |n|
+      root << create_mapping( (n+1).to_s, FIXED_MAPPING[n] )
     end
     
     root << create_mapping('4','stream_ref/file_id')

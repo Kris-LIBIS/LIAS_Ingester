@@ -1,6 +1,6 @@
-require 'lib/application_task'
+require_relative '../application_task'
 require_relative 'file_checker'
-require 'lib/tools/complex_file_collecter'
+require_relative '../tools/complex_file_collecter'
 
 class PreProcessor
   include ApplicationTask
@@ -42,8 +42,8 @@ class PreProcessor
         # continue
         process_run run
       when Status::PreProcessing ... Status::PreProcessed
-        warn "Restarting PreProcess of run #{run_id} with status is '#{Status.to_string(run.status)}'"
-        restart_run run_id
+        warn "Restarting PreProcess of run #{run_id} with status '#{Status.to_string(run.status)}'"
+        restart run_id
       when Status::PreProcessed .. Status::Finished
         warn "Skipping preprocessing of run ##{run_id} because status is '#{Status.to_string(run.status)}'"
       end

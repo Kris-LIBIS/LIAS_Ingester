@@ -1,14 +1,13 @@
 require 'cgi'
-require 'lib/tools/string'
-require File.dirname(__FILE__) + '/record/aleph_sequential'
-require File.dirname(__FILE__) + '/record/aleph_hash'
-require File.dirname(__FILE__) + '/record/dublin_core'
-require File.dirname(__FILE__) + '/record/oai_pmh'
-require File.dirname(__FILE__) + '/holding/opac_search_holding'
+require_relative 'record/aleph_sequential'
+require_relative 'record/aleph_hash'
+require_relative 'record/dublin_core'
+require_relative 'record/oai_pmh'
+require_relative 'holding/opac_search_holding'
 
 class Record
-  FixFieldStruct = Struct.new(:datas)
-  VarFieldStruct = Struct.new(:ind1, :ind2, :subfield)
+  FIX_FIELD_STRUCT = Struct.new(:datas)
+  VAR_FIELD_STRUCT = Struct.new(:ind1, :ind2, :subfield)
   
   attr_reader :xml_document
   
@@ -36,7 +35,7 @@ class Record
     result = []
     result1 = @xml_document.root.xpath("//fixfield[@id='#{tag}']")
     result1.each do |n|
-      result << FixFieldStruct.new(CGI::escapeHTML(n.content))
+      result << FIX_FIELD_STRUCT.new(CGI::escapeHTML(n.content))
     end
     
     return result unless result.empty?
@@ -59,19 +58,19 @@ class Record
         end
       end
         
-      result << VarFieldStruct.new(n['i1'], n['i2'], subfields)
+      result << VAR_FIELD_STRUCT.new(n['i1'], n['i2'], subfields)
     end
     
     if result.empty? && tag.eql?('001')
       doc_number = xml_get_text(@xml_document.root.xpath('//doc_number'))
-      result << FixFieldStruct.new(doc_number)
+      result << FIX_FIELD_STRUCT.new(doc_number)
     end
     
-    return result
+    result
   end
   
   def holdings
-    holding_data = []
+
     search = @xml_document.xpath('//search')
     if search
       search_type = search.first['type'].capitalize
@@ -82,12 +81,13 @@ class Record
           holdings_class = self.class.const_get("#{search_type}SearchHolding")
 	  
           if host
-            holding_data = holdings_class.new(self.tag('001').first.datas, host, base)
+            holdings_class.new(self.tag('001').first.datas, host, base)
           end
-        rescue Exception => e
+        rescue Exception
           puts "Holding class '#{search_type}SearchHolding' not found"
         end
       end
     end    
-  end    
+  end
+
 end

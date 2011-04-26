@@ -1,4 +1,5 @@
 module AlephSequential
+
   def to_aseq
     record = ''
     doc_number = xml_get_text(@xml_document.root.xpath('//doc_number'))
@@ -23,6 +24,7 @@ module AlephSequential
   end
   
 private
+
   def xml_get_text(xpath)
     text = ''
     if xpath.size == 1
@@ -30,5 +32,6 @@ private
     end
 
     text
-  end  
+  end
+
 end  

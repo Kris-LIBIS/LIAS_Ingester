@@ -31,13 +31,15 @@ class ModelFactory
     @models = {}
     Dir.glob("#{Application.dir}/config/ingest_models/*.yaml").each do |m|
       @@logger.debug(self.class) {"Loading ingest model: #{m}"}
-      model = YAML.load(File.open(m))
+      f = File.open(m)
+      model = YAML.load(f)
       @models[model[:NAME].downcase] = model
+      f.close
     end
   end
 
   def get_model1(description)
-    return ( IngestModel.new @models[description.downcase] )
+    IngestModel.new @models[description.downcase]
   end
 
   def get_model2(media, quality)
@@ -46,13 +48,13 @@ class ModelFactory
         return IngestModel.new(m)
       end
     end
-    return nil
+    nil
   end
 
   def get_model_for_config(config)
     return IngestModelDispatcher.new(config.ingest_model_map, config.ingest_run.location) if config.ingest_model_map
     return get_model1(config.ingest_model) if config.ingest_model
-    return get_model2(config.media_type, config.quality)
+    get_model2(config.media_type, config.quality)
   end
 
 end

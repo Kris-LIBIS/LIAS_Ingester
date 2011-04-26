@@ -1,6 +1,6 @@
 #require 'soap/wsdlDriver'
 require 'savon'
-require 'lib/tools/xml_writer'
+require_relative '../tools/xml_writer'
 
 class SoapClient
   include XmlWriter
@@ -69,11 +69,11 @@ class SoapClient
     root << create_text_node('interface_version', '1.0')
     root << create_text_node('user', user)
     root << create_text_node('password', password)
-    return doc
+    doc
   end
   
   def get_xml_response( response )
-    return response.first[1][response.first[1][:result].to_s.gsub(/\B[A-Z]+/, '_\&').downcase.to_sym]
+    response.first[1][response.first[1][:result].to_s.gsub(/\B[A-Z]+/, '_\&').downcase.to_sym]
   end
 
 end

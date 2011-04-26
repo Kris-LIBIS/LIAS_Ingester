@@ -1,8 +1,8 @@
 require 'rubygems'
 require 'nokogiri'
-require File.dirname(__FILE__) + '/generic_search'
+require_relative 'generic_search'
 require 'pp'
-require 'lib/tools/hash'
+require_relative '../../tools/hash'
 
 class OpacSearch < GenericSearch
  # attr_reader :xml_document
@@ -39,11 +39,7 @@ class OpacSearch < GenericSearch
     end
 
     while @record_pointer <= @num_records
-      set_entry  = 0
-      doc_number = 0
-      oai_marc   = nil
-      record     = nil
-      
+
       if @record_pointer <= @num_records        
         response = execute_http_query("op=present&set_entry=#{@record_pointer}&set_number=#{@set_number}&base=#{@base}")
         
@@ -133,7 +129,6 @@ private
   def execute_http_query(data)
     if @host.nil? || @host.size == 0
       raise Exception, "No host set"
-      return
     end
 
     begin
@@ -177,7 +172,7 @@ private
       
     end until redo_search == false or redo_count < 0
     
-    return xml_document
+    xml_document
   end
 
   

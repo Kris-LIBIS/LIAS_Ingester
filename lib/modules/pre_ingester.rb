@@ -1,6 +1,6 @@
-require 'lib/application_task'
-require 'lib/ingest_models/model_factory'
-require 'lib/tools/ingester_setup'
+require_relative '../application_task'
+require_relative '../ingest_models/model_factory'
+require_relative '../tools/ingester_setup'
 require_relative 'metadata'
 
 class PreIngester
@@ -138,7 +138,7 @@ class PreIngester
       
     end
     
-    return config_id
+    config_id
     
   end
   
@@ -205,7 +205,7 @@ class PreIngester
     
     # get metadata
     info 'Getting metadata'
-    result = get_metadata obj
+    get_metadata obj
     
     # copy stream to ingest_dir
     copy_stream obj
@@ -239,7 +239,7 @@ class PreIngester
   
   def finalize_ingest( cfg )
     
-    cfg.mets = @ingester_setup.requires_mets
+    cfg.mets = @ingester_setup.requires_mets?
     cfg.complex = !cfg.mets
     @ingester_setup.finalize_setup cfg.ingest_dir
     

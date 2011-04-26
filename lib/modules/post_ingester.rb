@@ -1,6 +1,6 @@
-require 'lib/application_task'
-require 'lib/webservices/digital_entity_manager'
-require 'lib/webservices/meta_data_manager'
+require_relative '../application_task'
+require_relative '../webservices/digital_entity_manager'
+require_relative '../webservices/meta_data_manager'
 
 class PostIngester
   include ApplicationTask
@@ -196,7 +196,7 @@ class PostIngester
         acl_record = MetaDataManager.instance.create_acl_record(ar.pinfo)
         result = MetaDataManager.instance.create_acl acl_record
         unless result[:error].empty? && result[:mids].size == 1
-          result[:error].each { |error| @app.logger.error "Error calling web service: #{error}" }
+          result[:error].each { |error| @@app.logger.error "Error calling web service: #{error}" }
           error "Failed to create accessrights metadata for #{ar.inspect}"
           obj.status = Status::PostIngestFailed
         end

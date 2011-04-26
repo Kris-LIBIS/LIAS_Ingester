@@ -1,4 +1,7 @@
+require 'dm-core'
+
 class ChecksumInfo
+
   include DataMapper::Resource
 
   property    :id,            Serial

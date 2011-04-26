@@ -4,10 +4,9 @@ require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
 require 'dm-migrations'
-require File.dirname(__FILE__) + '/config_file'
+require_relative 'config_file'
 
 class Database
-  attr_reader :db_engine
   attr_reader :handle
   attr_reader :logger
 
@@ -42,7 +41,7 @@ class Database
       DataMapper.setup(:default, {:adapter => 'redis', :host => ConfigFile['db_host'], :port => 6379, :thread_safe => true})
       puts "Database set to REDIS"
     else
-      puts $STDERR, "Unknown engine type: '#{@db_engine}'"
+      puts $stderr, "Unknown engine type: '#{@db_engine}'"
     end
     
     DataMapper::Model.raise_on_save_failure = true

@@ -70,12 +70,12 @@ class IngestObject
     return self.master.get_config if self.master
     return self.parent.get_config if self.parent
     return self.ingest_config unless self.parent
-    return nil
+    nil
   end
   
   def get_run
     return self.ingest_run if self.ingest_run
-    return get_config.ingest_run
+    get_config.ingest_run
   end
   
   def initialize(file_path = nil, checksum_type = nil)
@@ -89,86 +89,86 @@ class IngestObject
   end
   
   def root?
-    return self.parent.nil? && self.master.nil?
+    self.parent.nil? && self.master.nil?
   end
   
   def leaf?
-    return self.children.empty?
+    self.children.empty?
   end
   
   def child?
-    return self.parent
+    self.parent
   end
   
   def parent?
-    return self.children.size !=0
+    self.children.size !=0
   end
   
   def branch?
-    return self.parent && self.children.size != 0
+    self.parent && self.children.size != 0
   end
   
   def master?
-    return self.manifestations.size != 0
+    self.manifestations.size != 0
   end
   
   def manifestation?
-    return self.master
+    self.master
   end
   
   def file_path
     return self.file_info.file_path if self.file_info
-    return nil
+    nil
   end
   
   def flattened_path
     fp = self.file_path
     return fp.to_s.gsub('/', '_') if fp
-    return nil
+    nil
   end
   
   def base_name
     return self.file_info.base_name if self.file_info
-    return nil
+    nil
   end
   
   def file_name
     return self.file_info.file_name if self.file_info
-    return nil
+    nil
   end
   
   def absolute_path
-    return file_path.expand_path
+    file_path.expand_path
   end
   
   def relative_path
     return nil unless get_run
     location = Pathname.new( get_run.location ).expand_path
-    return absolute_path.relative_path_from location
+    absolute_path.relative_path_from location
   end
   
   def flattened_relative
     fp = relative_path
     return fp.to_s.gsub('/', '_') if fp
-    return nil
+    nil
   end
   
   def relative_stream
     return nil unless get_config
     stream_root = Pathname.new get_config.ingest_dir
     stream_root += 'transform/streams'
-    return file_stream.relative_path_from stream_root
+    self.file_stream.relative_path_from stream_root
   end
   
   def mime_type
     return self.file_info.mime_type if self.file_info
-    return nil
+    nil
   end
   
   def label
     return super if super
     return self.master.label if self.master
-    return nil
+    nil
   end
   
   def label_path
@@ -178,12 +178,12 @@ class IngestObject
       path = node.label + "/" + path
       node = node.parent
     end
-    return path
+    path
   end
   
   def get_checksum( checksum_type )
     return self.file_info.get_checksum(checksum_type) if self.file_info
-    return nil
+    nil
   end
   
   def add_child( object )
@@ -209,7 +209,7 @@ class IngestObject
     self.manifestations.each do |m|
       return m if m.usage_type == usage_type
     end
-    return nil
+    nil
   end
   
   def set_status_recursive( status, old_status = nil )

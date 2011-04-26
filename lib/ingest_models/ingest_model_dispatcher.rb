@@ -1,5 +1,4 @@
 require_relative 'ingest_model'
-require_relative 'model_factory'
 require 'pathname'
 require 'json'
 
@@ -12,7 +11,7 @@ class IngestModelDispatcher < IngestModel
   
   def get_manifestation(manifestation, media_type)
     @@logger.error(self.class) { 'Method \'get_manifestation\' not supported here.' }
-    return nil
+    nil
   end
   
   protected
@@ -24,7 +23,7 @@ class IngestModelDispatcher < IngestModel
     return nil unless ingest_model = @ingestmodel_map[src_path.to_s]
     return nil unless ingest_model = ModelFactory.instance.get_model1(ingest_model)
     
-    return ingest_model.make_manifestation( src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name )
+    ingest_model.make_manifestation( src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name )
     
   end
   

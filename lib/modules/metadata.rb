@@ -1,12 +1,12 @@
-require 'lib/application_task'
-require 'lib/libis/record'
-require 'lib/libis/search'
+require_relative '../application_task'
+require_relative '../libis/record'
+require_relative '../libis/search'
 require 'json'
 
 class Metadata
   include ApplicationTask
   
-  SearchOptions = {:host => 'http://opac.libis.be/X', :target => 'Opac', :base => 'KADOC', :index => 'sig'}
+  SEARCH_OPTIONS = {:host => 'http://opac.libis.be/X', :target => 'Opac', :base => 'KADOC', :index => 'sig'}
   
   def initialize(cfg)
     raise StandardError.new("input #{cfg} is not an IngestConfig") unless cfg.is_a?(IngestConfig)
@@ -30,7 +30,7 @@ class Metadata
   private
   
   def get_from_aleph(obj)
-    options = SearchOptions.merge @cfg.get_search_options
+    options = SEARCH_OPTIONS.merge @cfg.get_search_options
     search_term = obj.label
     if options[:term]
       if (options[:match])
@@ -61,7 +61,7 @@ class Metadata
       search = SearchFactory.new(options[:target]).new_search
       search.query(search_term, options[:index], options[:base], options)
       found = nil
-      i = 0
+      # i = 0
       search.each do |r|
         record = Record.new(r)
         # is this required?
@@ -69,7 +69,7 @@ class Metadata
         found = record unless found
       end
       
-      return found
+      found
   end
   
   def read_record(obj)
@@ -80,7 +80,7 @@ class Metadata
         return File.open(dc_file, 'r:utf-8').readlines.join
       end
     end
-    return nil
+    nil
   end
   
   def save(obj, record, options = {})

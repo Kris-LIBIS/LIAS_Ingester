@@ -1,4 +1,4 @@
-require 'lib/tools/http_fetch'
+require_relative '../../tools/http_fetch'
 
 class GenericSearch
   attr_accessor :host

@@ -2,17 +2,17 @@ require 'digest/md5'
 require 'digest/sha1'
 require 'digest/sha2'
 
-require 'lib/tools/exceptions'
+require_relative '../../lib/tools/exceptions'
 
 class Checksum
-  ChecksumTypes = [:MD5, :SHA1, :SHA256, :SHA384, :SHA512]
-  ChecksumTypesString = %w(MD5 SHA1 SHA256 SHA384 SHA512)
+  CHECKSUM_TYPES = [:MD5, :SHA1, :SHA256, :SHA384, :SHA512]
+  CHECKSUM_TYPES_STRING = %w(MD5 SHA1 SHA256 SHA384 SHA512)
 
   BUF_SIZE = 10240
   attr :type, :hasher
 
   def initialize(type)
-    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{ChecksumTypes.inspect}") unless ChecksumTypes.include? type
+    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{CHECKSUM_TYPES.inspect}") unless CHECKSUM_TYPES.include? type
     @type   = type
     @hasher = case type
              when :MD5
@@ -29,13 +29,13 @@ class Checksum
   end
 
   def self.type_from_string(type_string)
-    throw StandardError.new("Checksum: bad checksum type: '#{type_string}' - should be one of #{ChecksumTypesString.inspect}") unless ChecksumTypesString.include? type_string.upcase
-    return ChecksumTypes[ChecksumTypesString.index(type_string.upcase)]
+    throw StandardError.new("Checksum: bad checksum type: '#{type_string}' - should be one of #{CHECKSUM_TYPES_STRING.inspect}") unless CHECKSUM_TYPES_STRING.include? type_string.upcase
+    return CHECKSUM_TYPES[CHECKSUM_TYPES_STRING.index(type_string.upcase)]
   end
 
   def self.type_to_string(type)
-    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{ChecksumTypes.inspect}") unless ChecksumTypes.include? type
-    return ChecksumTypesString[ChecksumTypes.index(type)]
+    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{CHECKSUM_TYPES.inspect}") unless CHECKSUM_TYPES.include? type
+    return CHECKSUM_TYPES_STRING[CHECKSUM_TYPES.index(type)]
   end
 
   def get(file_path)
@@ -52,7 +52,7 @@ class Checksum
 
     end
 
-    return nil
+    nil
 
   end
 

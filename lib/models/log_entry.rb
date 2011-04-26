@@ -1,3 +1,5 @@
+require "dm-core"
+
 class LogEntry
   include DataMapper::Resource
 

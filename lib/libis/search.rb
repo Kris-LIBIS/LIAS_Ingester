@@ -1,5 +1,5 @@
-require File.dirname(__FILE__) + '/search/opac_search'
-require File.dirname(__FILE__) + '/search/primo_search'
+require_relative 'search/opac_search'
+require_relative 'search/primo_search'
 
 class SearchFactory
   def initialize(format)    

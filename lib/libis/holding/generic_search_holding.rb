@@ -1,4 +1,4 @@
-require 'lib/tools/http_fetch'
+require_relative '../../tools/http_fetch'
 
 class GenericSearchHolding
     attr_reader :doc_number, :host, :base

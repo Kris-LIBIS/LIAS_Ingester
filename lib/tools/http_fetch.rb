@@ -7,11 +7,11 @@ end
 
 
 module Net
+
   begin
     require 'net/https'
     HTTPS_SUPPORTED = true
   rescue LoadError
-    HTTPS_SUPPORTED = false
   end
 
   class HTTP

@@ -13,11 +13,11 @@ class Converter
   end
   
   def type2mime(t)
-    return @type2mime_map[t]
+    @type2mime_map[t]
   end
 
   def type2ext(t)
-    return @type2ext_map[t].first
+    @type2ext_map[t].first
   end
 
   def mime2type(mime)

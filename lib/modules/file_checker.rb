@@ -47,7 +47,7 @@ class FileChecker
       && (@config.check_checksum  ? check_checksum(obj) : true) \
       && (@config.check_ingested  ? check_ingested(obj) : true)
     
-    return result
+    result
     
   end
   
@@ -61,7 +61,7 @@ class FileChecker
   
   def check_filename(obj)
     
-    config_init = obj
+    config_init obj
     
     filter = @config.filename_match
     raise(FileCheckException, "#{filter} is not a regular expression") unless filter.is_a? Regexp

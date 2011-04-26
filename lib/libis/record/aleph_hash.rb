@@ -1,7 +1,7 @@
 module AlephHash
+
   def to_h
     record = {}
-    doc_number = xml_get_text(@xml_document.root.xpath('//doc_number'))
     oai_marc   = @xml_document.root.xpath('//oai_marc').first
     
     fixfields = oai_marc.xpath('//fixfield')
@@ -41,5 +41,6 @@ module AlephHash
     end
     
     record
-  end  
+  end
+
 end

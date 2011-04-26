@@ -1,7 +1,7 @@
 require 'fileutils'
 
-Dir.glob(File.dirname(__FILE__) + '/../converters/*.rb').each do |f|
-  require "#{f}"
+Dir.glob('../converters/*.rb').each do |f|
+  require_relative f
 end
 
 class IngestModel
@@ -25,7 +25,7 @@ class IngestModel
       return m if m[:MANIFESTATION] == manifestation
     end
     
-    return nil
+    nil
   end
   
   def create_manifestation(obj, manifestation, workdir)
@@ -53,7 +53,7 @@ class IngestModel
     
     return nil unless src_file_path and src_mime_type
     
-    return make_manifestation(src_file_path.to_s, src_mime_type, manifestation, workdir, tgt_file_name)
+    make_manifestation(src_file_path.to_s, src_mime_type, manifestation, workdir, tgt_file_name)
     
   end
   
@@ -75,7 +75,7 @@ class IngestModel
     when :ARCHIVE
       return ArchiveConverter.new(file)
     end
-    return nil
+    nil
   end
   
   protected
@@ -105,7 +105,7 @@ class IngestModel
     
     converter.convert(target, m[:FORMAT])
     
-    return target
+    target
     
   end
   

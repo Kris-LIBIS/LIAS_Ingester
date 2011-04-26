@@ -52,8 +52,7 @@ class IngestRun
 
     unless (File::exists?(config_file))
       @status     = Status::Failed
-      raise BadConfigException.new("Configuratiebestand #{config_file} kan niet gevonden worden")
-      return
+      raise BadConfigException.new("Configuratiebestand '#{config_file}' kan niet gevonden worden", nil)
     end
     
     # config file info
