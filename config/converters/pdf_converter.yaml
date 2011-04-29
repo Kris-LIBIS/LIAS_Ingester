@@ -1,8 +1,5 @@
-:MEDIA:         :VIDEO
+:MEDIA:         :DOCUMENT
 :TYPES:
-  - :TYPE:          :MSDOC
-    :MIME:          application/msword
-    :EXTENSIONS:    doc,docx
   - :TYPE:          :PDF
     :MIME:          application/pdf
     :EXTENSIONS:    pdf

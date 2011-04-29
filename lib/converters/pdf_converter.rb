@@ -1,12 +1,16 @@
-require_relative 'converter'
+class PdfConverter
 
-class DocumentConverter < Converter
-  
+  def initialized?
+    return true
+  end
+
   protected
 
   def init(source)
+    @source = source
+
     puts "Initializing #{self.class} with '#{source}'"
-    load_config Application.dir + '/config/converters/document_converter.yaml'
+    load_config Application.dir + '/config/converters/pdf_converter.yaml'
   end
 
   def do_convert(target, format)

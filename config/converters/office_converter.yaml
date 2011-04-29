@@ -1,0 +1,8 @@
+:MEDIA:         :DOCUMENT
+:TYPES:
+  - :TYPE:          :MSDOC
+    :MIME:          application/msword
+    :EXTENSIONS:    doc,docx
+  - :TYPE:          :MSXLS
+    :MIME:          application/excel
+    :EXTENSIONS:    xls,xlsx

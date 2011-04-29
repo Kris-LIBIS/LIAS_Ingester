@@ -71,7 +71,7 @@ class IngestModel
     when :VIDEO
       return VideoConverter.new(file)
     when :DOCUMENT
-      return DocumentConverter.new(file)
+      return OfficeConverter.new(file)
     when :ARCHIVE
       return ArchiveConverter.new(file)
     end

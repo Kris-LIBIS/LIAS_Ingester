@@ -47,10 +47,6 @@ class Converter
     ext2type extension
   end
   
-  def get_media_type
-    
-  end
-
   protected
 
   def load_config(file)
