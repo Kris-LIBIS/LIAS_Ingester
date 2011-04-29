@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+puts RUBY_PLATFORM
+if RUBY_PLATFORM == "java"
+  require 'extensions/all'
+end
 require_relative 'lib/application'
 
 # Makes our life much easier

@@ -1,5 +1,5 @@
 require 'rubygems'
-require 'sqlite3'
+#require 'sqlite3'
 require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
@@ -32,7 +32,7 @@ class Database
     when :sqlite3
       DataMapper.setup(:default, "sqlite3://#{ConfigFile['database']}")
       new_db = true unless File.exist?("#{ConfigFile['database']}")
-      @handle = SQLite3::Database.new("#{ConfigFile['database']}")
+#      @handle = SQLite3::Database.new("#{ConfigFile['database']}")
       puts "Database set to SQLite3 '#{ConfigFile['database']}'"
     when :oracle
       DataMapper.setup(:default, {:adapter => 'oracle', :user => ConfigFile['db_user'], :password => ConfigFile['db_password'], :host => ConfigFile['db_host'], :port => 1521, :database => ConfigFile['db_database']} )
@@ -70,7 +70,7 @@ class Database
 private
 
   def load_models
-   if @db_engine != :sqlite3 || @handle
+#   if @db_engine != :sqlite3 || @handle
       dir = File.dirname(__FILE__) + '/../models'
       dir = File.absolute_path(dir)
       models = Dir.glob("#{dir}/*.rb")
@@ -78,8 +78,8 @@ private
         info "loading model #{m}"
         require "#{m}"
       end
-    else
-       raise "No database handle found. Cannot load models"
-   end
+#    else
+#       raise "No database handle found. Cannot load models"
+#   end
   end
 end
