@@ -1,8 +1,6 @@
 require 'fileutils'
 
-Dir.glob('../converters/*.rb').each do |f|
-  require_relative f
-end
+require_relative '../converters/converter'
 
 class IngestModel
   

@@ -1,7 +1,12 @@
+Dir.glob('*_converter.rb').each do |f|
+  require_relative f
+end
+
 class Converter
 
   @@converters = []
-  
+
+  attr_reader :converters
   attr_reader :media_type
   
   def self.inherited( klass )

@@ -1,4 +1,6 @@
-class PdfConverter
+require_relative 'converter'
+
+class PdfConverter < Converter
 
   def initialized?
     return true
