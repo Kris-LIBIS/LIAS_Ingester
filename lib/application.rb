@@ -14,8 +14,11 @@ require_relative 'modules/post_ingester'
 class Application
   include Singleton
 
-  attr_reader :logger
-  attr_reader :options
+  attr_reader   :logger
+  attr_reader   :db_log_level
+  attr_accessor :log_objects
+  attr_reader   :log_file
+  attr_reader   :options
   attr_accessor :flush_counter
 
   def self.dir

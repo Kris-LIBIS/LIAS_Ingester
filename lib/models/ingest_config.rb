@@ -108,14 +108,16 @@ class IngestConfig
         end
       when :mets
         self.mets = true
-        value.key_strings_to_symbols!
-        self.complex_group  = value[:group]
-        self.complex_label  = value[:label]
-        self.complex_utype  = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]
-        if value[:accessright]
-          prot = Protection.from_value(value[:accessright])
-          prot.usage_type = self.complex_utype
-          self.protections << prot
+        if value
+          value.key_strings_to_symbols!
+          self.complex_group  = value[:group]
+          self.complex_label  = value[:label]
+          self.complex_utype  = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]
+          if value[:accessright]
+            prot = Protection.from_value(value[:accessright])
+            prot.usage_type = self.complex_utype
+            self.protections << prot
+          end
         end
       end # case label
     end # config.each
