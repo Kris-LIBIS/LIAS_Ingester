@@ -3,7 +3,7 @@
 require 'rubygems'
 puts RUBY_PLATFORM
 if RUBY_PLATFORM == "java"
-  require 'extensions/all'
+#  require 'extensions/all'
 end
 require_relative 'lib/application'
 
