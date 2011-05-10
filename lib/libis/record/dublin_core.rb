@@ -163,19 +163,19 @@ module DublinCore
         
         # ######## DC:TYPE
         aleph_record.tag('655 9').each do |t|
-          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
+          xml['dc'].type_ t.subfield['a'] unless t.subfield['a'].empty?
         end
         
         aleph_record.tag('088 9').each do |t|
-          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
+          xml['dc'].type_ t.subfield['a'] unless t.subfield['a'].empty?
         end
         
         aleph_record.tag('655 4').each do |t|
-          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
+          xml['dc'].type_ t.subfield['a'] unless t.subfield['a'].empty?
         end
         
         aleph_record.tag('955  ').each do |t|
-          xml['dc'].type t.subfield['a'] unless t.subfield['a'].empty?
+          xml['dc'].type_ t.subfield['a'] unless t.subfield['a'].empty?
         end
         
         aleph_record.tag('69002').each do |t|
@@ -210,8 +210,8 @@ module DublinCore
         
         aleph_record.tag('FMT').each do |t|
           
-          if t.members.include?('datas')          
-            xml['dc'].type fmt_mapping[t.datas]
+          if t.members.include?('datas')
+            xml['dc'].type_ fmt_mapping[t.datas]
           end
         end
         
