@@ -1,6 +1,7 @@
 require_relative 'common/config'
 require_relative 'common/status'
 
+#noinspection RubyResolve
 class IngestConfig
   include DataMapper::Resource
   include CommonConfig
@@ -46,7 +47,7 @@ class IngestConfig
     self.log_entries.destroy
     true
   end
-  
+
   after :status= do
     self.status_name = Status.to_string(self.status)
   end
@@ -61,18 +62,11 @@ class IngestConfig
     common_config(config, false)
     
     # ingest_config specific configuration
-    
+
     self.filename_match   = Regexp.new('')
     self.mime_type        = Regexp.new('')
-#    self.ingest_model     = 'default'
-#    self.media_type       = :IMAGE
-#    self.quality          = :ARCHIVE
     self.complex          = false
-#    self.complex_group    = ''
-#    self.complex_label    = ''
     self.complex_utype    = 'COMPLEX_VIEW_MAIN'
-#    self.ingest_id        = ''
-#    self.ingest_dir       = ''
     self.mets             = false
    
     config.each do |label,value|
@@ -152,11 +146,9 @@ class IngestConfig
 
   def add_object( obj )
     self.ingest_objects << obj
-#    obj.ingest_config = self
   end
 
   def del_object( obj )
-#    self.ingest_objects.delete obj
     obj.ingest_config = nil
   end
 

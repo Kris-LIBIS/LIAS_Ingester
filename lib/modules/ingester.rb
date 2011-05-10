@@ -189,7 +189,7 @@ class Ingester
       error "Cannot detect assigned PID: failed to find <vpid> entry in #{file_name}." unless vpid_node
       fixed_pid_list[vpid_node.content] = pid if vpid_node
 	  end
-	  return fixed_pid_list
+    fixed_pid_list
   end
   
   def fix_pidlist_for_mets( pid_list, cfg )
@@ -202,7 +202,7 @@ class Ingester
       fixed_pid_list[vpid] = pid_list[mets_id]
     end
     fixed_pid_list[cfg.root_objects.first.vpid] = pid_list['0']
-    return fixed_pid_list
+    fixed_pid_list
   end
   
   def get_pidlist( cfg )
@@ -216,7 +216,7 @@ class Ingester
         pid_list = fix_pidlist_for_mets pid_list, cfg
       end
     end
-    return pid_list
+    pid_list
 
   end
 

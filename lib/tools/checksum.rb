@@ -1,4 +1,6 @@
+#noinspection RubyResolve
 require 'digest/md5'
+#noinspection RubyResolve
 require 'digest/sha1'
 require 'digest/sha2'
 

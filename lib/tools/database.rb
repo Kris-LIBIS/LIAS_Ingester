@@ -76,6 +76,7 @@ private
       models = Dir.glob("#{dir}/*.rb")
       models.each do |m|
         info "loading model #{m}"
+        #noinspection RubyResolve
         require "#{m}"
       end
 #    else

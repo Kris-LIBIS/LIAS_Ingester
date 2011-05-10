@@ -7,9 +7,8 @@ module OaiPmh
 
     controlfields = []
     datafields = []
-    
-    doc_number = xml_get_text(@xml_document.root.find('//doc_number'))
-    oai_marc   = @xml_document.root.find('//oai_marc').first    
+
+    oai_marc   = @xml_document.root.find('//oai_marc').first
 
     fixfields = oai_marc.find('//fixfield')
     varfields = oai_marc.find('//varfield')
@@ -79,7 +78,7 @@ module OaiPmh
         }
       }
     }
-    
-    return XML::Document.string(oai_pmh_record)
+
+    XML::Document.string(oai_pmh_record)
   end
 end

@@ -32,6 +32,7 @@ class ModelFactory
     Dir.glob("#{Application.dir}/config/ingest_models/*.yaml").each do |m|
       @@logger.debug(self.class) {"Loading ingest model: #{m}"}
       f = File.open(m)
+      #noinspection RubyResolve
       model = YAML.load(f)
       @models[model[:NAME].downcase] = model
       f.close
@@ -43,7 +44,7 @@ class ModelFactory
   end
 
   def get_model2(media, quality)
-    @models.each do |n, m|
+    @models.each do |_, m|
       if m[:MEDIA] == media and m[:QUALITY] == quality
         return IngestModel.new(m)
       end

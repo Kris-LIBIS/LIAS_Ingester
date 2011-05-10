@@ -15,8 +15,10 @@ class Application
   include Singleton
 
   attr_reader   :logger
+  #noinspection RubyResolve
   attr_reader   :db_log_level
   attr_accessor :log_objects
+  #noinspection RubyResolve
   attr_reader   :log_file
   attr_reader   :options
   attr_accessor :flush_counter

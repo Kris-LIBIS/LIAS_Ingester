@@ -3,6 +3,7 @@ require 'fileutils'
 require 'pathname'
 require_relative 'common/status'
 
+#noinspection RubyResolve
 class IngestObject
   include DataMapper::Resource
   

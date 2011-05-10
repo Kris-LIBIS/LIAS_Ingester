@@ -1,5 +1,6 @@
 # centralized status number management
 
+#noinspection ALL
 module Status
 
 

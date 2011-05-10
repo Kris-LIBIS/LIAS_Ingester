@@ -1,5 +1,6 @@
 require "dm-core"
 
+#noinspection RubyResolve
 class Protection
   include DataMapper::Resource
 

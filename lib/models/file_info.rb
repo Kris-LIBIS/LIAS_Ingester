@@ -1,6 +1,7 @@
 require 'dm-core'
 require_relative '../tools/mime_type'
 
+#noinspection RubyResolve
 class FileInfo
   include DataMapper::Resource
   
@@ -13,7 +14,7 @@ class FileInfo
   
   belongs_to  :ingest_object
   
-  before :destroy do |post|
+  before :destroy do |_|
     self.checksum_infos.destroy
     true
   end

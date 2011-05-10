@@ -90,13 +90,13 @@ module CommonConfig
 
           when :ingest
             content.key_strings_to_symbols!
-            content.each do |k,v|
+            content.each do |k, _|
               Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
             end
 
           when :post_ingest
             content.key_strings_to_symbols!
-            content.each do |k,v|
+            content.each do |k, _|
               Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
             end
 

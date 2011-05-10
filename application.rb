@@ -1,10 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-puts RUBY_PLATFORM
-if RUBY_PLATFORM == "java"
-#  require 'extensions/all'
-end
 require_relative 'lib/application'
 
 # Makes our life much easier
@@ -24,8 +20,6 @@ if @@app.options[:action]
   ingester = Ingester.new
   post_ingester = PostIngester.new
 
-  result = 0
-
   ARGV.each do |arg|
 
     configs = nil
@@ -41,9 +35,8 @@ if @@app.options[:action]
       configs.each do |cfg_id|
         cfg_id = pre_ingester.start cfg_id  unless @@app.options[:end] and @@app.options[:end] < 3
         cfg_id = ingester.start cfg_id      unless @@app.options[:end] and @@app.options[:end] < 4
+        #noinspection RubyUnusedLocalVariable
         cfg_id = post_ingester.start cfg_id unless @@app.options[:end] and @@app.options[:end] < 5
-
-        result = cfg_id
       end
 
     when 2
@@ -54,9 +47,8 @@ if @@app.options[:action]
       configs.each do |cfg_id|
         cfg_id = pre_ingester.start cfg_id  unless @@app.options[:end] and @@app.options[:end] < 3
         cfg_id = ingester.start cfg_id      unless @@app.options[:end] and @@app.options[:end] < 4
+        #noinspection RubyUnusedLocalVariable
         cfg_id = post_ingester.start cfg_id unless @@app.options[:end] and @@app.options[:end] < 5
-
-        result = cfg_id
       end
 
     when 3
@@ -65,30 +57,27 @@ if @@app.options[:action]
       next if cfg_id.class == IngestConfig
 
       cfg_id = ingester.start cfg_id        unless @@app.options[:end] and @@app.options[:end] < 4
+      #noinspection RubyUnusedLocalVariable
       cfg_id = post_ingester.start cfg_id   unless @@app.options[:end] and @@app.options[:end] < 5
-
-      result = cfg_id
 
     when 4
 
       cfg_id = ingester.send(@@app.options[:action], arg)
       next if cfg_id.class == IngestConfig
 
+      #noinspection RubyUnusedLocalVariable
       cfg_id = post_ingester.start cfg_id   unless @@app.options[:end] and @@app.options[:end] < 5
-
-      result = cfg_id
 
     when 5
 
+      #noinspection RubyUnusedLocalVariable
       cfg_id = post_ingester.send(@@app.options[:action], arg)
-
-      result = cfg_id
 
     end
 
   end
   
   @@app.terminate
-  exit result
+  exit
 
 end

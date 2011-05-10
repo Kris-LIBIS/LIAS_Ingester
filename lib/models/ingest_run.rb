@@ -1,6 +1,7 @@
 require_relative 'common/config'
 require_relative 'common/status'
 
+#noinspection RubyResolve
 class IngestRun
   include DataMapper::Resource
   include CommonConfig

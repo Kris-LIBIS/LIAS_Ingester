@@ -24,6 +24,7 @@ module Net
       max_redirects = args[:max_redirects] || 10
 
       proxy_class   = Proxy(proxy_host, proxy_port)
+      #noinspection RubyArgCount
       request       = proxy_class.new(uri.host, uri.port)
 
       request.use_ssl = true if HTTPS_SUPPORTED && uri.scheme.eql?('https')

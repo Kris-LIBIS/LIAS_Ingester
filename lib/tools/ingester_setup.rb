@@ -125,8 +125,8 @@ class IngesterSetup
     file_info = Hash.new
     @last_id += 1
     file_info[:vpid] = @last_id
+    #noinspection RubyResolve
     file_info[:file_name] = obj.relative_stream.to_s if obj and obj.file_stream
-#    file_info[:file_name] = obj.flattened_path if obj and obj.file_stream
     file_info[:label] = label
     case usage_type.upcase
     when /^(COMPLEX_)?ORIGINAL$/
@@ -150,7 +150,7 @@ class IngesterSetup
     file_info[:entity_type] = entity_type
     file_info[:object] = obj
     @files[@last_id] = file_info
-    return @last_id
+    @last_id
   end
   
   def set_relation( vpid, relation_type, to_vpid )
@@ -162,7 +162,7 @@ class IngesterSetup
     @files[vpid][:relation_type] = relation_type
     @files[vpid][:related_to] = to_vpid
     @requires_mets ||= ( relation_type == :part_of and @files[to_vpid][:relation_type] == :part_of )
-    return true
+    true
   end
   
   def finalize_setup( setup_dir )
@@ -181,10 +181,11 @@ class IngesterSetup
   def get_related( relation, to_vpid, usage_type = nil )
     relation = relation.to_sym
     to_vpid = to_vpid.to_i
-    result = @files.find_all do |vpid, f|
+    result = @files.find_all do |_, f|
       f[:relation_type] == relation and f[:related_to] == to_vpid and
       ( usage_type ? f[:usage_type] == usage_type : true ) 
     end
+    result
   end
   
   def write_settings( file )
@@ -194,9 +195,7 @@ class IngesterSetup
       :node_ns => 'xb',
       'xb' => 'http://com/exlibris/digitool/common/jobs/xmlbeans' }
     doc.root = root
-    
-    node = nil
-    
+
     if @requires_mets
       node = create_node 'transformer_task', :attributes => {
         'name'        => 'METS xml file and associated file stream(s)',
@@ -240,8 +239,8 @@ class IngesterSetup
       param = task[:params][p]
       node << ( create_node 'param', :attributes => { 'name' => p.to_s, 'value' => param.to_s } )
     end
-    
-    return node
+
+    node
     
   end
 
@@ -249,11 +248,11 @@ class IngesterSetup
     ### NOTE: This is a workaround for what is probably a bug in DigiTool: in complex object ingests,
     ######### the VIEW_MAIN manifestations are not displayed by the viewer (could this be an issue in
     ######### the on-the-fly METS creator in the delevery module?)
-    @files.each { |vpid, f| f[:usage_type] = 'VIEW' if f[:usage_type] == 'VIEW_MAIN' } if @is_complex
+    @files.each { |_, f| f[:usage_type] = 'VIEW' if f[:usage_type] == 'VIEW_MAIN' } if @is_complex
     
     CSV.open( file, 'w:utf-8') do |csv|
       csv << LABELMAPPING.keys
-      @files.each do |vpid,file_info|
+      @files.each do |_,file_info|
         row = Array.new
         LABELMAPPING.keys.each do |tag|
           element = file_info[tag] ? file_info[tag].to_s : ''
@@ -268,7 +267,7 @@ class IngesterSetup
     x_map = create_node 'x_map'
     x_map << create_node('x_source', :attributes => { 'position' => position } )
     x_map << create_text_node( 'x_target', target)
-    return x_map
+    x_map
   end
   
   def write_mapping( file )
@@ -316,7 +315,8 @@ class IngesterSetup
     add_namespaces doc.root, 'mix'    => 'http://www.loc.gov/mix/'
     add_attributes doc.root, 'xsi:schemaLocation' => 'http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/mods/v3 .http://www.loc.gov/mods/v3/mods-3-1.xsd http://www.loc.gov/mix/ http://www.loc.gov/mix/mix.xsd http://cosimo.stanford.edu/sdr/metsrights/ http://cosimo.stanford.edu/sdr/metsrights.xsd'
     add_attributes doc.root, 'xmlns' => 'http://www.loc.gov/METS/' if @ns == ''
-    
+
+    #noinspection RubyUnusedLocalVariable
     doc.root  << ( header       = create_node @ns + 'metsHdr',      :attributes => { 'ID' => 'hdr' } )
     doc.root  << ( filesec      = create_node @ns + 'fileSec',      :attributes => { 'ID' => 'fsec' } )
     filesec   << ( archives     = create_node @ns + 'fileGrp',      :attributes => { 'ID' => 'fgrp_1', 'USE' => 'archive' } )
@@ -325,7 +325,7 @@ class IngesterSetup
     filesec   << ( view_mains   = create_node @ns + 'fileGrp',      :attributes => { 'ID' => 'fgrp_4', 'USE' => 'reference' } )
     doc.root  << ( logical_map  = create_node @ns + 'structMap',    :attributes => { 'ID' => 'smap_1', 'TYPE' => 'LOGICAL',  'LABEL' => 'Inhoud' } )
     
-    root_objects = @files.find_all do |vpid,file_info|
+    root_objects = @files.find_all do |_,file_info|
       file_info[:relation_type].nil?
     end
     
@@ -380,8 +380,8 @@ class IngesterSetup
     
     f = get_related( :manifestation, file[:vpid], 'VIEW_MAIN' ).first
     add_fptr_node f[1], div_node if f
-    
-    return div_node
+
+    div_node
     
   end
   
@@ -396,8 +396,8 @@ class IngesterSetup
     this_node = create_node @ns + 'div', :attributes => { 'ID' => this_id, 'LABEL' => File.basename(file[:label]) }
     
     parent_node << this_node
-    
-    return this_node
+
+    this_node
   end
   
   def add_fptr_node( file, parent_node )
@@ -414,9 +414,9 @@ class IngesterSetup
     
     this_node = add_node file, parent_node
     
-    get_related( :part_of, file[:vpid] ).each { |vpid, f| add_node_recursive f, this_node unless f[:object] and f[:object].leaf? }
+    get_related( :part_of, file[:vpid] ).each { |_, f| add_node_recursive f, this_node unless f[:object] and f[:object].leaf? }
     
-    get_related( :part_of, file[:vpid] ).each { |vpid, f| add_node_recursive f, this_node if f[:object] and f[:object].leaf? }
+    get_related( :part_of, file[:vpid] ).each { |_, f| add_node_recursive f, this_node if f[:object] and f[:object].leaf? }
     
   end
   
