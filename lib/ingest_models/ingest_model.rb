@@ -56,24 +56,17 @@ class IngestModel
   end
   
   def get_converter(file)
-    
-    case @config[:MEDIA]
-    when :ANY
-      mime_type = MimeType.get(file)
-      converter = Converter.get_converters.detect { |c| c.new(file).support_mimetype? mime_type }
-      return converter.new(file) if converter
-    when :IMAGE
-      return ImageConverter.new(file)
-    when :AUDIO
-      return AudioConverter.new(file)
-    when :VIDEO
-      return VideoConverter.new(file)
-    when :DOCUMENT
-      return OfficeConverter.new(file)
-    when :ARCHIVE
-      return ArchiveConverter.new(file)
-    end
+
+    converters = Converter.get_converters
+
+    converters = converters.select { |c| c.media_type == @config[:MEDIA] } unless @config[:MEDIA] == :ANY
+
+    mime_type = MimeType.get(file)
+    converter = converters.detect { |c| c.support_mimetype? mime_type }
+
+    return converter.new(file) if converter
     nil
+
   end
   
   protected
@@ -85,11 +78,11 @@ class IngestModel
     converter = get_converter src_file_path
     return nil unless converter && converter.initialized?
     
-    m = get_manifestation(manifestation, converter.media_type)
+    m = get_manifestation(manifestation, converter.class.media_type)
     
-    return nil if m.nil? or (converter.type2mime(m[:FORMAT]) == src_mime_type && m[:OPTIONS].nil?)
+    return nil if m.nil? or (converter.class.type2mime(m[:FORMAT]) == src_mime_type && m[:OPTIONS].nil?)
     
-    target += ModelFactory.filename_extension(manifestation) + '.' + converter.type2ext(m[:FORMAT])
+    target += ModelFactory.filename_extension(manifestation) + '.' + converter.class.type2ext(m[:FORMAT])
     
     if m[:OPTIONS]
       m[:OPTIONS].each do |k,v|

@@ -3,7 +3,7 @@ require_relative 'converter'
 class PdfConverter < Converter
 
   def initialized?
-    return true
+    true
   end
 
   protected
@@ -12,7 +12,6 @@ class PdfConverter < Converter
     @source = source
 
     puts "Initializing #{self.class} with '#{source}'"
-    load_config Application.dir + '/config/converters/pdf_converter.yaml'
   end
 
   def do_convert(target, format)

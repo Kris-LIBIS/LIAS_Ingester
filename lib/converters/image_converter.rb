@@ -1,11 +1,10 @@
 require 'rubygems'
 require 'quick_magick'
-require 'RMagick'
 require_relative 'converter'
 
 class ImageConverter < Converter
 
-  include Magick
+  include QuickMagick
 
   attr_reader :work
   
@@ -22,6 +21,7 @@ class ImageConverter < Converter
   end
 
   def quality(value)
+    @quality = value
     @work.append_to_settings('quality', value)
   end
 
@@ -29,37 +29,20 @@ class ImageConverter < Converter
     "#{dir}/watermark_#{usage_type}.png"
   end
 
+  #noinspection RubyResolve
   def create_watermark(text, dir, usage_type)
     
     file = get_watermark_file(dir, usage_type)
     return file if File.exist?(file)
 
-    watermark = Image.new(1000, 1000) { |p| p.background_color = 'transparent' }
-    
-    gc = Draw.new
-    gc.fill 'black'
-    gc.stroke 'black'
-    gc.gravity CenterGravity
-    gc.pointsize 100
-    gc.font_family "Helvetica"
-    gc.font_weight BoldWeight
-    gc.stroke 'none'
-    gc.rotate -20
-    gc.text 0, 0, (text.nil? ? ' (C) LIBIS' : text)
-    
-    gc.draw watermark
-    
-#    watermark = watermark.shade true, 310, 30
-    watermark = watermark.blur_image 2.0, 1.0
+    `#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/create_watermark.sh '#{file}' '#{(text.nil? ? ' (C) LIBIS' : text)}'`
 
-    watermark.write('png:' + file)
-    
     file
-    
+
   end
 
   def watermark(source, target, watermark_image)
-    `#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/run_watermarker2.sh #{source} #{target} #{watermark_image} X2`
+    `#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/watermarker.sh #{source} #{target} #{watermark_image}`
   end
 
   protected
@@ -67,7 +50,6 @@ class ImageConverter < Converter
   def init(source)
     @work = QuickMagick::Image.read(source).first
     Application.error('ImageConverter') { "QuickMagick cannot open image file '#{source}'."} unless @work
-    load_config Application.dir + '/config/converters/image_converter.yaml'
   end
 
   def do_convert(target,format)
