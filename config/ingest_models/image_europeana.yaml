@@ -20,6 +20,6 @@
   - :MANIFESTATION:   THUMBNAIL
     :FORMAT:          :JPEG
     :OPTIONS:
-      :RESIZE:        200x280
+      :RESIZE:        200
       :QUALITY:       50%
 
