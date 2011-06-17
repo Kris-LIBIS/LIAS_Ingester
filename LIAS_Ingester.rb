@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'rubygems'
 require_relative 'lib/application'
 
 # Makes our life much easier
