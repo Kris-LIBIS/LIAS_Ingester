@@ -1,0 +1,97 @@
+# This file lists all the types the application is knows about along with its mime type and file extensions.
+# The first file extension in the list is the default one that will be used when a file of that type is created.
+# The mime types need to be unique. Some mime types need to be 'invented' like for instance for PDF/A. The MimeType
+# class should take care of that.
+# Preferably the file extensions are unique too. If not, the first matching entry in the list will be used when a
+# reverse lookup from extension to type identifier is performed. However, file extensions will typically not be used
+# to determine type identifier or mime types. So you should be fairly safe when the file extensions are not unique.
+
+:TYPES:
+# Image types
+  - :MEDIA:         :IMAGE
+    :TYPE_INFO:
+      - :TYPE:          :TIFF
+        :MIME:          image/tiff
+        :EXTENSIONS:    tif,tiff
+      - :TYPE:          :JPEG2000
+        :MIME:          image/jp2
+        :EXTENSIONS:    jp2,jpg2
+      - :TYPE:          :JPEG
+        :MIME:          image/jpeg
+        :EXTENSIONS:    jpg,jpe,jpeg
+      - :TYPE:          :PNG
+        :MIME:          image/png
+        :EXTENSIONS:    png
+      - :TYPE:          :BMP
+        :MIME:          image/bmp
+        :EXTENSIONS:    bmp
+      - :TYPE:          :GIF
+        :MIME:          image/gif
+        :EXTENSIONS:    gif
+
+# Audio types
+  - :MEDIA:         :AUDIO
+    :TYPE_INFO:
+      - :TYPE:          :WAV
+        :MIME:          audio/x-wav
+        :EXTENSIONS:    wav
+      - :TYPE:          :MP3
+        :MIME:          audio/mpeg
+        :EXTENSIONS:    mp3
+      - :TYPE:          :FLAC
+        :MIME:          audio/flac
+        :EXTENSIONS:    flac
+      - :TYPE:          :OGG
+        :MIME:          audio/ogg
+        :EXTENSIONS:    ogg
+
+# Video types
+  - :MEDIA:         :VIDEO
+    :TYPE_INFO:
+      - :TYPE:          :MPEG
+        :MIME:          video/mpeg
+        :EXTENSIONS:    mpg,mpeg,mpa,mpe,mpv2
+      - :TYPE:          :MPEG4
+        :MIME:          video/mp4
+        :EXTENSIONS:    mp4,mpeg4
+      - :TYPE:          :MJPEG2000
+        :MIME:          video/jpeg2000
+        :EXTENSIONS:    mjp2
+      - :TYPE:          :QUICKTIME
+        :MIME:          video/quicktime
+        :EXTENSIONS:    qt,mov
+      - :TYPE:          :AVI
+        :MIME:          video/x-msvideo
+        :EXTENSIONS:    avi
+      - :TYPE:          :3GP
+        :MIME:          video/3gp
+        :EXTENSIONS:    3gp
+      - :TYPE:          :OGGV
+        :MIME:          video/ogg
+        :EXTENSIONS:    ogv
+      - :TYPE:          :WMV
+        :MIME:          video/x-ms-wmv
+        :EXTENSIONS:    wmv
+
+# Office document types
+  - :MEDIA:         :DOCUMENT
+    :TYPE_INFO:
+      - :TYPE:          :MSDOC
+        :MIME:          application/msword
+        :EXTENSIONS:    doc,docx
+      - :TYPE:          :MSXLS
+        :MIME:          application/excel
+        :EXTENSIONS:    xls,xlsx
+      - :TYPE:          :PDF
+        :MIME:          application/pdf
+        :EXTENSIONS:    pdf
+      - :TYPE:          :PDFA
+        :MIME:          application/pdfa # Note the invented mime type here. It requires implementation in theMimeType class.
+        :EXTENSIONS:    pdfa
+
+# Archive types
+  - :MEDIA:         :ARCHIVE
+    :TYPE_INFO:
+      - :TYPE:        :EAD
+        :MIME:        application/ead   # This is again an invented mime type. It's actually an XML ...
+        :EXTENSIONS:  ead,xml
