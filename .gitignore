@@ -2,6 +2,7 @@ config.yml
 .fuse*
 .*.swp
 *.komodoproject
+*.idea
 .project
 *.db
 *-libxml.rb
