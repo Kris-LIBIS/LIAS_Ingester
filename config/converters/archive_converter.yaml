@@ -1,11 +1,4 @@
-:MEDIA:         :ARCHIVE
-:TYPES:
-  - :TYPE:        :TAR
-    :MIME:        application/x-tar
-    :EXTENSIONS:  tar
-  - :TYPE:        :ZIP
-    :MIME:        application/zip
-    :EXTENSIONS:  zip
-  - :TYPE:        :TGZ
-    :MIME:        application/x-compressed
-    :EXTENSIONS:  tgz
+:INPUT_TYPES:
+  - :EAD
+:OUTPUT_TYPES:
+  - :PDF

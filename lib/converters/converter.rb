@@ -1,18 +1,10 @@
-require_relative '../tools/string'
+require 'tools/string'
+require 'ingester_task'
+
+require_relative 'type_database'
 
 class Converter
-
-  @@converters = []
-
-  #noinspection RubyResolve
-  def Converter.get_converters
-    if @@converters.empty?
-      Dir.glob("#{Application.dir}/lib/converters/*_converter.rb").each do |f|
-        require_relative File.basename(f, '.rb')
-      end
-    end
-    @@converters
-  end
+  public
 
   def initialize(source)
     init(source.to_s)
@@ -26,78 +18,97 @@ class Converter
 
   def Converter.inherited( klass )
 
-    @@converters << klass
+    ConverterRepository.register klass
 
     klass.class_eval {
 
-      def self.media_type
-        class_variable_get :@@media_type
+      def self.config_file
+        Application.dir + '/config/converters/' + self.name.underscore + '.yaml'
       end
 
-      def self.type2mime_map
-         class_variable_get :@@type2mime_map
+      def self.support_input_type?(type_id)
+        self.input_types.include? type_id
       end
 
-      def self.type2ext_map
-         class_variable_get :@@type2ext_map
+      def self.support_output_type?(type_id)
+        self.input_types.include? type_id
       end
 
-      def self.type2options_map
-         class_variable_get :@@type2options_map
+      def self.support_input_mimetype?(mimetype)
+        type_id = TypeDatabase.instance.mime2type mimetype
+        self.support_input_type? type_id
       end
 
-      def self.type2mime(t)
-        type2mime_map[t]
+      def self.support_output_mimetype?(mimetype)
+        type_id = TypeDatabase.instance.mime2type mimetype
+        self.support_output_type? type_id
       end
 
-      def self.type2ext(t)
-        type2ext_map[t].first
+      def self.support_conversion?(input_type, output_type)
+        self.conversions[input_type] and self.conversions[input_type].any? { |t| t == output_type }
       end
 
-      def self.mime2type(mime)
-        type2mime_map.invert[mime]
-      end
-
-      def self.ext2type(ext)
-        type2ext_map.each do |k,v|
-          return k if v.include? ext
-        end
-        nil
-      end
-
-      def self.support_mimetype?(mimetype)
-        type2mime_map.has_value? mimetype
+      def self.supported_output_types(input_type)
+        self.conversions[input_type]
       end
 
       def self.support_extension?(extension)
         ext2type extension
       end
 
-      def self.load_config(file)
-        my_type2mime_map = {}
-        my_type2ext_map = {}
-        my_type2options_map = {}
+      def self.load_config
 
+        file = self.config_file
         config = YAML.load_file file
-        my_media_type = config[:MEDIA]
-        config[:TYPES].each do |t|
-          type = t[:TYPE]
-          my_type2mime_map[type] = t[:MIME]
-          my_type2ext_map[type]  = t[:EXTENSIONS].split(',')
-          t.delete(:TYPE)
-          t.delete(:MIME)
-          t.delete(:EXTENSIONS)
-          my_type2options_map[type] = t
-        end
-        class_variable_set :@@media_type, my_media_type
-        class_variable_set :@@type2mime_map, my_type2mime_map
-        class_variable_set :@@type2ext_map, my_type2ext_map
-        class_variable_set :@@type2options_map, my_type2options_map
-      end
-    }
 
-    klass.class_exec(Application.dir + '/config/converters/' + klass.to_s.underscore + '.yaml') { |file|
-      klass.load_config(file)
+        my_input_types = []
+        my_output_types = []
+
+        config[:TYPES].each do |t|
+          my_input_types.add t
+          my_output_types.add t
+        end if config[:TYPES]
+
+        config[:INPUT_TYPES].each do |t|
+          my_input_types.add t
+        end if config[:INPUT_TYPES]
+
+        config[:OUTPUT_TYPES].each do |t|
+          my_output_types.add t
+        end if config[:OUTPUT_TYPES]
+
+        class_variable_set :@@input_types, my_input_types
+        class_variable_set :@@output_types, my_output_types
+
+        my_conversions = nil
+        my_conversions = config[:CONVERSIONS] if config[:CONVERSIONS]
+        unless my_conversions
+          my_conversions = {}
+          my_input_types.each do |input|
+            my_conversions[input] = my_output_types
+          end
+        end
+        class_variable_set :@@conversions, my_conversions
+      end
+
+      def initialize
+        load_config
+      end
+
+      private
+
+      def self.input_types
+        class_variable_get :@@input_types
+      end
+
+      def self.output_types
+        class_variable_get :@@output_types
+      end
+
+      def self.conversions
+        class_variable_get :@@conversions
+      end
+
     }
 
   end

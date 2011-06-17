@@ -1,8 +1,5 @@
-:MEDIA:         :DOCUMENT
 :TYPES:
-  - :TYPE:          :PDF
-    :MIME:          application/pdf
-    :EXTENSIONS:    pdf
-  - :TYPE:          :PDFA
-    :MIME:          application/pdfa
-    :EXTENSIONS:    pdfa
+  - :PDF
+:OUTPUT_TYPES:
+  - :PDFA
+  - :JPEG

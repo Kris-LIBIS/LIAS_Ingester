@@ -1,26 +1,9 @@
-:MEDIA:         :VIDEO
 :TYPES:
-  - :TYPE:          :MPEG
-    :MIME:          video/mpeg
-    :EXTENSIONS:    mpg,mpeg,mpa,mpe,mpv2
-  - :TYPE:          :MPEG4
-    :MIME:          video/mp4
-    :EXTENSIONS:    mp4,mpeg4
-  - :TYPE:          :MJPEG2000
-    :MIME:          video/jpeg2000
-    :EXTENSIONS:    mjp2
-  - :TYPE:          :QUICKTIME
-    :MIME:          video/quicktime
-    :EXTENSIONS:    qt,mov
-  - :TYPE:          :AVI
-    :MIME:          video/x-msvideo
-    :EXTENSIONS:    avi
-  - :TYPE:          :3GP
-    :MIME:          video/3gp
-    :EXTENSIONS:    3gp
-  - :TYPE:          :OGGV
-    :MIME:          video/ogg
-    :EXTENSIONS:    ogv
-  - :TYPE:          :WMV
-    :MIME:          video/x-ms-wmv
-    :EXTENSIONS:    wmv
+  - :MPEG
+  - :MPEG4
+  - :MJPEG2000
+  - :QUICKTIME
+  - :AVI
+  - :3GP
+  - :OGGV
+  - :WMV

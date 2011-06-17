@@ -1,14 +1,5 @@
-:MEDIA:         :AUDIO
 :TYPES:
-  - :TYPE:        :WAV
-    :MIME:        audio/x-wav
-    :EXTENSIONS:  wav
-  - :TYPE:        :MP3
-    :MIME:        audio/mpeg
-    :EXTENSIONS:  mp3
-  - :TYPE:        :FLAC
-    :MIME:        audio/flac
-    :EXTENSIONS:  flac
-  - :TYPE:        :OGG
-    :MIME:        audio/ogg
-    :EXTENSIONS:  ogg
+  - :WAV
+  - :MP3
+  - :FLAC
+  - :OGG
