@@ -1,15 +1,16 @@
+$: << File.expand_path(File.dirname(__FILE__))
+
 require 'rubygems'
 require 'singleton'
 require 'logger'
 require 'optparse'
 
-require_relative 'tools/database'
-#require 'lib/models/common/status'
-require_relative 'modules/initializer'
-require_relative 'modules/pre_processor'
-require_relative 'modules/pre_ingester'
-require_relative 'modules/ingester'
-require_relative 'modules/post_ingester'
+require 'tools/database'
+require 'modules/initializer'
+require 'modules/pre_processor'
+require 'modules/pre_ingester'
+require 'modules/ingester'
+require 'modules/post_ingester'
 
 class Application
   include Singleton
@@ -24,7 +25,7 @@ class Application
   attr_accessor :flush_counter
 
   def self.dir
-    "#{File.dirname(__FILE__)}/.."
+    File.expand_path "#{File.dirname(__FILE__)}/.."
   end
 
   def self.log_to(obj)
@@ -148,6 +149,7 @@ class Application
   
   def self.write_log(severity, datetime, progname, msg)
     return unless self.instance.log_file
+#    puts "severity #{severity} datetyime #{datetime} progname #{progname} msg #{msg}"
     self.instance.log_file.puts "[#{datetime.to_s}] #{severity} -- #{progname}: #{msg}"
     self.instance.flush_counter = self.instance.flush_counter + 1
     self.instance.log_file.flush if self.instance.flush_counter > 10

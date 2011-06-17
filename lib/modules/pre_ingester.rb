@@ -1,10 +1,10 @@
-require_relative '../application_task'
-require_relative '../ingest_models/model_factory'
-require_relative '../tools/ingester_setup'
+require 'ingester_module'
+require 'ingest_models/model_factory'
+require 'tools/ingester_setup'
 require_relative 'metadata'
 
 class PreIngester
-  include ApplicationTask
+  include IngesterModule
   
   def start_queue
     info 'Starting'
@@ -214,9 +214,6 @@ class PreIngester
     info 'Creating manifestations'
     create_manifestations obj
     
-    # watermark objects
-    create_watermark obj
-    
     # set object status to preingested
     obj.set_status_recursive Status::PreIngested
     
@@ -303,7 +300,9 @@ class PreIngester
   def create_manifestations( object )
     cfg = object.get_config
     ModelFactory.generated_manifestations.each do |m|
-      file = @model.create_manifestation object, m, "#{cfg.ingest_dir}/transform/streams/"
+      debug "Manifestation: #{m}"
+      p = cfg.get_protection(m)
+      file = @model.create_manifestation object, m, "#{cfg.ingest_dir}/transform/streams/", cfg.get_protection(m), "#{cfg.ingest_dir}/watermark_"
       if file
         info "Created manifestation file: #{file}"
         mobj = IngestObject.new file, :MD5
@@ -315,31 +314,6 @@ class PreIngester
       end
     end
     object.children.each { |child| create_manifestations child }
-  end
-  
-  def create_watermark( object )
-    cfg = object.get_config
-    
-    # note: original will never be watermark protected
-    object.manifestations.each do |manifestation|
-      p = cfg.get_protection(manifestation.usage_type)
-      next unless p and p.ptype == :WATERMARK # only watermark protection is done at this stage
-      converter = @model.get_converter manifestation.file_stream
-      if converter.respond_to?(:watermark)
-        wm_file = p.pinfo
-        wm_file = converter.create_watermark(p.pinfo, cfg.ingest_dir, manifestation.usage_type) unless File.exist?(wm_file)
-        new_file = File.dirname(manifestation.file_stream) + '/' +
-          File.basename(manifestation.file_stream, '.*') + '_watermark' + File.extname(manifestation.file_stream)
-        converter.watermark manifestation.file_stream, new_file, wm_file
-        info "Created file #{new_file} for watermark protection of #{manifestation.usage_type}"
-        File.delete(manifestation.file_stream)
-        manifestation.file_stream = new_file
-        manifestation.file_info.file_path = new_file if manifestation.file_info
-      else
-        error 'Watermark requested, but not supported for the file type'
-      end
-    end
-    object.children.each { |child| create_watermark child }
   end
   
   def add_to_ingest( object )

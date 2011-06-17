@@ -1,10 +1,11 @@
-require_relative '../application_task'
-require_relative '../libis/record'
-require_relative '../libis/search'
 require 'json'
 
+require 'ingester_module'
+require 'libis/record'
+require 'libis/search'
+
 class Metadata
-  include ApplicationTask
+  include IngesterModule
   
   SEARCH_OPTIONS = {:host => 'http://opac.libis.be/X', :target => 'Opac', :base => 'KADOC', :index => 'sig'}
   

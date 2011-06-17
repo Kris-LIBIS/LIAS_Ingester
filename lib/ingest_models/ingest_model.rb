@@ -1,8 +1,12 @@
 require 'fileutils'
 
-require_relative '../converters/converter'
+require 'ingester_task'
+require 'converters/converter'
+require 'converters/type_database'
 
 class IngestModel
+
+  include IngesterTask
   
   attr_reader :config
   
@@ -26,7 +30,7 @@ class IngestModel
     nil
   end
   
-  def create_manifestation(obj, manifestation, workdir)
+  def create_manifestation(obj, manifestation, workdir, protection, watermark_file)
     
     tgt_file_name = obj.label
     
@@ -51,13 +55,18 @@ class IngestModel
     
     return nil unless src_file_path and src_mime_type
     
-    make_manifestation(src_file_path.to_s, src_mime_type, manifestation, workdir, tgt_file_name)
+    make_manifestation(src_file_path.to_s, src_mime_type, manifestation, workdir, tgt_file_name,
+                       protection, "#{watermark_file}#{manifestation}")
     
   end
   
-  def get_converter(file)
+  def get_converters(src_file)
 
-    converters = Converter.get_converters
+    mime_type = MimeType.get(src_file)
+    src_type = TypeDatabase.instance.mime2type mime_type
+
+
+    converters = Converter.get_converter_sequence
 
     converters = converters.select { |c| c.media_type == @config[:MEDIA] } unless @config[:MEDIA] == :ANY
 
@@ -71,33 +80,42 @@ class IngestModel
   
   protected
   
-  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name)
+  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file)
     
     target = tgt_dir + (tgt_file_name.nil? ? File.basename(src_file_path, '.*') : tgt_file_name)
     
-    converter = get_converter src_file_path
-    return nil unless converter && converter.initialized?
-    
-    m = get_manifestation(manifestation, converter.class.media_type)
-    
-    return nil if m.nil? or (converter.class.type2mime(m[:FORMAT]) == src_mime_type && m[:OPTIONS].nil?)
-    
-    target += ModelFactory.filename_extension(manifestation) + '.' + converter.class.type2ext(m[:FORMAT])
-    
-    if m[:OPTIONS]
-      m[:OPTIONS].each do |k,v|
-        converter.resize v if k == :RESIZE
-        converter.scale v if k == :SCALE
-        converter.quality v if k == :QUALITY
-      end
+    src_type = TypeDatabase.instance.mime2type src_mime_type
+
+    m = get_manifestation(manifestation, src_type)
+
+    if m.nil?
+      warn "Skipping manifestation. No manifestation-config object found."
+      return nil
     end
-    
-    FileUtils.mkdir_p File.dirname(target)
-    
-    converter.convert(target, m[:FORMAT])
+
+    converter_chain = Converter.get_converter_chain src_type, m[:FORMAT]
+
+    unless converter_chain
+      warn "Skipping manifestation. No suitable converter chain found."
+      return nil
+    end
+
+    target += ModelFactory.filename_extension(manifestation) + '.' + TypeDatabase.instance.type2ext(m[:FORMAT])
+
+    conversion_operations = m[:OPTIONS] || {}
+    if protection and protection.ptype == :WATERMARK
+      conversion_operations[:WATERMARK] = [protection.pinfo, watermark_file]
+    end
+
+    if (src_type == m[:FORMAT] && conversion_operations.empty?)
+      debug  "Skipping manifestation. Target is identical to source."
+      return nil
+    end
+
+    converter_chain.convert src_file_path, target, conversion_operations
     
     target
-    
+
   end
   
 end

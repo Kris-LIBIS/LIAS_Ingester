@@ -1,7 +1,8 @@
-require_relative 'soap_client'
 require 'singleton'
 require 'iconv'
 #require 'htmlentities'
+
+require_relative 'soap_client'
 
 class MetaDataManager < SoapClient
   include Singleton

@@ -1,7 +1,37 @@
-require_relative 'tools/exceptions'
-require 'chronic_duration'
+#require 'application'
+require 'tools/exceptions'
 
-module ApplicationTask
+# Makes our life much easier
+def nil.each #(&block)
+end
+
+module IngesterTask
+
+  def IngesterTask.included(klass)
+    klass.class_eval {
+
+      def self.debug(msg)
+        Application.debug self.name, &lambda{msg}
+      end
+
+      def self.info(msg)
+        Application.info self.name, &lambda{msg}
+      end
+
+      def self.warn(msg)
+        Application.warn self.name, &lambda{msg}
+      end
+
+      def self.error(msg)
+        Application.error self.name, &lambda{msg}
+      end
+
+      def self.fatal(msg)
+        Application.fatal self.name, &lambda{msg}
+      end
+
+    }
+  end
 
   def debug(msg)
     Application.debug self.class, &lambda{msg}
@@ -36,18 +66,6 @@ module ApplicationTask
       error "Exception in #{self.class}: #{e.message}"
       e.backtrace.each { |x| error "#{x}" }
     end
-  end
-  
-  def elapsed_time(start_time)
-    ChronicDuration.output((Time.now - start_time).round(3), :format => :long)
-  end
-
-  def continue(id)
-    
-    error "Cannot continue the ingest at this stage. Please used 'undo' + 'start' or 'restart' this stage instead."
-    
-    nil
-    
   end
   
 end

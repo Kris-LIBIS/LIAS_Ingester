@@ -1,5 +1,6 @@
 require 'dm-core'
-require_relative '../tools/mime_type'
+
+require 'tools/mime_type'
 
 #noinspection RubyResolve
 class FileInfo

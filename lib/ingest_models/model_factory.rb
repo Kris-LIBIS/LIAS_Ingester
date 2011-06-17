@@ -1,5 +1,6 @@
 require 'singleton'
 require 'yaml'
+
 require_relative 'ingest_model'
 require_relative 'ingest_model_dispatcher'
 

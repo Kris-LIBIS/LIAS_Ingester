@@ -1,6 +1,7 @@
-require_relative 'ingest_model'
 require 'pathname'
 require 'json'
+
+require_relative 'ingest_model'
 
 class IngestModelDispatcher < IngestModel
   

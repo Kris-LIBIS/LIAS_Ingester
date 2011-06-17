@@ -1,7 +1,8 @@
 require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
-require_relative '../../tools/hash'
+
+require 'tools/hash'
 require_relative 'bad_config_exception'
 require_relative 'status'
 

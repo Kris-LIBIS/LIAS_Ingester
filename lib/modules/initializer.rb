@@ -1,8 +1,8 @@
-require_relative '../application_task'
-require_relative '../tools/checksum'
+require 'ingester_module'
+require 'tools/checksum'
 
 class Initializer
-  include ApplicationTask
+  include IngesterModule
   
   def start( cfg_file )
     

@@ -1,8 +1,10 @@
 require 'rubygems'
 require 'nokogiri'
-require_relative 'generic_search'
 require 'pp'
-require_relative '../../tools/hash'
+
+require 'tools/hash'
+
+require_relative 'generic_search'
 
 class OpacSearch < GenericSearch
  # attr_reader :xml_document
@@ -147,9 +149,11 @@ private
           #puts " Found #{xml_get_text(xml_document.xpath('//find/no_records'))} records"
           nil
         else
-          puts
-          puts "----------> Error searching for #{@term} --> '#{error}'"
-          puts
+          unless error == 'empty set'
+            puts
+            puts "----------> Error searching for #{@term} --> '#{error}'"
+            puts
+          end
           if error =~ /license/
             redo_search = true
           end          
@@ -158,7 +162,7 @@ private
         puts response.error!
       end
       rescue Exception => ex
-        sleep_time = 2
+        sleep_time = 0.5
         if ex.message =~ /503 "Service Temporarily Unavailable"/
           sleep_time = 30
           Application.warn('OPAC_Search') {"OPAC Service temporarily unavailable - retrying after #{sleep_time} minutes"}

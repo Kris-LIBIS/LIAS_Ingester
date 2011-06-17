@@ -1,10 +1,11 @@
-require_relative '../application_task'
-require_relative '../webservices/digital_entity_manager'
-require_relative '../tools/xml_reader'
 require 'awesome_print'
 
+require 'ingester_module'
+require 'webservices/digital_entity_manager'
+require 'tools/xml_reader'
+
 class Ingester
-  include ApplicationTask
+  include IngesterModule
   
   def start_queue
 

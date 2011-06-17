@@ -1,4 +1,5 @@
 require 'csv'
+
 require_relative 'xml_writer'
 
 class CsvFile

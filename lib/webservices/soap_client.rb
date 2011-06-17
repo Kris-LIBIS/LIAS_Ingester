@@ -1,6 +1,6 @@
-#require 'soap/wsdlDriver'
 require 'savon'
-require_relative '../tools/xml_writer'
+
+require 'tools/xml_writer'
 
 class SoapClient
   include XmlWriter

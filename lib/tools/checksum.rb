@@ -4,7 +4,7 @@ require 'digest/md5'
 require 'digest/sha1'
 require 'digest/sha2'
 
-require_relative '../../lib/tools/exceptions'
+require 'tools/exceptions'
 
 class Checksum
   CHECKSUM_TYPES = [:MD5, :SHA1, :SHA256, :SHA384, :SHA512]

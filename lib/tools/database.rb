@@ -4,6 +4,7 @@ require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
 require 'dm-migrations'
+
 require_relative 'config_file'
 
 class Database

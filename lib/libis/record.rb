@@ -1,4 +1,5 @@
 require 'cgi'
+
 require_relative 'record/aleph_sequential'
 require_relative 'record/aleph_hash'
 require_relative 'record/dublin_core'

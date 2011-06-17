@@ -1,9 +1,10 @@
-require_relative '../application_task'
+require 'ingester_module'
+require 'tools/complex_file_collecter'
+
 require_relative 'file_checker'
-require_relative '../tools/complex_file_collecter'
 
 class PreProcessor
-  include ApplicationTask
+  include IngesterModule
   
   public
   

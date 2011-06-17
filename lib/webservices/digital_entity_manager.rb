@@ -1,5 +1,6 @@
-require_relative 'soap_client'
 require 'singleton'
+
+require_relative 'soap_client'
 
 class DigitalEntityManager < SoapClient
   include Singleton

@@ -1,9 +1,9 @@
-require_relative '../application_task'
-require_relative '../webservices/digital_entity_manager'
-require_relative '../webservices/meta_data_manager'
+require 'ingester_module'
+require 'webservices/digital_entity_manager'
+require 'webservices/meta_data_manager'
 
 class PostIngester
-  include ApplicationTask
+  include IngesterModule
   
   def start_queue
     
