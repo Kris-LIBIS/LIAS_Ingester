@@ -1,6 +1,6 @@
-require "test/unit"
+require 'test/unit'
 
-require_relative '../tools/checksum'
+require 'tools/checksum'
 
 class ChecksumTest < Test::Unit::TestCase
 
