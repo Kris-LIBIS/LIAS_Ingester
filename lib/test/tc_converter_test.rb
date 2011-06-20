@@ -27,4 +27,13 @@ class ConverterTest < MiniTest::Unit::TestCase
     chain = TestConverterRepository.get_converter_chain :DOC, :GIF
     assert_equal([{:converter  => ConverterA, :target  => :PDFA}, {:converter => ConverterD, :target => :JPEG}, {:converter => ConverterE, :target => :GIF}], chain.to_array)
   end
+
+  def test_chain_operations
+    chain = TestConverterRepository.get_converter_chain :DOC, :JPEG
+    assert_equal([{:converter => ConverterA, :target => :PDFA}, {:converter => ConverterD, :target => :JPEG}], chain.to_array)
+    chain = TestConverterRepository.get_converter_chain :DOC, :JPEG, { :DUMMY => nil }
+    assert_nil(chain)
+    chain = TestConverterRepository.get_converter_chain :DOC, :JPEG, { :DO_SOMETHING => nil }
+    assert_equal([{:converter => ConverterA, :target => :PDFA}, {:converter => ConverterB, :target => :PDFA}, {:converter => ConverterD, :target => :JPEG}], chain.to_array)
+  end
 end

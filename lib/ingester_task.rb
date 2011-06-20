@@ -5,6 +5,8 @@ require 'tools/exceptions'
 def nil.each #(&block)
 end
 
+$ApplicationDir = File.expand_path "#{File.dirname(__FILE__)}/.."
+
 module IngesterTask
 
   def IngesterTask.included(klass)

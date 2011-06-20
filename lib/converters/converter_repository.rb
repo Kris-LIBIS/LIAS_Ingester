@@ -9,7 +9,7 @@ class ConverterRepository
 
   @@converters = Set.new
 
-  @@converters_glob = "#{Application.dir}/lib/converters/*_converter.rb"
+  @@converters_glob = "#{$ApplicationDir}/lib/converters/*_converter.rb"
 
   def ConverterRepository.register converter_class
     @@converters.add? converter_class
@@ -59,11 +59,20 @@ class ConverterRepository
         node[:target] = tgt_type
         sequence = current_chain.dup
         sequence << node
-        # we only want to remember the shortest converter chains
-        if !chains_found.empty? and sequence.length < chains_found[0].length
-          chains_found.clear
+        # check if the chain supports all the operations
+        success = true
+        operations.each do |op, val|
+          success = false unless sequence.any? do |node|
+            node[:converter].new.respond_to? op.to_s.downcase.to_sym
+          end
         end
-        chains_found << sequence if chains_found.empty? or sequence.length == chains_found[0].length
+        if success
+          # we only want to remember the shortest converter chains
+          if !chains_found.empty? and sequence.length < chains_found[0].length
+            chains_found.clear
+          end
+          chains_found << sequence if chains_found.empty? or sequence.length == chains_found[0].length
+        end
       end
     end
 
@@ -72,8 +81,9 @@ class ConverterRepository
     self.get_converters.each do |converter|
       next unless converter.support_input_type? src_type
       converter.supported_output_types(src_type).each do |tmp_type|
-        next if tmp_type == src_type
-        next if current_chain.any? { |c| c[:target] == tmp_type}
+        # would like to enable the following for optimalizationn, but some operation may require such a step
+        # next if tmp_type == src_type
+        # next if current_chain.any? { |c| c[:target] == tmp_type}
         self.get_converter_chain_recursive(tmp_type, tgt_type, operations, chains_found,
                                            current_chain.dup << { :converter => converter, :target => tmp_type })
       end

@@ -1,7 +1,7 @@
 require 'fileutils'
 
 require 'ingester_task'
-require 'converters/converter'
+require 'converters/converter_repository'
 require 'converters/type_database'
 
 class IngestModel
@@ -17,7 +17,8 @@ class IngestModel
   end
   
   def get_manifestation(manifestation, media_type)
-    
+    puts "Manifestation: #{manifestation}"
+    puts "Media type: #{media_type}"
     if @config[:MEDIA] == :ANY and media_type
       model = ModelFactory.instance.get_model2( media_type, @config[:QUALITY] )
       return ( model.get_manifestation manifestation, nil )
@@ -60,40 +61,33 @@ class IngestModel
     
   end
   
-  def get_converters(src_file)
-
-    mime_type = MimeType.get(src_file)
-    src_type = TypeDatabase.instance.mime2type mime_type
-
-
-    converters = Converter.get_converter_sequence
-
-    converters = converters.select { |c| c.media_type == @config[:MEDIA] } unless @config[:MEDIA] == :ANY
-
-    mime_type = MimeType.get(file)
-    converter = converters.detect { |c| c.support_mimetype? mime_type }
-
-    return converter.new(file) if converter
-    nil
-
-  end
-  
   protected
   
   def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file)
     
     target = tgt_dir + (tgt_file_name.nil? ? File.basename(src_file_path, '.*') : tgt_file_name)
     
-    src_type = TypeDatabase.instance.mime2type src_mime_type
+    src_type = TypeDatabase.mime2type src_mime_type
+    media_type = TypeDatabase.type2media src_type
 
-    m = get_manifestation(manifestation, src_type)
+    m = get_manifestation(manifestation, media_type)
 
     if m.nil?
       warn "Skipping manifestation. No manifestation-config object found."
       return nil
     end
 
-    converter_chain = Converter.get_converter_chain src_type, m[:FORMAT]
+    conversion_operations = m[:OPTIONS] || {}
+    if protection and protection.ptype == :WATERMARK
+      conversion_operations[:WATERMARK] = { :watermark_info =>protection.pinfo, :watermark_file => watermark_file }
+    end
+
+    if (src_type == m[:FORMAT] && conversion_operations.empty?)
+      debug  "Skipping manifestation. Target is identical to source."
+      return nil
+    end
+
+    converter_chain = ConverterRepository.get_converter_chain src_type, m[:FORMAT], conversion_operations
 
     unless converter_chain
       warn "Skipping manifestation. No suitable converter chain found."
@@ -101,16 +95,6 @@ class IngestModel
     end
 
     target += ModelFactory.filename_extension(manifestation) + '.' + TypeDatabase.instance.type2ext(m[:FORMAT])
-
-    conversion_operations = m[:OPTIONS] || {}
-    if protection and protection.ptype == :WATERMARK
-      conversion_operations[:WATERMARK] = [protection.pinfo, watermark_file]
-    end
-
-    if (src_type == m[:FORMAT] && conversion_operations.empty?)
-      debug  "Skipping manifestation. Target is identical to source."
-      return nil
-    end
 
     converter_chain.convert src_file_path, target, conversion_operations
     

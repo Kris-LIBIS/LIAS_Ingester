@@ -14,7 +14,8 @@ class PdfConverter < Converter
     @options[:ranges] = selection
   end
 
-  def watermark(watermark_info, watermark_file)
+  def watermark(options = {})
+    watermark_info = options[:watermark_info]
     if watermark_info.nil?
       @wm_text = [ '© LIBIS' ]
     elsif File.exist? watermark_info

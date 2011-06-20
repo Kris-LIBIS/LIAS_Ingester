@@ -91,8 +91,8 @@ class Converter
         class_variable_set :@@conversions, my_conversions
       end
 
-      def initialize
-        load_config
+      def initialize( source = nil )
+        init(source) if source
       end
 
       private

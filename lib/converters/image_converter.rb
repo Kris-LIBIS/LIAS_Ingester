@@ -19,7 +19,9 @@ class ImageConverter < Converter
     @options[:quality] = value
   end
 
-  def watermark(watermark_info, watermark_file)
+  def watermark(options = {})
+    watermark_info = options[:watermark_info]
+    watermark_file = options[:watermark_file]
     watermark_image = watermark_info
     unless watermark_image and File.exist? watermark_image
       watermark_image = watermark_file + ".png"
@@ -36,7 +38,7 @@ class ImageConverter < Converter
   def init(source)
     @options ||= {}
     @source = source
-    Application.error('ImageConverter') { "QuickMagick cannot open image file '#{source}'."} unless File.exist? source
+    Application.error('ImageConverter') { "Cannot find image file '#{source}'."} unless File.exist? source
   end
 
   def do_convert(target,format)

@@ -5,38 +5,74 @@ require 'application'
 class TypeDatabase
   include Singleton
 
-  attr_reader :types
-
   def self.type2media(t)
-    @type2media_map[t]
+    self.instance.type2media(t)
   end
 
   def self.type2mime(t)
-    @type2mime_map[t]
+    self.instance.type2mime(t)
   end
 
   def self.type2ext(t)
-    @type2ext_map[t].first
+    self.instance.type2ext(t)
   end
 
   def self.media2type(media)
+    self.instance.media2type(media)
+  end
+
+  def self.mime2type(mime)
+    self.instance.mime2type(mime)
+  end
+
+  def self.mime2media(mime)
+    self.instance.mime2media(mime)
+  end
+
+  def self.ext2type(ext)
+    self.instance.ext2type(ext)
+  end
+
+  def type2media(t)
+    @type2media_map[t]
+  end
+
+  def type2mime(t)
+    @type2mime_map[t]
+  end
+
+  def type2ext(t)
+    @type2ext_map[t].first
+  end
+
+  def media2type(media)
     @type2media_map.select do |k,v|
       v == media
     end.keys
   end
 
-  def self.mime2type(mime)
+  def mime2type(mime)
     @type2mime_map.invert[mime]
   end
 
-  def self.ext2type(ext)
+  def mime2media(mime)
+    type2media(mime2type(mime))
+  end
+
+  def ext2type(ext)
     @type2ext_map.each do |k,v|
       return k if v.include? ext
     end
     nil
   end
 
-  def self.load_config(file)
+  private
+
+  def initialize
+    load_config(Application.dir + '/config/types.yaml')
+  end
+
+  def load_config(file)
     config = YAML.load_file file
     @type2media_map = {}
     @type2mime_map = {}
@@ -53,12 +89,6 @@ class TypeDatabase
         @type2ext_map[type]  = t[:EXTENSIONS].split(',')
       end
     end
-  end
-
-  private
-
-  def initialize
-    load_config(Application.dir + '/config/types.yaml')
   end
 
 end

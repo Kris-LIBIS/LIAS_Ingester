@@ -9,7 +9,7 @@ class ModelFactory
 
   private
 
-  attr :models
+  attr_accessor :models
 
   MANIFESTATIONS = [ 'ORIGINAL', 'VIEW_MAIN', 'ARCHIVE', 'VIEW', 'THUMBNAIL' ]
 

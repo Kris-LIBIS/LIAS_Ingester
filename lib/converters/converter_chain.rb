@@ -1,8 +1,11 @@
 require 'fileutils'
 
+require 'ingester_task'
+
 require_relative 'type_database'
 
 class ConverterChain
+  include IngesterTask
 
   def initialize(converter_chain)
     @converter_chain = converter_chain
@@ -21,7 +24,7 @@ class ConverterChain
     # sanity check: check if the required operations are supported by at least one converter in the chain
     conversion_operations.each do |k,v|
       method = k.to_s.downcase.to_sym
-      chain_element = @converter_chain.reverse.detect { |c| c[:converter].repond_to? method }
+      chain_element = @converter_chain.reverse.detect { |c| c[:converter].new.respond_to? method }
       unless chain_element
         error "No converter in the converter chain supports '#{method.to_s}'. Continuing conversion without this operation."
       else
@@ -46,12 +49,15 @@ class ConverterChain
 
       unless chain.empty?
         target += '.temp.' + TypeDatabase.instance.type2ext(target_type)
+        target += '.' + TypeDatabase.instance.type2ext(target_type) while File.exist? target
         temp_files << target
       end
 
       FileUtils.mkdir_p File.dirname(target)
 
       converter.convert(target, target_type)
+
+      src_file = target
 
     end
 
