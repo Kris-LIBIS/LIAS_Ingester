@@ -58,13 +58,13 @@ module CommonConfig
 
         return unless config
 
-        config.key_strings_to_symbols!
+        config.key_strings_to_symbols! :downcase => true
 
         config.each do |label,content|
           next unless content
           case label
           when :pre_process
-            content.key_strings_to_symbols!
+            content.key_strings_to_symbols! :downcase => true
             content.each do |k,v|
               case k
               when :check_virus
@@ -79,7 +79,7 @@ module CommonConfig
             end
 
           when :pre_ingest
-            content.key_strings_to_symbols!
+            content.key_strings_to_symbols! :downcase => true
             content.each do |k,v|
               case k
               when :work_dir
@@ -90,19 +90,19 @@ module CommonConfig
             end
 
           when :ingest
-            content.key_strings_to_symbols!
+            content.key_strings_to_symbols! :downcase => true
             content.each do |k, _|
               Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
             end
 
           when :post_ingest
-            content.key_strings_to_symbols!
+            content.key_strings_to_symbols! :downcase => true
             content.each do |k, _|
               Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
             end
 
           when :checksum
-            content.key_strings_to_symbols!
+            content.key_strings_to_symbols! :downcase => true
             content.each do |k,v|
               case k
               when :type
@@ -115,7 +115,7 @@ module CommonConfig
             end
 
           when :metadata
-            content.key_strings_to_symbols!
+            content.key_strings_to_symbols! :downcase => true
             content.each do |k,v|
               case k
               when :target

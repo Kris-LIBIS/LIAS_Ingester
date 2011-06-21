@@ -16,6 +16,7 @@ class IngestConfig
   # ingest options
   property    :ingest_model,    String
   property    :ingest_model_map,String
+  property    :manifestations,  Yaml
   property    :media_type,      Enum[:IMAGE, :DOCUMENT, :ARCHIVE, :CONTAINER, :AUDIO, :VIDEO, :ANY]
   property    :quality,         Enum[:ARCHIVE, :HIGH, :LOW, :STORAGE]
 
@@ -56,7 +57,7 @@ class IngestConfig
 
   def init(config)
     
-    config.key_strings_to_symbols!
+    config.key_strings_to_symbols! :downcase => true
     
     # common configuration
     common_config(config, false)
@@ -76,7 +77,7 @@ class IngestConfig
       when :mime_type
         self.mime_type      = Regexp.new(value)
       when :ingest_model
-        value.key_strings_to_symbols!
+        value.key_strings_to_symbols! :downcase => true
         value.each do |k,v|
           case k
           when :file
@@ -87,11 +88,13 @@ class IngestConfig
             self.media_type     = v.to_s.upcase.to_sym
           when :quality
             self.quality        = v.to_s.upcase.to_sym
+          when :manifestations
+            self.manifestations = v.key_strings_to_symbols! :upcase => true, :recursive => true
           end # case k
         end # value.each
       when :complex
         self.complex        = true
-        value.key_strings_to_symbols!
+        value.key_strings_to_symbols! :downcase => true
         self.complex_group  = value[:group]
         self.complex_label  = value[:label]
         self.complex_utype  = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]
@@ -103,7 +106,7 @@ class IngestConfig
       when :mets
         self.mets = true
         if value
-          value.key_strings_to_symbols!
+          value.key_strings_to_symbols! :downcase => true
           self.complex_group  = value[:group]
           self.complex_label  = value[:label]
           self.complex_utype  = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]

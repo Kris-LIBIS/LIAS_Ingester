@@ -75,11 +75,11 @@ class IngestRun
     self.selection      = Regexp.new(/.*/)
     
     if config[:common]
-      config[:common].key_strings_to_symbols!
+      config[:common].key_strings_to_symbols! :downcase => true
       config[:common].each do |k1,v1|
         case k1
         when :packaging
-          v1.key_strings_to_symbols!
+          v1.key_strings_to_symbols! :downcase => true
           v1.each do |k2,v2|
             case k2
             when :type

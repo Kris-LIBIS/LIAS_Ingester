@@ -12,7 +12,7 @@ class OpacSearch < GenericSearch
   def query(term, index, base, options = {})
     raise ArgumentError, 'options must be a hash' unless options.is_a?(Hash)
     
-    options.key_symbols_to_strings!
+    options.key_symbols_to_strings! :downcase => true
 
     @host           = options['host'] if options.include?('host')
     @term           = term
