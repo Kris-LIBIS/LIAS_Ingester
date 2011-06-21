@@ -4,5 +4,7 @@
   - :PNG
   - :BMP
   - :GIF
+:INPUT_TYPES:
+  - :JPEG2000
 :OUTPUT_TYPES:
   - :JPEG2000
