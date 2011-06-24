@@ -33,9 +33,9 @@ class PreProcessor
     end unless run = IngestRun.first(:id => run_id)
     
     begin
-      
-      Application.log_to run
-      
+
+      ApplicationStatus.instance.run = run
+
       case run.status
       when Status::Idle ... Status::Initialized
         error "Cannot yet PreProcess run ##{run_id}. Status is '#{Status.to_string(run.status)}'"
@@ -50,7 +50,7 @@ class PreProcessor
       end
       
     ensure
-      Application.log_end run
+      ApplicationStatus.instance.run = nil
       
     end
     
@@ -110,8 +110,8 @@ class PreProcessor
   def process_run( run )
     
     start_time = Time.now
-    Application.log_to(run)
-    
+    ApplicationStatus.instance.run = run
+
     info "Processing run ##{run.id}"
     run.status = Status::PreProcessing
     run.save
@@ -132,15 +132,15 @@ class PreProcessor
   ensure
     run.save
     info "Run ##{run.id} processed. Elapsed time: #{elapsed_time(start_time)}."
-    Application.log_end(run)
-    
+    ApplicationStatus.instance.run = nil
+
   end
   
   private
   
   def process_config( config )
     
-    Application.log_to(config)
+    ApplicationStatus.instance.cfg = config
     config.status = Status::PreProcessing
     config.save
     
@@ -172,15 +172,15 @@ class PreProcessor
     handle_exception e
     
   ensure
-    Application.log_end(config)
+    ApplicationStatus.instance.cfg = nil
     config.save
     
   end
   
   def process_object( object, config )
     
-    Application.log_to object
-    
+    ApplicationStatus.instance.obj = object
+
     if object.status == Status::PreProcessed
       info "Skipping object ##{object.id}."
       Application.log_end object
@@ -218,13 +218,14 @@ class PreProcessor
   ensure
     object.save
     info "Object ##{object.id} preprocessed"
-    Application.log_end object
-    
+    ApplicationStatus.instance.obj = nil
+
   end
   
   def undo_run( run )
     
     info "Undo run ##{run.id} PreProcess."
+    ApplicationStatus.instance.run = run
     
     run.ingest_configs.each do |cfg|
       undo_config cfg
@@ -234,14 +235,16 @@ class PreProcessor
     run.save
     
     info "Run ##{run.id} PreProcess undone."
-    
+    ApplicationStatus.instance.run = nil
+
   end
   
   def undo_config( cfg )
     
     start_time = Time.now
     info "Undo configuration ##{cfg.id} PreProcess."
-    
+    ApplicationStatus.instance.cfg = cfg
+
     cfg.ingest_objects.each do |obj|
       undo_object obj
     end
@@ -250,12 +253,14 @@ class PreProcessor
     cfg.save
     
     info "Configuration ##{cfg.id} PreProcess undone. Elapsed time: #{elapsed_time start_time}."
+    ApplicationStatus.instance.cfg = nil
     
   end
   
   def undo_object( obj )
     
     info "Undo object ##{obj.id} PreProcess."
+    ApplicationStatus.instance.obj = obj
     
     obj.children.each { |child| undo_object child }
     
@@ -271,6 +276,7 @@ class PreProcessor
     obj.status = Status::Initialized
     
     info "Object ##{obj.id} PreProcess undone."
+    ApplicationStatus.instance.obj = nil
     
   end
 

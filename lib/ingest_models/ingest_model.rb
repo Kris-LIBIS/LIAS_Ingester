@@ -1,8 +1,11 @@
 require 'fileutils'
 
+require 'application_status'
 require 'ingester_task'
 require 'converters/converter_repository'
 require 'converters/type_database'
+require 'tools/hash'
+require 'tools/mime_type'
 
 class IngestModel
 
@@ -12,15 +15,19 @@ class IngestModel
   
   def initialize(config)
     @config = config
+    @config.key_strings_to_symbols! :upcase => true, :recursive => true
     @@logger.debug(self.class) {"Creating ingest model: #{config}"}
-    
+    @custom_config = nil
+  end
+
+  def custom_config(config)
+    @custom_config = config
+    self
   end
   
   def get_manifestation(manifestation, media_type)
-    puts "Manifestation: #{manifestation}"
-    puts "Media type: #{media_type}"
     if @config[:MEDIA] == :ANY and media_type
-      model = ModelFactory.instance.get_model2( media_type, @config[:QUALITY] )
+      model = ModelFactory.instance.get_model2( media_type, @config[:QUALITY] ).custom_config(@custom_config)
       return ( model.get_manifestation manifestation, nil )
     end
     
@@ -68,16 +75,47 @@ class IngestModel
     target = tgt_dir + (tgt_file_name.nil? ? File.basename(src_file_path, '.*') : tgt_file_name)
     
     src_type = TypeDatabase.mime2type src_mime_type
-    media_type = TypeDatabase.type2media src_type
 
-    m = get_manifestation(manifestation, media_type)
+    m = get_manifestation(manifestation, TypeDatabase.type2media(src_type))
 
     if m.nil?
       warn "Skipping manifestation. No manifestation-config object found."
       return nil
     end
 
+    debug "Using ingestmodel: #{self.inspect}"
+    target += ModelFactory.filename_extension(manifestation) + '.' + TypeDatabase.instance.type2ext(m[:FORMAT])
+
     conversion_operations = m[:OPTIONS] || {}
+
+    if @custom_config
+      debug "Has custom config!"
+      cfg = @custom_config.detect { |c| c[:MANIFESTATION].upcase == manifestation }
+      unless cfg.nil?
+        debug "Found config: #{cfg}"
+        #noinspection RubyUnusedLocalVariable
+        file_name = File.basename src_file_path, '.*'
+        file = ""
+        file = File.join(ApplicationStatus.instance.run.location, eval(cfg[:FILE])) if cfg[:FILE]
+        debug "Looking for file '#{file}'"
+        if File.exist?(file)
+          conversion_operations = {}
+          src_file_path = File.expand_path(file)
+          debug "Using source file #{src_file_path}"
+          unless cfg[:OPTIONS]
+            FileUtils.mkdir_p tgt_dir
+            FileUtils.cp src_file_path, target
+            debug "Copying pregenerated manifestation file '#{file}' to '#{target}'."
+            return target
+          end
+          debug "Using pregenerated manifestation file '#{file}."
+          src_mime_type = MimeType.get src_file_path
+          src_type = TypeDatabase.mime2type src_mime_type
+        end
+        conversion_operations = conversion_operations.recursive_merge(cfg[:OPTIONS]) if cfg[:OPTIONS]
+      end
+    end
+
     if protection and protection.ptype == :WATERMARK
       conversion_operations[:WATERMARK] = { :watermark_info =>protection.pinfo, :watermark_file => watermark_file }
     end
@@ -93,8 +131,6 @@ class IngestModel
       warn "Skipping manifestation. No suitable converter chain found."
       return nil
     end
-
-    target += ModelFactory.filename_extension(manifestation) + '.' + TypeDatabase.instance.type2ext(m[:FORMAT])
 
     converter_chain.convert src_file_path, target, conversion_operations
     

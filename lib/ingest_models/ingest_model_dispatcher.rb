@@ -5,9 +5,10 @@ require_relative 'ingest_model'
 
 class IngestModelDispatcher < IngestModel
   
-  def initialize( ingestmodel_file, base_dir )
+  def initialize( ingestmodel_file, base_dir, custom_config )
     @base_path = Pathname.new(File.expand_path(base_dir))
     @ingestmodel_map = JSON File.open(ingestmodel_file, 'r:utf-8').readlines.join
+    @custom_config = custom_config
   end
   
   def get_manifestation(manifestation, media_type)
@@ -23,6 +24,8 @@ class IngestModelDispatcher < IngestModel
     
     return nil unless ingest_model = @ingestmodel_map[src_path.to_s]
     return nil unless ingest_model = ModelFactory.instance.get_model1(ingest_model)
+
+    ingest_model.custom_config @custom_config
     
     ingest_model.make_manifestation( src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name )
     

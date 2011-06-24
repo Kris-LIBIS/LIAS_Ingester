@@ -5,6 +5,7 @@ require 'singleton'
 require 'logger'
 require 'optparse'
 
+require 'application_status'
 require 'tools/database'
 require 'modules/initializer'
 require 'modules/pre_processor'

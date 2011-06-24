@@ -34,8 +34,8 @@ class PreIngester
     
     begin
       
-      Application.log_to cfg.ingest_run
-      Application.log_to cfg
+      ApplicationStatus.instance.run = cfg.ingest_run
+      ApplicationStatus.instance.cfg = cfg
       
       case cfg.status
       when Status::Idle ... Status::PreProcessed
@@ -59,8 +59,8 @@ class PreIngester
       end
       
     ensure
-      Application.log_end cfg
-      Application.log_end cfg.ingest_run
+      ApplicationStatus.instance.cfg = nil
+      ApplicationStatus.instance.run = nil
       
     end
     
@@ -78,11 +78,11 @@ class PreIngester
     end
     
     unless Status.phase(cfg.status) == Status::PreIngest
-      Application.log_to cfg.ingest_run
-      Application.log_to cfg
+      ApplicationStatus.instance.run = cfg.ingest_run
+      ApplicationStatus.instance.cfg = cfg
       warn "Cannot undo configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
-      Application.log_end cfg
-      Application.log_end cfg.ingest_run
+      ApplicationStatus.instance.cfg = nil
+      ApplicationStatus.instance.run = nil
       return cfg if cfg.status == Status::PreProcessed
       return nil
     end
@@ -94,12 +94,12 @@ class PreIngester
   def restart( config_id )
     
     if cfg = undo(config_id)
-      Application.log_to cfg.ingest_run
-      Application.log_to cfg
+      ApplicationStatus.instance.run = cfg.ingest_run
+      ApplicationStatus.instance.cfg = cfg
       info "Restarting config ##{config_id}"
       process_config cfg, false
-      Application.log_end cfg
-      Application.log_end cfg.ingest_run
+      ApplicationStatus.instance.cfg = nil
+      ApplicationStatus.instance.run = nil
       return config_id
     end
     
@@ -118,8 +118,8 @@ class PreIngester
     
     begin
       
-      Application.log_to cfg.ingest_run
-      Application.log_to cfg
+      ApplicationStatus.instance.run = cfg.ingest_run
+      ApplicationStatus.instance.cfg = cfg
       
       case cfg.status
       when Status::Idle ... Status::PreProcessed
@@ -133,8 +133,8 @@ class PreIngester
       end
       
     ensure
-      Application.log_end cfg
-      Application.log_end cfg.ingest_run
+      ApplicationStatus.instance.cfg = nil
+      ApplicationStatus.instance.run = nil
       
     end
     
@@ -147,8 +147,8 @@ class PreIngester
   def process_config( cfg, continue = false )
     
     start_time = Time.now
-    Application.log_to cfg.ingest_run
-    Application.log_to(cfg)
+    ApplicationStatus.instance.run = cfg.ingest_run
+    ApplicationStatus.instance.cfg = cfg
     info "Processing config ##{cfg.id}"
     
     cfg.status = Status::PreIngesting
@@ -189,14 +189,14 @@ class PreIngester
     cfg.save
     warn "#{failed_objects.size} objects failed during Pre-Ingest" unless failed_objects.empty?
     info "Config ##{cfg.id} processed. Elapsed time: #{elapsed_time(start_time)}."
-    Application.log_end cfg
-    Application.log_end cfg.ingest_run
-    
+    ApplicationStatus.instance.cfg = nil
+    ApplicationStatus.instance.run = nil
+
   end # process_config
   
   def process_object( obj )
     
-    Application.log_to(obj)
+    ApplicationStatus.instance.obj = obj
     
     info "Processing object ##{obj.id}"
     
@@ -223,7 +223,7 @@ class PreIngester
     
   ensure
     obj.save
-    Application.log_end(obj)
+    ApplicationStatus.instance.obj = nil
     
   end # process_object
   
@@ -339,6 +339,8 @@ class PreIngester
   
   def undo_config( cfg )
     start_time = Time.now
+    ApplicationStatus.instance.run = cfg.ingest_run
+    ApplicationStatus.instance.cfg = cfg
     info "Undo configuration ##{cfg.id} PreIngest."
     cfg.root_objects.each do |obj|
       undo_object obj
@@ -348,10 +350,13 @@ class PreIngester
     cfg.status = Status::PreProcessed
     cfg.save
     info "Configuration ##{cfg.id} PreIngest undone. Elapsed time: #{elapsed_time(start_time)}."
+    ApplicationStatus.instance.cfg = nil
+    ApplicationStatus.instance.run = nil
     cfg
   end
   
   def undo_object( obj )
+    ApplicationStatus.instance.obj = obj
     info "Undo object ##{obj.id} PreIngest."
     obj.vpid = nil
     obj.children.each { |child| undo_object child }
@@ -361,6 +366,7 @@ class PreIngester
     obj.clear_filestream
     obj.save
     info "Object ##{obj.id} PreIngest undone."
+    ApplicationStatus.instance.obj = nil
   end
   
 end

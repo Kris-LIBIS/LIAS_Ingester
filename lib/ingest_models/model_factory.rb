@@ -40,6 +40,12 @@ class ModelFactory
     end
   end
 
+  def get_model_for_config(config)
+    return IngestModelDispatcher.new(config.ingest_model_map, config.ingest_run.location, config.manifestations_config) if config.ingest_model_map
+    return get_model1(config.ingest_model).custom_config(config.manifestations_config) if config.ingest_model
+    get_model2(config.media_type, config.quality).custom_config(config.manifestations_config)
+  end
+
   def get_model1(description)
     IngestModel.new @models[description.downcase]
   end
@@ -51,12 +57,6 @@ class ModelFactory
       end
     end
     nil
-  end
-
-  def get_model_for_config(config)
-    return IngestModelDispatcher.new(config.ingest_model_map, config.ingest_run.location) if config.ingest_model_map
-    return get_model1(config.ingest_model) if config.ingest_model
-    get_model2(config.media_type, config.quality)
   end
 
 end

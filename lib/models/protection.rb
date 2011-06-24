@@ -79,6 +79,12 @@ class Protection
     return accessrights
   end
 
+  def get_run
+    return self.ingest_run if self.ingest_run
+    return self.ingest_config.ingest_run if self.ingest_config
+    nil
+  end
+
   def debug_print(indent = 0)
     p ' ' * indent + self.inspect
   end

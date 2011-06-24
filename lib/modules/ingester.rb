@@ -36,8 +36,8 @@ class Ingester
     
     begin
 
-      Application.log_to cfg.ingest_run
-      Application.log_to cfg
+      ApplicationStatus.instance.run = cfg.ingest_run
+      ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
       when Status::Idle ... Status::PreIngested
@@ -54,8 +54,8 @@ class Ingester
       end
 
     ensure
-      Application.log_end cfg
-      Application.log_end cfg.ingest_run
+      ApplicationStatus.instance.cfg = nil
+      ApplicationStatus.instance.run = nil
 
     end
 
@@ -104,8 +104,8 @@ class Ingester
     
     begin
 
-      Application.log_to cfg.ingest_run
-      Application.log_to cfg
+      ApplicationStatus.instance.run = cfg.ingest_run
+      ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
       when Status::Idle ... Status::Ingesting
@@ -122,8 +122,8 @@ class Ingester
       end
 
     ensure
-      Application.log_end cfg
-      Application.log_end cfg.ingest_run
+      ApplicationStatus.instance.cfg = nil
+      ApplicationStatus.instance.run = nil
 
     end
 
@@ -136,8 +136,8 @@ class Ingester
   def process_config( cfg, continue = false )
 
     start_time = Time.now
-    Application.log_to cfg.ingest_run
-    Application.log_to(cfg)
+    ApplicationStatus.instance.run = cfg.ingest_run
+    ApplicationStatus.instance.cfg = cfg
     info "Processing config ##{cfg.id}"
 
     cfg.status = Status::Ingesting
@@ -168,8 +168,8 @@ class Ingester
   ensure
     cfg.save
     info "Config ##{cfg.id} processed. Elapsed time: #{elapsed_time(start_time)}."
-    Application.log_end(cfg)
-    Application.log_end cfg.ingest_run
+    ApplicationStatus.instance.cfg = nil
+    ApplicationStatus.instance.run = nil
 
     end # process_config
 
@@ -245,6 +245,8 @@ class Ingester
 
   def undo_config( cfg )
     start_time = Time.now
+    ApplicationStatus.instance.run = cfg.ingest_run
+    ApplicationStatus.instance.cfg = cfg
     info "Undo configuration ##{cfg.id} Ingest."
     cfg.root_objects.each do |obj|
       undo_object obj
@@ -253,9 +255,12 @@ class Ingester
     cfg.status = Status::PreIngested
     cfg.save
     info "Configuration ##{cfg.id} Ingest undone. Elapsed time: #{elapsed_time(start_time)}."
+    ApplicationStatus.instance.cfg = nil
+    ApplicationStatus.instance.run = nil
   end
 
   def undo_object( obj )
+    ApplicationStatus.instance.obj = obj
     info "Undo object ##{obj.id} Ingest."
     obj.status = Status::Ingesting
     obj.manifestations.each { |o| undo_object o }
@@ -264,6 +269,7 @@ class Ingester
     obj.status = Status::PreIngested if obj.status == Status::Ingesting
     obj.save
     info "Object ##{obj.id} Ingest undone."
+    ApplicationStatus.instance.obj = nil
   end
 
   def delete_object( obj )

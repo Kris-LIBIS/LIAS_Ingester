@@ -17,3 +17,5 @@ module IngesterModule
   end
   
 end
+
+require_relative 'application_status'

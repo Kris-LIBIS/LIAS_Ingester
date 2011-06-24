@@ -53,4 +53,24 @@ class Hash
     self.replace(r)
   end
 
+  def recursive_merge(other_hash)
+    self.merge(other_hash) do |_, old_val, new_val|
+      if old_val.is_a? Hash
+        old_val.recursive_merge new_val
+      else
+        new_val
+      end
+    end
+  end
+
+  def recursive_merge!(other_hash)
+    self.merge!(other_hash) do |_, old_val, new_val|
+      if old_val.is_a? Hash
+        old_val.recursive_merge new_val
+      else
+        new_val
+      end
+    end
+  end
+
 end

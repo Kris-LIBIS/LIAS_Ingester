@@ -20,10 +20,10 @@ class Initializer
       run.init cfg_file
       run.status = Status::New
       run.save
-      Application.log_to run
+      ApplicationStatus.instance.run = run
       info "Created new run ##{run.id}"
     elsif Status.phase(run.status) == Status::Initialize and !Status.done?(run.status)
-      Application.log_to run
+      ApplicationStatus.instance.run = run
       info "Run exists, but did not finish, restarting previous run ##{run.id} - status '#{Status.to_string run.status}'"
       undo run.id
       run.init cfg_file
@@ -46,7 +46,7 @@ class Initializer
       run.save
     end
     
-    Application.log_end run
+    ApplicationStatus.instance.run = nil
     info 'Done'
     
     result
@@ -64,7 +64,7 @@ class Initializer
       return nil
     end
     
-    Application.log_to run
+    ApplicationStatus.instance.run = run
     
     unless Status.phase(run.status) == Status::Initialize
       warn "Cannot undo run ##{run_id} because status is #{Status.to_string run.status}"
@@ -76,7 +76,7 @@ class Initializer
     
     info "Run ##{run_id} is reset. Elapsed time: #{elapsed_time start_time}."
     
-    Application.log_end run
+    ApplicationStatus.instance.run = nil
     
     run
     
@@ -85,10 +85,10 @@ class Initializer
   def restart( run_id )
     
     if run = undo(run_id)
-      Application.log_to run
+      ApplicationStatus.instance.run = run
       info "Restarting run ##{run_id}"
       process_run run
-      Application.log_end run
+      ApplicationStatus.instance.run = nil
       info 'Done'
       return run_id
     end
@@ -102,7 +102,7 @@ class Initializer
   def process_run( run )
     
     start_time = Time.now
-    Application.log_to run
+    ApplicationStatus.instance.run = run
     
     info "Processing run ##{run.id}"
     run.status = Status::Initializing
@@ -116,11 +116,11 @@ class Initializer
     files.each do |f|
       obj = IngestObject.new f, run.checksum_type
       run.add_object obj
-      Application.log_to obj
+      ApplicationStatus.instance.obj = obj
       obj.status = Status::Initialized
       obj.save
       info "New object ##{obj.id} for '#{f}'"
-      Application.log_end obj
+      ApplicationStatus.instance.obj = nil
     end
     
     run.status = Status::Initialized
@@ -137,7 +137,7 @@ class Initializer
   ensure
     run.save
     info "Run ##{run.id} processed. Elapsed time: #{elapsed_time start_time}."
-    Application.log_end run
+    ApplicationStatus.instance.run = nil
     
   end
   
@@ -152,19 +152,25 @@ class Initializer
   end
   
   def undo_run( run )
+    ApplicationStatus.instance.run = run
     run.reset
     run.init run.config_file
     run.status = Status::New
     run.save
+    ApplicationStatus.instance.run = nil
   end
   
   def undo_config( cfg )
+    ApplicationStatus.instance.cfg = cfg
     debug "Destroying config ##{cfg.id}."
+    ApplicationStatus.instance.cfg = nil
     cfg.destroy
   end
   
   def undo_object( obj )
+    ApplicationStatus.instance.obj = obj
     debug "Deleting object ##{obj.id}."
+    ApplicationStatus.instance.obj = nil
     obj.delete
   end
   

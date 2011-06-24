@@ -34,8 +34,8 @@ class PostIngester
     
     begin
       
-      Application.log_to cfg.ingest_run
-      Application.log_to cfg
+      ApplicationStatus.instance.run = cfg.ingest_run
+      ApplicationStatus.instance.cfg = cfg
       
       case cfg.status
       when Status::Idle ... Status::Ingested
@@ -59,8 +59,8 @@ class PostIngester
       end
       
     ensure
-      Application.log_end cfg
-      Application.log_end cfg.ingest_run
+      ApplicationStatus.instance.cfg = nil
+      ApplicationStatus.instance.run = nil
       
     end
     
@@ -121,8 +121,8 @@ class PostIngester
   def process_config(cfg)
     
     start_time = Time.now
-    Application.log_to cfg.ingest_run
-    Application.log_to(cfg)
+    ApplicationStatus.instance.run = cfg.ingest_run
+    ApplicationStatus.instance.cfg = cfg
     info "Processing config ##{cfg.id}"
     
     cfg.status = Status::PostIngesting
@@ -153,14 +153,14 @@ class PostIngester
     cfg.save
     warn "#{failed_objects.size} objects failed during Post-Ingest" unless failed_objects.empty?
     info "Config ##{cfg.id} processed. Elapsed time: #{elapsed_time(start_time)}."
-    Application.log_end(cfg)
-    Application.log_end cfg.ingest_run
+    ApplicationStatus.instance.cfg = nil
+    ApplicationStatus.instance.run = nil
     
   end # process_config
 
   def process_object(obj)
     
-    Application.log_to(obj)
+    ApplicationStatus.instance.obj = obj
     info "Processing object ##{obj.id}"
     
     obj.set_status_recursive Status::PostIngesting, Status::Ingested
@@ -180,7 +180,7 @@ class PostIngester
    
   ensure
     obj.save
-    Application.log_end(obj)
+    ApplicationStatus.instance.obj = nil
     
   end # process_object
   
@@ -255,6 +255,8 @@ class PostIngester
   
   def undo_config( cfg )
     start_time = Time.now
+    ApplicationStatus.instance.run = cfg.ingest_run
+    ApplicationStatus.instance.cfg = cfg
     info "Undo configuration ##{cfg.id} PostIngest."
     cfg.root_objects.each do |obj|
       obj.set_status_recursive Status::PostIngesting
@@ -265,13 +267,17 @@ class PostIngester
     cfg.status = Status::Ingested
     cfg.save
     info "Configuration ##{cfg.id} PostIngest undone. Elapsed time: #{elapsed_time(start_time)}."
+    ApplicationStatus.instance.cfg = nil
+    ApplicationStatus.instance.run = nil
   end
   
   def undo_object( cfg, obj )
+    ApplicationStatus.instance.obj = obj
     info "Undo object ##{obj.id} PostIngest."
     unlink_ar cfg, obj
     unlink_and_delete_dc obj
     info "Object ##{obj.id} PostIngest undone."
+    ApplicationStatus.instance.obj = nil
   end
   
   def unlink_and_delete_dc( obj )
