@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'ingester_module'
 require 'tools/complex_file_collecter'
 
@@ -150,6 +152,7 @@ class PreProcessor
     
     info "Processing config ##{config.id}"
     collected_objects = config.ingest_run.ingest_objects
+    collected_objects = config.ingest_objects.dup if collected_objects.empty?
     collected_objects.each do |object|
       process_object object, config
     end

@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'dm-is-tree'
 require 'fileutils'
 require 'pathname'
@@ -8,21 +10,22 @@ require_relative 'common/status'
 class IngestObject
   include DataMapper::Resource
   
-  property    :id,              Serial, :key => true
-  property    :created_at,      Date
-  property    :updated_at,      Date
-  property    :status,          Integer, :default => Status::New
-  property    :status_name,     String
-  property    :label,           String#, :index => :label_idx
-  property    :usage_type,      String#, :index => :usage_type_idx
-  property    :metadata,        FilePath
-  property    :metadata_mid,    Integer
+  property    :id,              DataMapper::Property::Serial, :key => true
+  property    :created_at,      DataMapper::Property::Date
+  property    :updated_at,      DataMapper::Property::Date
+  property    :status,          DataMapper::Property::Integer, :default => Status::New
+  property    :status_name,     DataMapper::Property::String
+  property    :label,           DataMapper::Property::String #, :index => :label_idx
+  property    :usage_type,      DataMapper::Property::String #, :index => :usage_type_idx
+  property    :metadata,        DataMapper::Property::FilePath
+  property    :metadata_mid,    DataMapper::Property::Integer
   
-  property    :file_stream,     FilePath
-  property    :vpid,            String#, :index => :vpid_idx
-  property    :pid,             String#, :index => :pid_idx
-  property    :message,         String
-  property    :more_info,       Text
+  property    :file_stream,     DataMapper::Property::FilePath
+  property    :vpid,            DataMapper::Property::String #, :index => :vpid_idx
+  property    :pid,             DataMapper::Property::String #, :index => :pid_idx
+  property    :message,         DataMapper::Property::String
+  property    :tree_index,      DataMapper::Property::Integer
+  property    :more_info,       DataMapper::Property::Text
   
   has 1,      :file_info
   
@@ -151,8 +154,13 @@ class IngestObject
   
   def flattened_relative
     fp = relative_path
-    return fp.to_s.gsub('/', '_') if fp
+    return fp.to_s.gsub('/', '_').gsub(' ','_0x020_') if fp
     nil
+  end
+
+  def stream_name
+    #flattened_relative
+    id.to_s + File.extname(file_name)
   end
   
   def relative_stream

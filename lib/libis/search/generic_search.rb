@@ -1,10 +1,16 @@
+# coding: utf-8
+
 require 'tools/http_fetch'
 
 class GenericSearch
+  #noinspection RubyResolve
   attr_accessor :host
+  #noinspection RubyResolve
   attr_reader :term, :index, :base
+  #noinspection RubyResolve
   attr_reader :num_records, :set_number
-  attr_reader :record_pointer, :session_id  
+  #noinspection RubyResolve
+  attr_reader :record_pointer, :session_id
   
   def query(term, index, base, options = {})
     puts "to be implemented"

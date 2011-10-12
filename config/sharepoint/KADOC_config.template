@@ -1,0 +1,25 @@
+common:
+
+  packaging:
+    type:             dir
+    recursive:        true
+
+  pre_process:
+    check_virus:      false
+    check_checksum:   false
+    check_ingested:   true
+
+  pre_ingest:
+    work_dir:         /nas/vol03/acquire/temp
+    
+  checksum:
+    type:             md5
+    file:             MD5/md5sums.txt
+
+  control_fields:
+    partition_c:     test sharepoint
+
+  accessrights:
+    original:         id = 31682
+    view:             id = 31682
+    view_main:        watermark = "KADOC - K.U.Leuven"

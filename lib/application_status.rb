@@ -1,9 +1,12 @@
+# coding: utf-8
+
 require "singleton"
 require_relative 'application'
 
 class ApplicationStatus
   include Singleton
 
+  #noinspection RubyResolve
   attr_reader :run, :cfg, :obj
 
   def run=(run)

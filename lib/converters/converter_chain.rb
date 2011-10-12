@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'fileutils'
 
 require 'ingester_task'
@@ -15,21 +17,21 @@ class ConverterChain
     @converter_chain
   end
 
-  def convert(src_file, target_file, conversion_operations = nil)
+  def convert(src_file, target_file, operations = [])
 
     chain = @converter_chain.clone
 
-    operations = {}
+    my_operations = {}
 
     # sanity check: check if the required operations are supported by at least one converter in the chain
-    conversion_operations.each do |k,v|
+    operations.each do |k,v|
       method = k.to_s.downcase.to_sym
       chain_element = @converter_chain.reverse.detect { |c| c[:converter].new.respond_to? method }
       unless chain_element
         error "No converter in the converter chain supports '#{method.to_s}'. Continuing conversion without this operation."
       else
-        operations[chain_element[:converter]] ||= {}
-        operations[chain_element[:converter]][method] = v
+        my_operations[chain_element[:converter]] ||= {}
+        my_operations[chain_element[:converter]][method] = v
       end
     end
 
@@ -41,7 +43,7 @@ class ConverterChain
       converter_class = chain_element[:converter]
       converter = converter_class.new(src_file)
 
-      operations[converter_class].each do |k,v|
+      my_operations[converter_class].each do |k,v|
         converter.send k, v
       end
 
@@ -62,7 +64,7 @@ class ConverterChain
     end
 
     temp_files.each do |f|
-      File.delete(f);
+      File.delete(f)
     end
 
   end

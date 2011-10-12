@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require_relative 'common/config'
 require_relative 'common/status'
 
@@ -6,40 +8,41 @@ class IngestConfig
   include DataMapper::Resource
   include CommonConfig
 
-  property :status, Integer, :default => Status::New
-  property :status_name, String
+  property    :status,                Integer, :default => Status::New
+  property    :status_name,           String
 
   # file selection criteria
-  property :filename_match, Regexp
-  property :mime_type, Regexp
+  property    :filename_match,        Regexp
+  property    :mime_type,             Regexp
 
   # ingest options
-  property :ingest_model, String
-  property :ingest_model_map, String
-  property :manifestations_config, Yaml
-  property :media_type, Enum[:IMAGE, :DOCUMENT, :ARCHIVE, :CONTAINER, :AUDIO, :VIDEO, :ANY]
-  property :quality, Enum[:ARCHIVE, :HIGH, :LOW, :STORAGE]
+  property    :ingest_model,          String
+  property    :ingest_model_map,      String
+  property    :manifestations_config, Yaml
+  property    :media_type,            Enum[:IMAGE, :DOCUMENT, :ARCHIVE, :CONTAINER, :AUDIO, :VIDEO, :ANY]
+  property    :quality,               Enum[:ARCHIVE, :HIGH, :LOW, :STORAGE]
 
   # complex options
-  property :complex, Boolean
-  property :complex_group, String
-  property :complex_label, String
-  property :complex_utype, String
+  property    :complex,               Boolean
+  property    :complex_group,         String
+  property    :complex_label,         String
+  property    :complex_utype,         String
 
   # mets options
-  property :mets, Boolean
+  property    :mets,                  Boolean
 
   # ingest info
-  property :ingest_id, String
-  property :ingest_dir, String
-  property :tasker_log, Text
+  property    :ingest_id,             String
+  property    :ingest_dir,            String
+  property    :tasker_log,            Text
+  property    :ingest_type,           Enum[:NORMAL, :SHAREPOINT_DATA, :SHAREPOINT_XML], :default => :NORMAL
 
-  belongs_to :ingest_run, :required => false
+  belongs_to  :ingest_run,            :required => false
 
-  has n, :protections, :child_key => :ingest_config_id
-  has n, :ingest_objects, :child_key => :ingest_config_id
+  has n,      :protections,           :child_key => :ingest_config_id
+  has n,      :ingest_objects,        :child_key => :ingest_config_id
 
-  has n, :log_entries, :child_key => :ingest_config_id
+  has n,      :log_entries,           :child_key => :ingest_config_id
 
   before :destroy do
     self.root_objects.each { |o| o.delete }
@@ -63,7 +66,6 @@ class IngestConfig
     common_config(config, false)
 
     # ingest_config specific configuration
-
     self.filename_match = Regexp.new('')
     self.mime_type = Regexp.new('')
     self.complex = false
@@ -76,6 +78,8 @@ class IngestConfig
           self.filename_match = Regexp.new(value)
         when :mime_type
           self.mime_type = Regexp.new(value)
+        when :ingest_type
+          self.ingest_type = value.to_s.upcase.to_sym
         when :ingest_model
           value.key_strings_to_symbols! :downcase => true
           value.each do |k, v|

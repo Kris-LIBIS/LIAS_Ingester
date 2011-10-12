@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'cgi'
 
 require_relative 'record/aleph_sequential'
@@ -82,6 +84,7 @@ class Record
           holdings_class = self.class.const_get("#{search_type}SearchHolding")
 	  
           if host
+            #noinspection RubyArgCount
             holdings_class.new(self.tag('001').first.datas, host, base)
           end
         rescue Exception

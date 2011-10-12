@@ -1,3 +1,5 @@
+# coding: utf-8
+
 class MimeType
 
   def self.get( file_path )

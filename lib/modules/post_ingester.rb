@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'ingester_module'
 require 'webservices/digital_entity_manager'
 require 'webservices/meta_data_manager'
@@ -40,7 +42,7 @@ class PostIngester
       case cfg.status
       when Status::Idle ... Status::Ingested
         # Oops! Not yet ready.
-        error "Cannot yet PreIngest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+        error "Cannot yet PostIngest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
       when Status::Ingested ... Status::PostIngesting
         # Excellent! Continue ...
         process_config cfg
@@ -55,7 +57,7 @@ class PostIngester
           continue cfg
         end
       when Status::Finished
-        warn "Skipping PreIngest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        warn "Skipping PostIngest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
       end
       
     ensure
@@ -127,7 +129,7 @@ class PostIngester
     
     cfg.status = Status::PostIngesting
     cfg.save
-    
+
     failed_objects = []
     
 # For some strange reason the statement below does not work
@@ -165,6 +167,8 @@ class PostIngester
     
     obj.set_status_recursive Status::PostIngesting, Status::Ingested
     obj.save
+
+    update_pid_links(obj) if obj.ingest_config.ingest_type == :SHAREPOINT_XML
     
     ### link the accessright records
     link_ar obj.get_config, obj
@@ -195,14 +199,15 @@ class PostIngester
       if ar.mid.nil?
         acl_record = MetaDataManager.instance.create_acl_record(ar.pinfo)
         result = MetaDataManager.instance.create_acl acl_record
-        unless result[:error].empty? && result[:mids].size == 1
-          result[:error].each { |error| @@app.logger.error "Error calling web service: #{error}" }
+        result[:error].each { |error| @@app.logger.error "Error calling web service: #{error}" } if result[:error]
+        unless result[:mids] and result[:mids].size == 1
           error "Failed to create accessrights metadata for #{ar.inspect}"
           obj.status = Status::PostIngestFailed
+        else
+          ar.mid = result[:mids][0]
+          ar.save
+          info "Created accessrights metadata record #{ar.mid} for protection ##{ar.id}"
         end
-        ar.mid = result[:mids][0]
-        ar.save
-        info "Created accessrights metadata record #{ar.mid} for protection ##{ar.id}"
       end
     when :WATERMARK
       return
@@ -213,7 +218,7 @@ class PostIngester
       return
     end
     result = DigitalEntityManager.instance.link_acl obj.pid, ar.mid
-    unless result[:error].empty?
+    if result[:error]
       result[:error].each { |e| error "Error calling web service: #{e}" }
       error "Failed to link accessright #{ar.mid} to object #{obj.pid}"
       obj.status = Status::PostIngestFailed
@@ -228,8 +233,8 @@ class PostIngester
         warn "Ignoring metadata on virtual object ##{obj.id}: '#{obj.label_path}'"
       else
         result = MetaDataManager.instance.create_dc_from_xml(obj.metadata)
-        result[:error].each { |e| error "Error calling web service: #{e}"}
-        if result[:mids].empty?
+        result[:error].each { |e| error "Error calling web service: #{e}"} if result[:error]
+        unless result[:mids] and !result[:mids].empty?
           error "Failed to create DC metadata for object #{obj.pid}"
           obj.status = Status::PostIngestFailed
           return
@@ -240,7 +245,7 @@ class PostIngester
     end
     if mid and obj.pid
       result = DigitalEntityManager.instance.link_dc obj.pid, mid
-      unless result[:error].empty?
+      if result[:error]
         result[:error].each { |e| error "Error calling web service: #{e}"}
         error "Failed to link metadata record #{mid} to object #{obj.pid}"
         obj.status = Status::PostIngestFailed
@@ -251,6 +256,35 @@ class PostIngester
     end
     obj.manifestations.each { |m| create_and_link_dc m, mid }
     obj.children.each       { |c| create_and_link_dc c }
+  end
+
+  def update_pid_links( obj )
+    filename = obj.file_stream
+    child_pids = []
+    doc = XmlDocument.open filename
+    doc.xpath('//file').each do |file_element|
+      id = file_element.attribute('oid').content
+      pid = IngestObject.first(:id => id).pid
+      child_pids << pid
+      file_element.set_attribute 'pid', pid
+    end
+    doc.save filename
+    result = DigitalEntityManager.instance.update_stream(obj.pid, filename)
+    if result[:error]
+      result[:error].each { |e| error "Error calling web service: #{e}"}
+      error "Failed to update record file stream for object ##{obj.pid}"
+      obj.status = Status::PostIngestFailed
+    else
+      info "Updated object links for object #{obj.pid}"
+    end
+    result = DigitalEntityManager.instance.add_relations(obj.pid, 'include', child_pids)
+    if result[:error]
+      result[:error].each { |e| error "Error calling web service: #{e}"}
+      error "Failed to link child objects for object ##{obj.pid}"
+      obj.status = Status::PostIngestFailed
+    else
+      info "Linked child objects for object #{obj.pid}"
+    end
   end
   
   def undo_config( cfg )

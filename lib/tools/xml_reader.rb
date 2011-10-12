@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'nokogiri'
 
 module XmlReader
@@ -7,11 +9,11 @@ module XmlReader
     File.open( file_name ) do |fp|
       doc = Nokogiri::XML::Document.parse( fp )
     end
-    return doc
+    doc
   end
   
   def self.parse_string( string )
-    return Nokogiri::XML::Document.parse( string )
+    Nokogiri::XML::Document.parse( string )
   end
 
 end

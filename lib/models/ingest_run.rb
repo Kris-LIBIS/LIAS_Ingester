@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require_relative 'common/config'
 require_relative 'common/status'
 
@@ -6,27 +8,29 @@ class IngestRun
   include DataMapper::Resource
   include CommonConfig
 
-  property    :status,          Integer, :default => Status::New
-  property    :status_name,     String
-  property    :init_end,        DateTime
+  property    :status,                Integer, :default => Status::New
+  property    :status_name,           String
 
   # config file info
-  property    :config_file,     String
-  property    :checksum,        String
-  property    :mtime,           DateTime
+  property    :config_file,           String
+  property    :checksum,              String
+  property    :mtime,                 DateTime
 
   # packaging info
-  property    :packaging,       Enum[:DIR, :ZIP, :RAR, :TAR, :TGZ, :TBZ]
-  property    :location,        String
-  property    :recursive,       Boolean
-  property    :selection,       Regexp
+  property    :packaging,             Enum[:DIR, :ZIP, :RAR, :TAR, :TGZ, :TBZ]
+  property    :location,              String
+  property    :recursive,             Boolean
+  property    :selection,             Regexp
 
-  has n,      :protections, :child_key => :ingest_run_id
-  has n,      :ingest_objects, :child_key => :ingest_run_id
+  # post_processing options
+  property    :scope_push_file,       String
+
+  has n,      :protections,           :child_key => :ingest_run_id
+  has n,      :ingest_objects,        :child_key => :ingest_run_id
 
   has n,      :ingest_configs
 
-  has n,      :log_entries, :child_key => :ingest_run_id
+  has n,      :log_entries,           :child_key => :ingest_run_id
 
   before :destroy do
     self.ingest_configs.destroy
@@ -62,18 +66,23 @@ class IngestRun
     self.mtime          = File.mtime(config_file)
     
     config              = YAML::load_file(config_file)
+
+    init_config(config)
+
+  end
+
+  def init_config(config)
     config.key_strings_to_symbols! :downcase => true
     
     # common configuration
     common_config(config[:common])
     
     # ingest_run specific configuration
-    
     self.packaging      = :DIR
     self.location       = '.'
     self.recursive      = false
-    self.selection      = Regexp.new(/.*/)
-    
+#    self.selection      = Regexp.new(/.*/)
+
     if config[:common]
       config[:common].key_strings_to_symbols! :downcase => true
       config[:common].each do |k1,v1|

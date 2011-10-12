@@ -1,17 +1,25 @@
+# coding: utf-8
+
 require 'singleton'
 
-require_relative 'soap_client'
+require 'webservices/soap_client'
 
-class DigitalEntityManager < SoapClient
+class DigitalEntityManager
   include Singleton
+  include SoapClient
 
   def initialize
-    super "DigitalEntityManager"
+    setup "DigitalEntityManager"
   end
   
   def create_object( de_info )
     de_call = create_digital_entity_call de_info, 'create'
     request :digital_entity_call, :general => general.to_s, :digital_entity_call => de_call.to_s 
+  end
+
+  def update_object( de_info, update_options = {} )
+    de_call = create_digital_entity_call de_info, 'update', update_options
+    request :digital_entity_call, :general => general.to_s, :digital_entity_call => de_call.to_s
   end
 
   def delete_object( pid )
@@ -55,39 +63,80 @@ class DigitalEntityManager < SoapClient
   end
 
   def link_md(pid, mid, md_name, md_type)
-    de_info =
-      { 'pid' => pid.to_s,
-        'metadata' => [ { 'cmd' => 'insert', 'link_to_exists' => 'true', 'mid' => mid.to_s, 'name' => md_name, 'type' => md_type } ]}
-    update_options = { 'metadata' => 'delta' }
-    de_call = create_digital_entity_call de_info, 'update', update_options
-    request :digital_entity_call, :general => general.to_s, :digital_entity_call => de_call.to_s
+    update_object( { 'pid' => pid.to_s,
+                     'metadata' =>
+                         [ { 'cmd' => 'insert',
+                             'link_to_exists' => 'true',
+                             'mid' => mid.to_s,
+                             'name' => md_name,
+                             'type' => md_type
+                           }
+                         ]
+                   },
+                   { 'metadata' => 'delta' }
+    )
   end
 
   def unlink_md(pid, mid, md_name, md_type)
-    de_info =
-      { 'pid' => pid.to_s,
-        'metadata' => [ { 'cmd' => 'delete', 'shared' => 'true', 'mid' => mid.to_s, 'name' => md_name, 'type' => md_type } ]}
-    update_options = { 'metadata' => 'delta' }
-    de_call = create_digital_entity_call de_info, 'update', update_options
-    request :digital_entity_call, :general => general.to_s, :digital_entity_call => de_call.to_s
+    update_object( { 'pid' => pid.to_s,
+                     'metadata' =>
+                         [ { 'cmd' => 'delete',
+                             'shared' => 'true',
+                             'mid' => mid.to_s,
+                             'name' => md_name,
+                             'type' => md_type
+                           }
+                         ]
+                   },
+                   { 'metadata' => 'delta' }
+    )
   end
   
   def unlink_all_md(pid, md_name = nil, md_type = nil)
-    de_info =
-    { 'pid' => pid.to_s,
-      'metadata' => [ { 'cmd' => 'delete', 'shared' => 'true'} ]}
+    de_info = { 'pid' => pid.to_s,
+                'metadata' =>
+                    [ { 'cmd' => 'delete',
+                        'shared' => 'true'
+                      }
+                    ]
+    }
     de_info['metadata'][0]['name'] = md_name if md_name
     de_info['metadata'][0]['type'] = md_name if md_type
-    update_options = { 'metadata' => 'all' }
-    de_call = create_digital_entity_call de_info, 'update', update_options
-    request :digital_entity_call, :general => general.to_s, :digital_entity_call => de_call.to_s
+    update_object( de_info, { 'metadata' => 'all' } )
+  end
+
+  def add_relations(pid, relation_type, related_pids)
+    relations = []
+    related_pids.each do |p|
+      relations << { 'cmd' => 'insert',
+                     'type' => relation_type.to_s,
+                     'pid' => p.to_s
+      }
+    end
+    update_object( { 'pid' => pid.to_s,
+                     'relation' => relations
+                   },
+                   { 'relation' => 'delta' }
+    )
+  end
+
+  def update_stream(pid, filename)
+    update_object( { 'pid' => pid,
+                     'stream_ref' =>
+                         { 'cmd' => 'update',
+                           'store_command' => 'copy',
+                           'location' => 'nfs',
+                           'file_name' => filename
+                         }
+                   }
+    )
   end
 
   private
 
   def create_digital_entity_call( de_info = {}, command = 'create', update_options = {} )
     # de_info is a hash like this:
-    # { 'vpid' => 0,
+    # { 'vpid' => 0, || 'pid' => 0,
     #   'control' => { 'label' => 'abc', 'usage_type' => 'archive' },
     #   'metadata' => [ { 'name' => 'descriptive', 'type' => 'dc', 'value' => '<record>...</record>'},
     #                   { 'cmd' => 'insert', 'link_to_exists' => true, 'mid' => '12345' } ],
@@ -99,25 +148,25 @@ class DigitalEntityManager < SoapClient
     # { 'metadata' => 'delta',
     #   'relation' => 'all',
     # }
-    digital_entity_call = create_document
-    root = create_node('digital_entity_call',
-                       :namespaces => { :node_ns  => 'xb',
-                                        'xb'      => 'http://com/exlibris/digitool/repository/api/xmlbeans'})
+    digital_entity_call = XmlDocument.new
+    root = digital_entity_call.create_node('digital_entity_call',
+                                           :namespaces => { :node_ns  => 'xb',
+                                                            'xb'      => 'http://com/exlibris/digitool/repository/api/xmlbeans'})
     digital_entity_call.root = root
 
-    root << (digital_entity = create_node('xb:digital_entity'))
-    digital_entity << create_text_node('pid', de_info['pid']) if de_info['pid']
-    digital_entity << create_text_node('vpid', de_info['vpid']) if de_info['vpid']
+    root << (digital_entity = digital_entity_call.create_node('xb:digital_entity'))
+    digital_entity << digital_entity_call.create_text_node('pid', de_info['pid']) if de_info['pid']
+    digital_entity << digital_entity_call.create_text_node('vpid', de_info['vpid']) if de_info['vpid']
     if de_info['control']
-      digital_entity << (ctrl = create_node('control'))
-      de_info['control'].each { |k,v| ctrl << create_text_node(k.to_s, v.to_s) }
+      digital_entity << (ctrl = digital_entity_call.create_node('control'))
+      de_info['control'].each { |k,v| ctrl << digital_entity_call.create_text_node(k.to_s, v.to_s) }
     end
     if de_info['metadata'] || update_options['metadata']
       attributes = {}
       if (cmd = update_options.delete 'metadata')
         attributes['cmd'] = 'delete_and_insert_' + cmd
       end
-      digital_entity << (mds = create_node('mds', :attributes => attributes))
+      digital_entity << (mds = digital_entity_call.create_node('mds', :attributes => attributes))
       if de_info['metadata']
         de_info['metadata'].each do |m|
           attributes = {}
@@ -130,8 +179,8 @@ class DigitalEntityManager < SoapClient
           if (link_to_exists = m.delete 'link_to_exists')
             attributes['link_to_exists'] = link_to_exists
           end
-          mds << (md = create_node('md', :attributes => attributes))
-          m.each { |k,v| md << create_text_node(k.to_s, v.to_s) }
+          mds << (md = digital_entity_call.create_node('md', :attributes => attributes))
+          m.each { |k,v| md << digital_entity_call.create_text_node(k.to_s, v.to_s) }
         end
       end
     end
@@ -140,34 +189,34 @@ class DigitalEntityManager < SoapClient
       if (cmd = update_options.delete 'relation')
         attributes['cmd'] = 'delete_and_insert_' + cmd
       end
-      digital_entity << (relations = create_node('relations', :attributes => attributes))
+      digital_entity << (relations = digital_entity_call.create_node('relations', :attributes => attributes))
       if de_info['relation']
         de_info['relation'].each do |r|
           attributes = {}
           if (cmd = r.delete 'cmd')
             attributes['cmd'] = cmd
           end
-          relations << (relation = create_node('relation', :attributes => attributes))
-          r.each { |k,v| relation << create_text_node(k.to_s, v.to_s) }
+          relations << (relation = digital_entity_call.create_node('relation', :attributes => attributes))
+          r.each { |k,v| relation << digital_entity_call.create_text_node(k.to_s, v.to_s) }
         end
       end
     end
-    if de_info['stream_ref']
+    if f = de_info['stream_ref']
       attributes = {}
-      if (cmd = r.delete 'cmd')
+      if (cmd = f.delete 'cmd')
         attributes['cmd'] = cmd
       end
-      if (store_command = r.delete 'store_command')
+      if (store_command = f.delete 'store_command')
         attributes['store_command'] = store_command
       end
-      if (location = r.delete 'location')
+      if (location = f.delete 'location')
         attributes['location'] = location
       end
-      digital_entity << (stream_ref = create_node('stream_ref', :attributes => attributes))
-      de_info['stream_ref'].each { |k,v| stream_ref << create_text_node(k.to_s, v.to_s) }
+      digital_entity << (stream_ref = digital_entity_call.create_node('stream_ref', :attributes => attributes))
+      de_info['stream_ref'].each { |k,v| stream_ref << digital_entity_call.create_text_node(k.to_s, v.to_s) }
     end
-    root << create_text_node('command', command)
-    digital_entity_call
+    root << digital_entity_call.create_text_node('command', command)
+    digital_entity_call.document
   end
 
 end

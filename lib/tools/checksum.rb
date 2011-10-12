@@ -1,3 +1,5 @@
+# coding: utf-8
+
 #noinspection RubyResolve
 require 'digest/md5'
 #noinspection RubyResolve

@@ -1,6 +1,9 @@
+# coding: utf-8
+
 require 'rubygems'
 #require 'sqlite3'
 require 'dm-core'
+#noinspection RubyResolve
 require 'dm-types'
 require 'dm-timestamps'
 require 'dm-migrations'
@@ -8,6 +11,7 @@ require 'dm-migrations'
 require_relative 'config_file'
 
 class Database
+  #noinspection RubyResolve
   attr_reader :handle
   attr_reader :logger
 

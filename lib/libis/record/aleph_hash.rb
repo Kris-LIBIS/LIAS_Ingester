@@ -1,3 +1,5 @@
+# coding: utf-8
+
 module AlephHash
 
   def to_h

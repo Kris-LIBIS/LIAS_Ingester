@@ -1,3 +1,5 @@
+# coding: utf-8
+
 #require 'application'
 require 'tools/exceptions'
 
@@ -5,7 +7,7 @@ require 'tools/exceptions'
 def nil.each #(&block)
 end
 
-$ApplicationDir = File.expand_path "#{File.dirname(__FILE__)}/.."
+$application_dir = File.expand_path "#{File.dirname(__FILE__)}/.."
 
 module IngesterTask
 
@@ -56,10 +58,7 @@ module IngesterTask
   end
 
   def handle_exception(e)
-    unless e.instance_of?(AbortException)
-      error "Exception in #{self.class}: #{e.message}"
-      e.backtrace.each { |x| error "#{x}" }
-    end
+    print_exception e
     raise AbortException.new
   end
 

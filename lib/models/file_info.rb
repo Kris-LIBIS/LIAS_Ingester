@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'dm-core'
 
 require 'tools/mime_type'

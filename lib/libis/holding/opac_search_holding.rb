@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require_relative 'generic_search_holding'
 
 class OpacSearchHolding < GenericSearchHolding

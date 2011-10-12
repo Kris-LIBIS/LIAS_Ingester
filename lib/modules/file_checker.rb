@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # This class is able to perform all file checks that we may want to perform during pre-ingest
 # - check if the file exists
 # - check if the file name matches a given filter

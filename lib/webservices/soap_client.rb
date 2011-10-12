@@ -1,79 +1,128 @@
+# coding: utf-8
+
 require 'savon'
+require 'nori'
 
-require 'tools/xml_writer'
+require 'tools/xml_document'
 
-class SoapClient
-  include XmlWriter
+module SoapClient
 
+  def init
+    @base_url = 'http://aleph08.libis.kuleuven.be:1801/de_repository_web/services/'
+    @wsdl_extension = '?wsdl'
+    # Disabled the use of Nokogiri parser. It aborts when illegal characters are encountered, while the default REXML
+    # does not care. Unfortunately SharePoint web services will send XML with illegal characters when they exist in
+    # the document's metadata.
+    # Nori.parser = :nokogiri
+    Nori.configure { |config| config.convert_tags_to { |tag| ['Envelope', 'Body'].include?(tag) ? tag.snakecase.to_sym : tag.to_sym } }
+  end
+
+  #noinspection RubyResolve
   attr_reader :client
 
-  def initialize( service )
+  def setup( service, options = {} )
+    init unless @base_url
     Savon.configure do |cfg|
       cfg.logger = Application.instance.logger
-      cfg.log_level = ConfigFile['SOAP_logging_level'] || :error
+      cfg.log_level = ConfigFile['SOAP_logging_level'] || :info
       cfg.log = ConfigFile['SOAP_logging']
       cfg.soap_version = 2
       cfg.raise_errors = false
       HTTPI.logger = Application.instance.logger
-      HTTPI.log_level = ConfigFile['SOAP_logging_level'] || :error
+      HTTPI.log_level = ConfigFile['SOAP_logging_level'] || :info
       HTTPI.log = ConfigFile['SOAP_logging']
     end
-    @client = Savon::Client.new do
+
+    url = @base_url + service + @wsdl_extension
+    proxy = options[:proxy]
+
+    @client = Savon::Client.new do |wsdl, http|
       http.read_timeout = 120
       http.open_timeout = 120
-      wsdl.document = "http://aleph08.libis.kuleuven.be:1801/de_repository_web/services/" + service + "?wsdl"
+      wsdl.document = url
+      http.proxy = proxy if proxy
+      if options[:username] and options[:password]
+        http.auth.basic options[:username], options[:password]
+      end
     end
+
+    @client
   end
   
   def request( method, body)
     b = body.clone; b.delete(:general)
-    @@logger.debug(self.class) { "Request '#{method.inspect}' '#{b.inspect}'"}
-    response = @client.request method do |soap|
+    soap_options = body.delete(:soap_options) || {}
+    wsdl_options = body.delete(:wsdl_options) || {}
+    http_options = body.delete(:http_options) || {}
+    wsse_options = body.delete(:wsse_options) || {}
+    method_options = body.delete(:method_options) || {}
+    Application.instance.logger.debug(self.class) { "Request '#{method.inspect}' '#{b.inspect}'"}
+    response = @client.request method, method_options do |soap, wsdl, http, _|
       soap.body = body
+      soap_options.each do |k, v|
+        soap.send (k.to_s + '=').to_sym, v
+      end
+      wsdl_options.each do |k, v|
+        wsdl.send (k.to_s + '=').to_sym, v
+      end
+      http_options.each do |k, v|
+        http.send (k.to_s + '=').to_sym, v
+      end
+      if wsse_options[:username]
+        http.auth.basic wsse_options[:username], wsse_options[:password]
+      end
     end
-    parse_result response
+    result = parse_result response
+    result
   end
 
   def parse_result( response )
-    error = []
-    pids = []
-    mids = []
-    de = []
-    r = response.to_hash
     unless response.success?
-      error << "SOAP Fault: " + response.soap_fault.to_s if response.soap_fault?
+      error = []
+      error << "SOAP Error: " + response.soap_fault.to_s if response.soap_fault?
       error << "HTTP Error: " + response.http_error.to_s if response.http_error?
-    else
-#      @@logger.debug(self.class) { "Response: '#{r.to_s.inspect}'"}
-      result = get_xml_response(r)
-#      @@logger.debug(self.class) { "Result: '#{result.inspect}'"}
-      doc = Nokogiri::XML(result)
-      doc.xpath('//error_description').each { |x| error << x.content unless x.content.nil? }
-      doc.xpath('//pid').each { |x| pids << x.content unless x.content.nil?}
-      doc.xpath('//mid').each { |x| mids << x.content unless x.content.nil?}
-      doc.xpath('//xb:digital_entity').each { |x| de << x.to_s }
+      Application.instance.logger.debug(self.class) { "Result: error='#{error.inspect}'" }
+      return { error: error }
     end
-    @@logger.debug(self.class) { "Result: error='#{error.inspect}', pids='#{pids.inspect}', mids='#{mids.inspect}', digital_entities='#{de.inspect}'"}
-    { :error => error, :pids => pids, :mids => mids, :digital_entities => de, :result => r}
+
+    result = result_parser(response.to_hash)
+    result
   end
 
   def general( owner = 'LIA01', user = 'super:lia01', password = 'super' )
-    doc = create_document
-    root = create_node('general')
-    add_namespaces(root, {
+    doc = XmlDocument.new
+    root = doc.create_node('general')
+    doc.add_namespaces(root, {
       :node_ns   => 'xb',
       'xb'       => 'http://com/exlibris/digitool/repository/api/xmlbeans'})
     doc.root = root
-    root << create_text_node('application', 'DIGITOOL-3')
-    root << create_text_node('owner', owner)
-    root << create_text_node('interface_version', '1.0')
-    root << create_text_node('user', user)
-    root << create_text_node('password', password)
-    doc
+    root << doc.create_text_node('application', 'DIGITOOL-3')
+    root << doc.create_text_node('owner', owner)
+    root << doc.create_text_node('interface_version', '1.0')
+    root << doc.create_text_node('user', user)
+    root << doc.create_text_node('password', password)
+    doc.document
   end
-  
+
+  protected
+
+  # default parser handles DigiTool response messages
+  def result_parser( response )
+    result = get_xml_response(response)
+    error = nil
+    pids = nil
+    mids = nil
+    de = nil
+    doc = XmlDocument.parse(result)
+    doc.xpath('//error_description').each { |x| error ||= []; error << x.content unless x.content.nil? }
+    doc.xpath('//pid').each { |x| pids ||= []; pids << x.content unless x.content.nil?}
+    doc.xpath('//mid').each { |x| mids ||= []; mids << x.content unless x.content.nil?}
+    doc.xpath('//xb:digital_entity').each { |x| de ||= []; de << x.to_s }
+    { errors: error, pids: pids, mids: mids, digital_entities: de }
+  end
+
   def get_xml_response( response )
-    response.first[1][response.first[1][:result].to_s.gsub(/\B[A-Z]+/, '_\&').downcase.to_sym]
+    response.first[1][response.first[1][:result].to_sym]
   end
 
 end

@@ -1,3 +1,5 @@
+# coding: utf-8
+
 class ConfigFile
 
   FILENAME = 'config.yml'

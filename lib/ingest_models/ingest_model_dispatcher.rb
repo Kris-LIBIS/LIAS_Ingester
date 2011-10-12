@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'pathname'
 require 'json'
 
@@ -18,7 +20,7 @@ class IngestModelDispatcher < IngestModel
   
   protected
   
-  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name)
+  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file)
     
     src_path = Pathname.new(src_file_path).relative_path_from(@base_path)
     
@@ -27,7 +29,7 @@ class IngestModelDispatcher < IngestModel
 
     ingest_model.custom_config @custom_config
     
-    ingest_model.make_manifestation( src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name )
+    ingest_model.make_manifestation( src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file )
     
   end
   

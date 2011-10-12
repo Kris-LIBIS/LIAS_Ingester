@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'singleton'
 
 require 'application'
@@ -46,7 +48,7 @@ class TypeDatabase
   end
 
   def media2type(media)
-    @type2media_map.select do |k,v|
+    @type2media_map.select do |_,v|
       v == media
     end.keys
   end

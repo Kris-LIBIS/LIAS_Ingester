@@ -1,3 +1,5 @@
+# coding: utf-8
+
 class Hash
 #  alias :orig_sqb :[]
 #  def [](p)

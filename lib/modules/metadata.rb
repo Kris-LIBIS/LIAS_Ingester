@@ -1,13 +1,16 @@
+# coding: utf-8
+
 require 'json'
 
-require 'ingester_module'
+require 'ingester_task'
 require 'libis/record'
 require 'libis/search'
+require 'tools/xml_document'
 
 class Metadata
-  include IngesterModule
+  include IngesterTask
   
-  SEARCH_OPTIONS = {:host => 'http://opac.libis.be/X', :target => 'Opac', :base => 'KADOC', :index => 'sig'}
+  MY_SEARCH_OPTIONS = {:host => 'http://opac.libis.be/X', :target => 'Opac', :base => 'KADOC', :index => 'sig'}
   
   def initialize(cfg)
     raise StandardError.new("input #{cfg} is not an IngestConfig") unless cfg.is_a?(IngestConfig)
@@ -31,7 +34,7 @@ class Metadata
   private
   
   def get_from_aleph(obj)
-    options = SEARCH_OPTIONS.merge @cfg.get_search_options
+    options = MY_SEARCH_OPTIONS.merge @cfg.get_search_options
     search_term = obj.label
     if options[:term]
       if (options[:match])
@@ -51,8 +54,8 @@ class Metadata
   
   def get_from_disk(obj)
     record = read_record obj
-    if record.nil? or record.empty?
-      Application.warn('Metadata') { "Could not find metadata in '#{metadata_file}'" } if obj.root?
+    if record.invalid?
+      Application.warn('Metadata') { "Could not find metadata in '#{@cfg.metadata_file}'" } if obj.root?
     else
       copy_metadata_as_is obj, record
     end
@@ -74,14 +77,16 @@ class Metadata
   end
   
   def read_record(obj)
+    doc = XmlDocument.new
     search_term = [obj.label]
     search_term << obj.relative_path.to_s if obj.file_name
     search_term.reverse.each do |term|
       if dc_file = @metadata_map[term]
-        return File.open(dc_file, 'r:utf-8').readlines.join
+        doc = XmlDocument.open dc_file
+        break
       end
     end
-    nil
+    doc
   end
   
   def save(obj, record, options = {})
@@ -96,22 +101,28 @@ class Metadata
   end
   
   def copy_metadata_from_aleph(obj, record)
-    obj.metadata = "#{@cfg.ingest_dir}/transform/dc_#{obj.id}.xml"
-    File.open(obj.metadata, "w:utf-8") do |f|
-      f.puts "<records>"
-      f.puts record.to_dc(obj.label)
-      f.puts "</records>"
+    begin
+      obj.metadata = "#{@cfg.ingest_dir}/transform/dc_#{obj.id}.xml"
+      doc = XmlDocument.new
+      records = doc.create_node('records')
+      record_doc = XmlDocument.parse(record.to_dc(obj.label))
+      records << record_doc.root
+      doc.root = records
+      doc.save(obj.metadata)
+    rescue Exception => e
+      obj.metadata = nil
+      handle_exception e
     end
   end
-  
+
   def copy_metadata_as_is(obj, record)
-    obj.metadata = "#{@cfg.ingest_dir}/transform/dc_#{obj.id}.xml"
     begin
-      File.open(obj.metadata, "w:utf-8") do |f|
-        f.puts "<records>"
-        f.puts record.to_s
-        f.puts "</records>"
-      end
+      obj.metadata = "#{@cfg.ingest_dir}/transform/dc_#{obj.id}.xml"
+      doc = XmlDocument.new
+      records = doc.create_node('records')
+      doc.root = records
+      records << record.root
+      doc.save(obj.metadata)
     rescue Exception => e
       obj.metadata = nil
       handle_exception e

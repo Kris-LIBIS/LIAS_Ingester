@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'singleton'
 require 'yaml'
 
@@ -9,21 +11,23 @@ class ModelFactory
 
   private
 
+  #noinspection RubyResolve
   attr_accessor :models
 
+  #noinspection RubyConstant
   MANIFESTATIONS = [ 'ORIGINAL', 'VIEW_MAIN', 'ARCHIVE', 'VIEW', 'THUMBNAIL' ]
 
   public
 
-  def ModelFactory.generated_manifestations
+  def self.manifestations
     return MANIFESTATIONS.slice(1..-1)
   end
 
-  def ModelFactory.all_manifestations
+  def self.all_manifestations
     return MANIFESTATIONS
   end
 
-  def ModelFactory.filename_extension(manifestation)
+  def self.filename_extension(manifestation)
     return '' if manifestation == 'ORIGINAL'
     return "_#{manifestation}"
   end

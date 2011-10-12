@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'fileutils'
 
 require 'application_status'
@@ -10,7 +12,8 @@ require 'tools/mime_type'
 class IngestModel
 
   include IngesterTask
-  
+
+  #noinspection RubyResolve
   attr_reader :config
   
   def initialize(config)
@@ -40,24 +43,17 @@ class IngestModel
   
   def create_manifestation(obj, manifestation, workdir, protection, watermark_file)
     
-    tgt_file_name = obj.label
-    
     if obj.parent? and obj.file_info.nil? # complex object - we create a thumbnail from the first child object
       return nil unless manifestation == 'THUMBNAIL'
-      p = obj
-      while p = p.parent
-        tgt_file_name = p.label + '_' + tgt_file_name
-      end
       obj = obj.children[0]
       while obj && obj.file_info.nil? && obj.parent?
         obj = obj.children[0]
       end
       return nil unless obj && obj.file_info
-    else
-#      tgt_file_name = obj.relative_path.dirname + obj.relative_path.basename('.*')
-      tgt_file_name = File.basename( obj.flattened_relative, '.*' )
     end
     
+    tgt_file_name = File.basename( obj.stream_name, '.*' )
+
     src_file_path = obj.file_stream ? obj.file_stream : obj.absolute_path
     src_mime_type = obj.mime_type
     
@@ -79,7 +75,7 @@ class IngestModel
     m = get_manifestation(manifestation, TypeDatabase.type2media(src_type))
 
     if m.nil?
-      warn "Skipping manifestation. No manifestation-config object found."
+      warn "Skipping manifestation '#{manifestation}'. Could not find the manifestation in the ingest model."
       return nil
     end
 
@@ -105,10 +101,10 @@ class IngestModel
           unless cfg[:OPTIONS]
             FileUtils.mkdir_p tgt_dir
             FileUtils.cp src_file_path, target
-            debug "Copying pregenerated manifestation file '#{file}' to '#{target}'."
+            info "Copying pregenerated manifestation file '#{file}' to '#{target}'."
             return target
           end
-          debug "Using pregenerated manifestation file '#{file}."
+          info "Using pregenerated manifestation file '#{file}."
           src_mime_type = MimeType.get src_file_path
           src_type = TypeDatabase.mime2type src_mime_type
         end

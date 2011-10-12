@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'dm-core'
 
 #noinspection RubyResolve

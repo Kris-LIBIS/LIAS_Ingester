@@ -1,7 +1,14 @@
+# coding: utf-8
+
 require 'rubygems'
 require 'builder'
 
 module OaiPmh
+
+  def tag(_)
+    raise NotImplementedError, "method needs to be implemented in record implementation '#{self.class}'"
+  end
+
   def to_oai_pmh
     aleph_record = self
 
@@ -30,7 +37,6 @@ module OaiPmh
     "xmlns" => 'http://www.openarchives.org/OAI/2.0/',
     "xmlns:xsi" => 'http://www.w3.org/2001/XMLSchema-instance',
     "xsi:schemaLocation" => 'http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd') {
-      #              oai_pmh_record = xml.tag!("OAI-PMH") {
       xml.ListRecords {
         xml.record {
           xml.header {
@@ -40,7 +46,6 @@ module OaiPmh
             xml.record( "xmlns" => "http://www.loc.gov/MARC21/slim",
             "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
             "xsi:schemaLocation" => "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd") {
-              #                                     xml.record {
               xml.leader(aleph_record.tag('LDR').first.datas.gsub('^', ' '))
 
               controlfields.each do |k|

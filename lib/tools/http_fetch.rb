@@ -1,7 +1,10 @@
+# coding: utf-8
+
 require 'net/http'
 require 'set'
 
 class Net::HTTPResponse
+  #noinspection RubyResolve
   attr_accessor :final_uri
 end
 

@@ -1,6 +1,7 @@
-require "dm-core"
+# coding: utf-8
 
-#noinspection RubyResolve
+require 'dm-core'
+
 class LogEntry
   include DataMapper::Resource
 
@@ -14,6 +15,7 @@ class LogEntry
   belongs_to  :ingest_config,   :required => false
   belongs_to  :ingest_object,   :required => false
   
+  #noinspection RubyResolve
   def to_s
     "#{self.ingest_run ? self.ingest_run.id : '---'} #{self.ingest_config ? self.ingest_config.id : '---'} #{self.ingest_object ? self.ingest_object.id : '---'} [#{self.created_at.to_s}] #{self.severity} -- #{self.program}: #{self.message}"
   end

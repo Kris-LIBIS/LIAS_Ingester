@@ -1,4 +1,5 @@
-#encoding: UTF-8
+# coding: utf-8
+
 require 'application'
 require 'tools/mime_type'
 
@@ -32,16 +33,15 @@ class PdfConverter < Converter
     @options ||= {}
     @source = source
 
-    unless support_input_mimetype?(MimeType.get(@source))
+    unless self.input_mimetype?(MimeType.get(@source))
       Application.instance().logger.error(self.class) { "Supplied file '#{@source}' is not a PDF file." }
     end
 
-
   end
 
-  def do_convert(target, format)
+  def do_convert(target, _)
 
-    cmd = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/pdf_copy.sh --file_input \"#{source}\" --file_output \"#{target}\""
+    cmd = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/pdf_copy.sh --file_input \"#{@source}\" --file_output \"#{target}\""
 
     @options.each do |k,v|
       cmd += " --#{k.to_s} #{v}"

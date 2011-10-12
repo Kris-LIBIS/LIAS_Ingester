@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'set'
 
 require 'ingester_task'
@@ -9,14 +11,14 @@ class ConverterRepository
 
   @@converters = Set.new
 
-  @@converters_glob = "#{$ApplicationDir}/lib/converters/*_converter.rb"
+  @@converters_glob = "#{$application_dir}/lib/converters/*_converter.rb"
 
-  def ConverterRepository.register converter_class
+  def self.register converter_class
     @@converters.add? converter_class
   end
 
   #noinspection RubyResolve
-  def ConverterRepository.get_converters
+  def self.get_converters
     if @@converters.empty?
       Dir.glob(@@converters_glob).each do |f|
         require f
@@ -26,9 +28,9 @@ class ConverterRepository
     @@converters
   end
 
-  def ConverterRepository.get_converter_chain(src_type, tgt_type, operations = nil)
+  def self.get_converter_chain(src_type, tgt_type, operations = [])
     msg = "conversion from #{src_type.to_s} to #{tgt_type.to_s}"
-    chain_list = self.get_converter_chain_recursive src_type, tgt_type, operations
+    chain_list = self.recursive_chain src_type, tgt_type, operations
     if chain_list.length > 1
       warn "Found more than one conversion chain for #{msg}. Picking the first one."
     end
@@ -48,7 +50,7 @@ class ConverterRepository
 
   private
 
-  def ConverterRepository.get_converter_chain_recursive(src_type, tgt_type, operations, chains_found = [], current_chain = [])
+  def self.recursive_chain(src_type, tgt_type, operations, chains_found = [], current_chain = [])
     return chains_found unless current_chain.length < 8 # upper limit of converter chain we want to consider
 
     self.get_converters.each do |converter|
@@ -61,9 +63,9 @@ class ConverterRepository
         sequence << node
         # check if the chain supports all the operations
         success = true
-        operations.each do |op, val|
-          success = false unless sequence.any? do |node|
-            node[:converter].new.respond_to? op.to_s.downcase.to_sym
+        operations.each do |op, _|
+          success = false unless sequence.any? do |n|
+            n[:converter].new.respond_to? op.to_s.downcase.to_sym
           end
         end
         if success
@@ -84,7 +86,7 @@ class ConverterRepository
         # would like to enable the following for optimalizationn, but some operation may require such a step
         # next if tmp_type == src_type
         # next if current_chain.any? { |c| c[:target] == tmp_type}
-        self.get_converter_chain_recursive(tmp_type, tgt_type, operations, chains_found,
+        self.recursive_chain(tmp_type, tgt_type, operations, chains_found,
                                            current_chain.dup << { :converter => converter, :target => tmp_type })
       end
     end

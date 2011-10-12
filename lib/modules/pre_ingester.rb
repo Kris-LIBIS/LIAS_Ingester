@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'ingester_module'
 require 'ingest_models/model_factory'
 require 'tools/ingester_setup'
@@ -5,38 +7,38 @@ require_relative 'metadata'
 
 class PreIngester
   include IngesterModule
-  
+
   def start_queue
     info 'Starting'
-    
+
     cfg_queue = IngestConfig.all(:status => Status::PreProcessed)
-    
+
     cfg_queue.each do |cfg|
-      
+
       process_config cfg, false
-      
+
     end # cfg_queue.each
-    
+
   rescue Exception => e
     handle_exception e
-    
+
   ensure
     info 'Done'
-    
+
   end
-  
+
   def start( config_id )
-    
+
     begin
       error "Configuration ##{config_id} not found"
       return nil
     end unless cfg = IngestConfig.first(:id => config_id)
-    
+
     begin
-      
+
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
-      
+
       case cfg.status
       when Status::Idle ... Status::PreProcessed
         # Oops! Not yet ready.
@@ -57,26 +59,26 @@ class PreIngester
       when Status::Ingesting .. Status::Finished
         warn "Skipping PreIngest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
       end
-      
+
     ensure
       ApplicationStatus.instance.cfg = nil
       ApplicationStatus.instance.run = nil
-      
+
     end
-    
+
     config_id
-    
+
   end
-  
+
   def undo( config_id )
-    
+
     cfg = IngestConfig.first(:id => config_id)
-    
+
     if cfg.nil?
       error "Configuration ##{config_id} not found"
       return nil
     end
-    
+
     unless Status.phase(cfg.status) == Status::PreIngest
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
@@ -86,13 +88,13 @@ class PreIngester
       return cfg if cfg.status == Status::PreProcessed
       return nil
     end
-    
+
     undo_config cfg
-    
+
   end
-  
+
   def restart( config_id )
-    
+
     if cfg = undo(config_id)
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
@@ -102,25 +104,25 @@ class PreIngester
       ApplicationStatus.instance.run = nil
       return config_id
     end
-    
+
     nil
-    
+
   end
-  
+
   def continue( config_id )
-    
+
     cfg = IngestConfig.first(:id => config_id)
-    
+
     if cfg.nil?
       error "Configuration ##{config_id} not found"
       return nil
     end
-    
+
     begin
-      
+
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
-      
+
       case cfg.status
       when Status::Idle ... Status::PreProcessed
         error "Configuration ##{config_id} not yet ready for PreIngest. Status is '#{Status.to_string(cfg.status)}'."
@@ -131,33 +133,33 @@ class PreIngester
       else
         warn "Configuration ##{config_id} allready finished PreIngesting."
       end
-      
+
     ensure
       ApplicationStatus.instance.cfg = nil
       ApplicationStatus.instance.run = nil
-      
+
     end
-    
+
     config_id
-    
+
   end
-  
+
   private
-  
+
   def process_config( cfg, continue = false )
-    
+
     start_time = Time.now
     ApplicationStatus.instance.run = cfg.ingest_run
     ApplicationStatus.instance.cfg = cfg
     info "Processing config ##{cfg.id}"
-    
+
     cfg.status = Status::PreIngesting
     cfg.save
-    
+
     failed_objects = []
-    
+
     setup_ingest cfg, continue != true
-    
+
     valid_states = [Status::PreProcessed]
     if continue
       valid_states << Status::PreIngesting
@@ -166,25 +168,25 @@ class PreIngester
 
     @model = ModelFactory.instance.get_model_for_config cfg
     @metadata = Metadata.new cfg
-    
+
     cfg.root_objects.each do |obj|
-      
+
       process_object obj if valid_states.include?(obj.status)
-      
+
       add_to_ingest obj if obj.status == Status::PreIngested
-      
+
       failed_objects << obj if obj.status == Status::PreIngestFailed
-      
+
     end # cfg.ingest_objects.each
-    
+
     finalize_ingest cfg
-    
+
     cfg.status = Status::PreIngested
-    
+
   rescue Exception => e
     cfg.status = Status::PreIngestFailed
     print_exception e
-    
+
   ensure
     cfg.save
     warn "#{failed_objects.size} objects failed during Pre-Ingest" unless failed_objects.empty?
@@ -193,59 +195,59 @@ class PreIngester
     ApplicationStatus.instance.run = nil
 
   end # process_config
-  
+
   def process_object( obj )
-    
+
     ApplicationStatus.instance.obj = obj
-    
+
     info "Processing object ##{obj.id}"
-    
+
     obj.status = Status::PreIngesting
     obj.save
-    
+
     # get metadata
     info 'Getting metadata'
     get_metadata obj
-    
+
     # copy stream to ingest_dir
     copy_stream obj
-    
+
     # create manifestations
     info 'Creating manifestations'
     create_manifestations obj
-    
+
     # set object status to preingested
     obj.set_status_recursive Status::PreIngested
-    
+
   rescue Exception => e
     obj.status = Status::PreIngestFailed
     print_exception e
-    
+
   ensure
     obj.save
     ApplicationStatus.instance.obj = nil
-    
+
   end # process_object
-  
+
   private
-  
+
   def setup_ingest( cfg, clear_dir )
     setup_ingest_dir cfg, clear_dir
     create_ingester_setup cfg
   end
-  
+
   def finalize_ingest( cfg )
-    
+
     cfg.mets = @ingester_setup.requires_mets?
     cfg.complex = !cfg.mets
     @ingester_setup.finalize_setup cfg.ingest_dir
-    
+
   end
-  
+
   def setup_ingest_dir( cfg, clear_dir )
-    
+
     cfg.ingest_id = "#{ConfigFile['ingest_name']}_#{format('%d',cfg.id)}"
-    
+
     load_dir = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_ingest_dir']}/load_#{cfg.ingest_id}"
     unless cfg.work_dir.nil?
       FileUtils.mkdir(cfg.work_dir) unless Dir.exist?(cfg.work_dir)
@@ -255,7 +257,7 @@ class PreIngester
     else
       cfg.ingest_dir = load_dir
     end
-    
+
     info "Setting up ingest directory: #{cfg.ingest_dir}"
     FileUtils.rm_r("#{cfg.ingest_dir}", :force => true) if clear_dir
     FileUtils.mkdir("#{cfg.ingest_dir}") unless Dir.exist?(cfg.ingest_dir)
@@ -272,36 +274,35 @@ class PreIngester
       dir = "#{cfg.ingest_dir}/#{d}"
       FileUtils.mkdir dir unless Dir.exist?(dir)
     end
-    
+
   end
-  
+
   def create_ingester_setup( cfg )
     info 'Preparing ingester setup'
     @ingester_setup = IngesterSetup.new
     @ingester_setup.add_control_fields cfg.get_control_fields, ''
   end
-  
+
   def get_metadata( object )
     result = @metadata.get_dc_record(object)
     object.children.each{ |child| get_metadata child }
     result
   end
-  
+
   def copy_stream( object )
     if object.file_info
       info "Copying original stream '#{object.file_path}'"
-      object.file_stream = "#{object.get_config.ingest_dir}/transform/streams/#{object.flattened_relative}"
+      object.file_stream = "#{object.get_config.ingest_dir}/transform/streams/#{object.stream_name}"
 #      FileUtils.mkdir_p File.dirname(object.file_stream)
       FileUtils.cp_r object.file_path, object.file_stream
     end
     object.children.each { |child| copy_stream child }
   end
-  
+
   def create_manifestations( object )
     cfg = object.get_config
-    ModelFactory.generated_manifestations.each do |m|
+    ModelFactory.manifestations.each do |m|
       debug "Manifestation: #{m}"
-      p = cfg.get_protection(m)
       file = @model.create_manifestation object, m, "#{cfg.ingest_dir}/transform/streams/", cfg.get_protection(m), "#{cfg.ingest_dir}/watermark_"
       if file
         info "Created manifestation file: #{file}"
@@ -315,7 +316,7 @@ class PreIngester
     end
     object.children.each { |child| create_manifestations child }
   end
-  
+
   def add_to_ingest( object )
     if (object.root? and object.parent?)
       object.vpid = @ingester_setup.add_complex_object object.label, object.usage_type
@@ -328,7 +329,7 @@ class PreIngester
     object.children.each       { |obj| add_to_ingest obj }
     object.save
   end
-  
+
   def delete_ingest_dir( cfg )
     load_dir = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_ingest_dir']}/load_#{cfg.ingest_id}"
       FileUtils.rm_r "#{load_dir}", :force => true
@@ -336,7 +337,7 @@ class PreIngester
         FileUtils.rm_r cfg.ingest_dir, :force => true
       end
   end
-  
+
   def undo_config( cfg )
     start_time = Time.now
     ApplicationStatus.instance.run = cfg.ingest_run
@@ -354,7 +355,7 @@ class PreIngester
     ApplicationStatus.instance.run = nil
     cfg
   end
-  
+
   def undo_object( obj )
     ApplicationStatus.instance.obj = obj
     info "Undo object ##{obj.id} PreIngest."

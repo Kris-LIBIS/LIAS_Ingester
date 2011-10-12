@@ -1,8 +1,10 @@
+# coding: utf-8
+
 require 'awesome_print'
 
 require 'ingester_module'
 require 'webservices/digital_entity_manager'
-require 'tools/xml_reader'
+require 'tools/xml_document'
 
 class Ingester
   include IngesterModule
@@ -185,17 +187,21 @@ class Ingester
     fixed_pid_list = {}
     pid_list.each do |xmlnr, pid|
       file_name = cfg.ingest_dir + "/ingest/digital_entities/#{xmlnr}.xml"
-      doc = XmlReader::parse_file file_name
+      doc = XmlDocument.open file_name
+      if doc.invalid?
+        error "Failed to parse '#{file_name}'. Some PIDs may be missing."
+        next
+      end
       vpid_node = doc.xpath('//xb:digital_entity/vpid').first
       error "Cannot detect assigned PID: failed to find <vpid> entry in #{file_name}." unless vpid_node
       fixed_pid_list[vpid_node.content] = pid if vpid_node
-	  end
+    end
     fixed_pid_list
   end
   
   def fix_pidlist_for_mets( pid_list, cfg )
-    doc = XmlReader::parse_file cfg.ingest_dir + '/ingest/digital_entities/0.xml'
-    filesec = XmlReader::parse_string doc.xpath('//md/value[../type="fileSec"]').first.content.to_s
+    doc = XmlDocument.open cfg.ingest_dir + '/ingest/digital_entities/0.xml'
+    filesec = XmlDocument.parse doc.xpath('//md/value[../type="fileSec"]').first.content.to_s
     fixed_pid_list = {}
     filesec.xpath('//mets:file').each do |f|
       vpid = f['ID'].gsub('file_','')
@@ -205,10 +211,11 @@ class Ingester
     fixed_pid_list[cfg.root_objects.first.vpid] = pid_list['0']
     fixed_pid_list
   end
-  
+
   def get_pidlist( cfg )
     pid_list = {}
     if cfg.tasker_log
+      #noinspection RubyResolve
       cfg.tasker_log.scan(/Ingesting: (\d+).*?\n?.*?Pid=(\d+) Success/) do
         pid_list[$1]=$2
       end
@@ -218,7 +225,6 @@ class Ingester
       end
     end
     pid_list
-
   end
 
   def assign_pids cfg

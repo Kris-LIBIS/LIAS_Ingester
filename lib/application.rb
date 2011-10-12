@@ -1,3 +1,5 @@
+# coding: utf-8
+
 $: << File.expand_path(File.dirname(__FILE__))
 
 require 'rubygems'
@@ -7,22 +9,29 @@ require 'optparse'
 
 require 'application_status'
 require 'tools/database'
-require 'modules/initializer'
 require 'modules/pre_processor'
 require 'modules/pre_ingester'
 require 'modules/ingester'
 require 'modules/post_ingester'
 
+# Makes our life much easier
+def nil.each #(&block)
+end
+
 class Application
   include Singleton
 
+  #noinspection RubyResolve
   attr_reader   :logger
   #noinspection RubyResolve
   attr_reader   :db_log_level
+  #noinspection RubyResolve
   attr_accessor :log_objects
   #noinspection RubyResolve
   attr_reader   :log_file
+  #noinspection RubyResolve
   attr_reader   :options
+  #noinspection RubyResolve
   attr_accessor :flush_counter
 
   def self.dir
@@ -41,13 +50,13 @@ class Application
     false
   end
   
-  def set_action(action,start)
+  def set_action(action, module_id)
     if @options[:action] then
       puts "ERROR: options --start, --continue, --restart and --undo are mutually exclusive."
       exit
     end
     @options[:action] = action
-    @options[:start] = start
+    @options[:module_id] = module_id
   end
 
   def initialize
@@ -57,7 +66,7 @@ class Application
     
     OptionParser.new do |opts|
       
-      opts.banner = "Usage: #{$0} [options] <configuration_file|id> ..."
+      opts.banner = "Usage: #{$0} [options] <configuration_file|id|selection> ..."
       opts.separator ""
       opts.separator "Options:"
       opts.separator('  module numbers: 1 = initializer, 2 = preprocessor, 3 = preingester,  4 = ingester, 5 = postingester')
@@ -83,7 +92,15 @@ class Application
       opts.on('--undo N', 'Undo the module for a run/configuration', Integer) do |data|
         set_action :undo, data
       end
-      
+
+      opts.on('--sharepoint_metadata F', 'The file containing the SharePoint metadata') do |file|
+        @options[:sharepoint_metadata] = file
+      end
+
+      opts.on('--sharepoint_datadir D', 'Location of the downloaded SharePoint data') do |dir|
+        @options[:sharepoint_datadir] = dir
+      end
+
       @options[:end] = 99
       opts.on('--end N', 'End processing at this module', Integer) do |data|
         @options[:end] = data
@@ -129,15 +146,10 @@ class Application
       @logger.db_logger(severity, datetime, progname, msg)
     }
     
-    @logger.level = ConfigFile['log_level'] || 1
-    @logger.level = options[:log_level] if options[:log_level]
-    
-    @db_log_level = ConfigFile['log_to_db_level'] || 2
-    @db_log_level = options[:db_log_level] if options[:db_log_level]
-    
-    @log_file = ConfigFile['log_file'] || nil
-    @log_file = options[:log_file] if options[:log_file]
-    
+    @logger.level = config_value(:log_level, 1)
+    @db_log_level = config_value(:log_to_db_level, 2, :db_log_level)
+    @log_file = config_value(:log_file, nil)
+
     @log_file = File.open(@log_file,'w:utf-8') if @log_file
     
     @flush_counter = 0
@@ -150,11 +162,12 @@ class Application
   
   def self.write_log(severity, datetime, progname, msg)
     return unless self.instance.log_file
-#    puts "severity #{severity} datetyime #{datetime} progname #{progname} msg #{msg}"
     self.instance.log_file.puts "[#{datetime.to_s}] #{severity} -- #{progname}: #{msg}"
-    self.instance.flush_counter = self.instance.flush_counter + 1
-    self.instance.log_file.flush if self.instance.flush_counter > 10
-    self.instance.flush_counter = 0 if self.instance.flush_counter > 10
+    self.instance.flush_counter += 1
+    if self.instance.flush_counter > 10
+      self.instance.log_file.flush
+      self.instance.flush_counter = 0
+    end
   end
 
   def self.send_log(severity, datetime, progname, msg)
@@ -196,12 +209,23 @@ class Application
     raise "Assertion failed! #{msg}" unless yield if $DEBUG
   end
 
+  def config_value( key, default, key2 = nil )
+    result = ConfigFile[key.to_s] || default
+    key = key2 if key2
+    #noinspection RubyResolve
+    result = @options[key.to_sym] if @options[key.to_sym]
+    result
+  end
+
 end
 
 class Logger
+  #noinspection RubyResolve
   attr_accessor :db_log
 
   def db_logger(severity, datetime, progname, msg)
+    # hack required as the logger passes in the message string encoded as US-ASCII
+    msg.encode!('utf-8','utf-8', undef: :replace)
     ::Application.write_log(severity, datetime, progname, msg)
     ::Application.send_log(severity, datetime, progname, msg) if @db_log
     @default_formatter.call(severity, datetime, progname, msg)

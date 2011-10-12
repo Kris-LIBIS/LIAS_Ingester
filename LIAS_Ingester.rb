@@ -1,6 +1,10 @@
 #!/usr/bin/env ruby
 
+# coding: utf-8
+
 require_relative 'lib/application'
+
+require 'modules/initializer'
 
 # Makes our life much easier
 def nil.each #(&block)
@@ -21,9 +25,9 @@ if @@app.options[:action]
 
   ARGV.each do |arg|
 
-    configs = nil
+    configs = []
 
-    case @@app.options[:start]
+    case @@app.options[:module_id]
 
     when 1
 
@@ -32,10 +36,10 @@ if @@app.options[:action]
 
       configs = pre_processor.start run_id  unless @@app.options[:end] and @@app.options[:end] < 2
       configs.each do |cfg_id|
-        cfg_id = pre_ingester.start cfg_id  unless @@app.options[:end] and @@app.options[:end] < 3
-        cfg_id = ingester.start cfg_id      unless @@app.options[:end] and @@app.options[:end] < 4
-        #noinspection RubyUnusedLocalVariable
-        cfg_id = post_ingester.start cfg_id unless @@app.options[:end] and @@app.options[:end] < 5
+          cfg_id = pre_ingester.start cfg_id  unless @@app.options[:end] and @@app.options[:end] < 3
+          cfg_id = ingester.start cfg_id      unless @@app.options[:end] and @@app.options[:end] < 4
+          #noinspection RubyUnusedLocalVariable
+          cfg_id = post_ingester.start cfg_id unless @@app.options[:end] and @@app.options[:end] < 5
       end
 
     when 2
@@ -75,7 +79,8 @@ if @@app.options[:action]
     end
 
   end
-  
+
+
   @@app.terminate
   exit
 

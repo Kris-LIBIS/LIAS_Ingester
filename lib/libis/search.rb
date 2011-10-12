@@ -1,5 +1,8 @@
+# coding: utf-8
+
 require_relative 'search/opac_search'
 require_relative 'search/primo_search'
+require_relative 'search/sharepoint_search'
 
 class SearchFactory
   def initialize(format)    

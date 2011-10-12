@@ -1,9 +1,10 @@
+# coding: utf-8
+
 require 'csv'
 
-require_relative 'xml_writer'
+require_relative 'xml_document'
 
-class CsvFile
-  include XmlWriter
+class CsvFile < XmlDocument
 
   FIXED_HEADER  = ['vpid', 'file_name', 'relation_type', 'related_to', 'usage_type', 'preservation_level', 'entity_type', 'label']
   FIXED_MAPPING = ['vpid', 'stream_ref/file_name', 'relations/relation/type', 'relations/relation/vpid', 'control/usage_type', 'control/preservation_level', 'control/entity_type', 'control/label']
@@ -18,6 +19,7 @@ class CsvFile
     @next_id = 0
     @header = FIXED_HEADER
     @files = Hash.new
+    super
   end
 
   def add_complex_object( name, usage_type )
@@ -89,16 +91,13 @@ class CsvFile
   end
 
   def write_mapping( file )
-    doc = create_document
-    
+
     root = create_node('x_mapping',
                        :namespaces => { :node_ns  =>  'tm',
                                         'tm'      =>  'http://com/exlibris/digitool/repository/transMap/xmlbeans'
                                       },
                        :attributes => { 'start_from_line' => '2' }
                       )
-    
-    doc.root = root
     
     stream_map = create_node 'x_map'
     stream_map << create_text_node('x_target', 'stream_ref')
@@ -119,7 +118,7 @@ class CsvFile
     
     root << create_mapping('4','stream_ref/file_id')
     
-    save_document doc, file
+    save file
     
   end
 

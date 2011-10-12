@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'ingester_module'
 require 'tools/checksum'
 
@@ -10,7 +12,8 @@ class Initializer
     
     info 'Starting'
     info "Processing config file: #{cfg_file}"
-    
+    start_time = Time.now
+
     mtime = File.mtime(cfg_file)
     checksum = Checksum.new(:MD5).get cfg_file
     run = IngestRun.first :config_file => cfg_file, :mtime => mtime, :checksum => checksum, :order => [ :updated_at.desc ]
@@ -46,6 +49,7 @@ class Initializer
       run.save
     end
     
+    info "Run ##{result} processed. Elapsed time: #{elapsed_time start_time}."
     ApplicationStatus.instance.run = nil
     info 'Done'
     
@@ -97,11 +101,10 @@ class Initializer
     
   end
   
-  private
+  protected
   
   def process_run( run )
     
-    start_time = Time.now
     ApplicationStatus.instance.run = run
     
     info "Processing run ##{run.id}"
@@ -110,7 +113,7 @@ class Initializer
     # TODO: unpack the container if necessary
     
     # get all the files
-    files = get_files run.location, run.selection, run.recursive
+    files = get_files(run.location, run.selection, run.recursive)
     info "Found #{files.size} files to process"
     
     files.each do |f|
@@ -136,7 +139,6 @@ class Initializer
     
   ensure
     run.save
-    info "Run ##{run.id} processed. Elapsed time: #{elapsed_time start_time}."
     ApplicationStatus.instance.run = nil
     
   end
@@ -145,9 +147,13 @@ class Initializer
     result = []
     file_list = Dir.glob "#{directory}/*"
     dirs, files = file_list.partition { |f| test(?d, f) }
-    files.each { |f| result << f if f.match match_expression }
+    if match_expression
+      result += files.find_all { |f| f.match match_expression }
+    else
+      result += files
+    end
     result.sort!
-    dirs.each { |d| result += get_files d, match_expression, recursive if recursive }
+    dirs.each { |d| result += get_files d, match_expression, recursive } if recursive
     result
   end
   

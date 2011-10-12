@@ -1,9 +1,12 @@
+# coding: utf-8
+
 require 'tools/string'
 require 'ingester_task'
 
 require_relative 'type_database'
 
 class Converter
+
   public
 
   def initialize(source)
@@ -14,7 +17,6 @@ class Converter
     do_convert(target, format)
   end
 
-  attr_reader :converters
 
   def Converter.inherited( klass )
 
@@ -26,33 +28,33 @@ class Converter
         Application.dir + '/config/converters/' + self.name.underscore + '.yaml'
       end
 
-      def self.support_input_type?(type_id)
+      def self.input_type?(type_id)
         self.input_types.include? type_id
       end
 
-      def self.support_output_type?(type_id)
+      def self.output_type?(type_id)
         self.input_types.include? type_id
       end
 
-      def self.support_input_mimetype?(mimetype)
+      def self.input_mimetype?(mimetype)
         type_id = TypeDatabase.instance.mime2type mimetype
-        self.support_input_type? type_id
+        self.input_type? type_id
       end
 
-      def self.support_output_mimetype?(mimetype)
+      def self.output_mimetype?(mimetype)
         type_id = TypeDatabase.instance.mime2type mimetype
-        self.support_output_type? type_id
+        self.output_type? type_id
       end
 
-      def self.support_conversion?(input_type, output_type)
+      def self.conversion?(input_type, output_type)
         self.conversions[input_type] and self.conversions[input_type].any? { |t| t == output_type }
       end
 
-      def self.supported_output_types(input_type)
+      def self.output_types(input_type)
         self.conversions[input_type]
       end
 
-      def self.support_extension?(extension)
+      def self.extension?(extension)
         ext2type extension
       end
 

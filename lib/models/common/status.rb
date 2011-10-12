@@ -1,3 +1,5 @@
+# coding: utf-8
+
 # centralized status number management
 
 #noinspection ALL
@@ -11,6 +13,7 @@ module Status
   PreIngest         = 0x0040                    # 64
   Ingest            = 0x0050                    # 80
   PostIngest        = 0x0060                    # 96
+  PostProcess       = 0x0070                    # 112
 
   # Status in phase
   Running           = 0x0001                    # 1
@@ -40,37 +43,46 @@ module Status
   PostIngestFailed  = PostIngest + Failed       # 100
   PostIngested      = PostIngest + Done         # 104
 
+  PostProcessing    = PostProcess + Running     # 113
+  PostProcessFailed = PostProcess + Failed      # 116
+  PostProcessed     = PostProcess + Done        # 120
+
   Finished          = 0x00F0     + Done         # 248
 
   StatusMap = {
-    Idle              => 'Idle',
-    Initialize        => 'Initialize',
-    PreProcess        => 'PreProcess',
-    PreIngest         => 'PreIngest',
-    Ingest            => 'Ingest',
-    PostIngest        => 'PostIngest',
-    
-    Running           => 'Running',
-    Done              => 'Done',
-    Failed            => 'Failed',
-    
-    New               => 'New',
-    Initializing      => 'Initializing',
-    Initialized       => 'Initialized',
-    InitializeFailed  => 'InitializeFailed',
-    PreProcessing     => 'PreProcessing',
-    PreProcessed      => 'PreProcessed',
-    PreProcessFailed  => 'PreProcessFailed',
-    PreIngesting      => 'PreIngesting',
-    PreIngested       => 'PreIngested',
-    PreIngestFailed   => 'PreIngestFailed',
-    Ingesting         => 'Ingesting',
-    Ingested          => 'Ingested',
-    IngestFailed      => 'IngestFailed',
-    PostIngesting     => 'PostIngesting',
-    PostIngested      => 'PostIngested',
-    PostIngestFailed  => 'PostIngestFailed',
-    Finished          => 'Finished'
+      Idle => 'Idle',
+      Initialize => 'Initialize',
+      PreProcess => 'PreProcess',
+      PreIngest => 'PreIngest',
+      Ingest => 'Ingest',
+      PostIngest => 'PostIngest',
+      PostProcess => 'PostProcess',
+
+      Running => 'Running',
+      Done => 'Done',
+      Failed => 'Failed',
+
+      New => 'New',
+      Initializing => 'Initializing',
+      Initialized => 'Initialized',
+      InitializeFailed => 'InitializeFailed',
+      PreProcessing => 'PreProcessing',
+      PreProcessed => 'PreProcessed',
+      PreProcessFailed => 'PreProcessFailed',
+      PreIngesting => 'PreIngesting',
+      PreIngested => 'PreIngested',
+      PreIngestFailed => 'PreIngestFailed',
+      Ingesting => 'Ingesting',
+      Ingested => 'Ingested',
+      IngestFailed => 'IngestFailed',
+      PostIngesting => 'PostIngesting',
+      PostIngested => 'PostIngested',
+      PostIngestFailed => 'PostIngestFailed',
+      PostProcessing => 'PostProcessing',
+      PostProcessFailed => 'PostProcessFailed',
+      PostProcessed => 'PostProcessed',
+
+      Finished => 'Finished'
   }
 
   def self.running?(status)

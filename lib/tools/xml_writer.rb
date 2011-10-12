@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'nokogiri'
 
 module XmlWriter
@@ -19,13 +21,13 @@ module XmlWriter
     fd.close
   end
 
-  def create_text_node( name, text, options = nil )
+  def create_text_node( name, text, options = {} )
     node = create_node name, options
     node << text
     node
   end
 
-  def create_node( name, options = nil )
+  def create_node( name, options = {} )
 
     node = Nokogiri::XML::Node.new name, @document
 

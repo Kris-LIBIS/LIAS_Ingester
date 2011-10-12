@@ -1,8 +1,11 @@
+# coding: utf-8
+
 require 'dm-core'
 require 'dm-types'
 require 'dm-timestamps'
 
 require 'tools/hash'
+
 require_relative 'bad_config_exception'
 require_relative 'status'
 

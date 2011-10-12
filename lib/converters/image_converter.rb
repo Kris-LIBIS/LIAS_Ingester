@@ -1,4 +1,5 @@
-#encoding: UTF-8
+# coding: utf-8
+
 require_relative 'converter'
 
 class ImageConverter < Converter
@@ -17,6 +18,10 @@ class ImageConverter < Converter
 
   def quality(value)
     @options[:quality] = value
+  end
+
+  def dpi(value)
+    @options[:resample] = value
   end
 
   def watermark(options = {})
@@ -42,11 +47,11 @@ class ImageConverter < Converter
   end
 
   def do_convert(target,format)
+
     target_file = target
-    target_format = format
-    target_format = :JP2 if target_format == :JPEG2000
-    if target_format == :JP2
-      target_format = "BMP"
+
+    format = :JP2 if format == :JPEG2000
+    if format == :JP2
       target_file += '.tmp.bmp'
     end
 
@@ -67,7 +72,7 @@ class ImageConverter < Converter
 
     Application.debug('ImageConverter') { "result: #{result}" }
 
-    if format == :JPEG2000
+    if format == :JP2
       result = `j2kdriver -i #{target_file} -t jp2 -R 0 -w R53 -o #{target} 2>&1`
       if result.match(/error/i)
         Application.error('ImageConverter') { "JPEG2000 conversion failed: #{result}" }

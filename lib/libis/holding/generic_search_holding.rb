@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'tools/http_fetch'
 
 class GenericSearchHolding

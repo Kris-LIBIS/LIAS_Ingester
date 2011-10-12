@@ -1,3 +1,5 @@
+# coding: utf-8
+
 require 'rubygems'
 require 'nokogiri'
 require 'cgi'
@@ -21,6 +23,10 @@ class Array
 end
 
 module DublinCore
+
+  def tag(_)
+    raise NotImplementedError, "method needs to be implemented in record implementation '#{self.class}'"
+  end
   
   def to_dc(label)
     aleph_record = self
