@@ -33,7 +33,7 @@ class PdfConverter < Converter
     @options ||= {}
     @source = source
 
-    unless self.input_mimetype?(MimeType.get(@source))
+    unless PdfConverter.input_mimetype?(MimeType.get(@source))
       Application.instance().logger.error(self.class) { "Supplied file '#{@source}' is not a PDF file." }
     end
 
