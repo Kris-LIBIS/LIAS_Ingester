@@ -55,6 +55,7 @@ class ImageConverter < Converter
       target_file += '.tmp.bmp'
     end
 
+
     command = "convert"
     command = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/watermarker.sh" if @wm_image
 
@@ -62,7 +63,7 @@ class ImageConverter < Converter
       command += " -#{o.to_s} '#{v}'"
     end
 
-    command += " '#{@source}' '#{target_file}'"
+    command += " '#{@source + ([:PDF, :TIFF].include? TypeDatabase.instance.mime2type(MimeType.get(@source)) ? '[0]' : '')}' '#{target_file}'"
 
     command += " '#{@wm_image}'" if @wm_image
 
