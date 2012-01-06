@@ -107,6 +107,9 @@ class Metadata
       records = doc.create_node('records')
       record_doc = XmlDocument.parse(record.to_dc(obj.label))
       records << record_doc.root
+      obj.get_run.get_metadata_fields.each do |tag,value|
+        records << doc.create_text_node(tag,value)
+      end
       doc.root = records
       doc.save(obj.metadata)
     rescue Exception => e
@@ -120,8 +123,11 @@ class Metadata
       obj.metadata = "#{@cfg.ingest_dir}/transform/dc_#{obj.id}.xml"
       doc = XmlDocument.new
       records = doc.create_node('records')
-      doc.root = records
       records << record.root
+      obj.get_run.get_metadata_fields.each do |tag,value|
+        records << doc.create_text_node(tag,value)
+      end
+      doc.root = records
       doc.save(obj.metadata)
     rescue Exception => e
       obj.metadata = nil

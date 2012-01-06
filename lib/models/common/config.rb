@@ -37,6 +37,7 @@ module CommonConfig
       property    :search_base,     DataMapper::Property::String
       property    :search_match,    DataMapper::Property::Regexp
       property    :search_term,     DataMapper::Property::String
+      property    :metadata_fields, DataMapper::Property::Yaml, :length => 2000
 
       # contol fields
       property    :control_fields,  DataMapper::Property::Yaml, :length => 2000
@@ -135,6 +136,8 @@ module CommonConfig
                 self.search_term    = v
               when :file
                 self.metadata_file1 = v
+              when :fields
+                self.metadata_fields = v
               else
                 Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
               end
@@ -207,6 +210,13 @@ module CommonConfig
         result[:index]  = self.search_index   if self.search_index
         result[:match]  = self.search_match   if self.search_match
         result[:term]   = self.search_term    if self.search_term
+        result
+      end
+
+      def get_metadata_fields
+        result = Hash.new
+        result.merge! self.ingest_run.metadata_fields if self.respond_to? :ingest_run and self.ingest_run and self.ingest_run.metadata_fields
+        result.merge! self.metadata_fields if self.metadata_fields
         result
       end
 
