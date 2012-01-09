@@ -29,11 +29,11 @@ class Converter
       end
 
       def self.input_type?(type_id)
-        self.input_types.include? type_id
+        self.input_types_list.include? type_id
       end
 
       def self.output_type?(type_id)
-        self.input_types.include? type_id
+        self.output_types_list.include? type_id
       end
 
       def self.input_mimetype?(mimetype)
@@ -99,11 +99,11 @@ class Converter
 
       private
 
-      def self.input_types
+      def self.input_types_list
         class_variable_get :@@input_types
       end
 
-      def self.output_types
+      def self.output_types_list
         class_variable_get :@@output_types
       end
 
