@@ -40,7 +40,7 @@ class IngestModel
     
     nil
   end
-  
+
   def create_manifestation(obj, manifestation, workdir, protection, watermark_file)
     
     if obj.parent? and obj.file_info.nil? # complex object - we create a thumbnail from the first child object
@@ -60,13 +60,13 @@ class IngestModel
     return nil unless src_file_path and src_mime_type
     
     make_manifestation(src_file_path.to_s, src_mime_type, manifestation, workdir, tgt_file_name,
-                       protection, "#{watermark_file}#{manifestation}")
+                       protection, "#{watermark_file}#{manifestation}", obj)
     
   end
   
   protected
   
-  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file)
+  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file, obj)
     
     target = tgt_dir + (tgt_file_name.nil? ? File.basename(src_file_path, '.*') : tgt_file_name)
     
@@ -89,24 +89,32 @@ class IngestModel
       cfg = @custom_config.detect { |c| c[:MANIFESTATION].upcase == manifestation }
       unless cfg.nil?
         debug "Found config: #{cfg}"
-        #noinspection RubyUnusedLocalVariable
-        file_name = File.basename src_file_path, '.*'
-        file = ""
-        file = File.join(ApplicationStatus.instance.run.location, eval(cfg[:FILE])) if cfg[:FILE]
-        debug "Looking for file '#{file}'"
-        if File.exist?(file)
-          conversion_operations = {}
-          src_file_path = File.expand_path(file)
-          debug "Using source file #{src_file_path}"
-          unless cfg[:OPTIONS]
-            FileUtils.mkdir_p tgt_dir
-            FileUtils.cp src_file_path, target
-            info "Copying pregenerated manifestation file '#{file}' to '#{target}'."
-            return target
+        if cfg[:FILE]
+          file_path = File.dirname obj.relative_path
+          #noinspection RubyUnusedLocalVariable
+          file_name = obj.base_name
+          #noinspection RubyUnusedLocalVariable
+          file_ext = File.extname file_path
+          #noinspection RubyUnusedLocalVariable
+          file_dir = File.dirname file_path
+          file = File.join(ApplicationStatus.instance.run.location, eval(cfg[:FILE]))
+          debug "Looking for file '#{file}'"
+          if File.exist?(file)
+            conversion_operations = {}
+            src_file_path = File.expand_path(file)
+            debug "Using source file #{src_file_path}"
+            unless cfg[:OPTIONS]
+              FileUtils.mkdir_p tgt_dir
+              FileUtils.cp src_file_path, target
+              info "Copying pregenerated manifestation file '#{file}' to '#{target}'."
+              return target
+            end
+            info "Using pregenerated manifestation file '#{file}."
+            src_mime_type = MimeType.get src_file_path
+            src_type = TypeDatabase.mime2type src_mime_type
+          else
+            warn "Pregenerated manifestation file '#{file}' does not exist."
           end
-          info "Using pregenerated manifestation file '#{file}."
-          src_mime_type = MimeType.get src_file_path
-          src_type = TypeDatabase.mime2type src_mime_type
         end
         conversion_operations = conversion_operations.recursive_merge(cfg[:OPTIONS]) if cfg[:OPTIONS]
       end
