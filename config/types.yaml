@@ -76,16 +76,35 @@
 # Office document types
   - :MEDIA:         :DOCUMENT
     :TYPE_INFO:
+      - :TYPE:          :RTF
+        :MIME:          application/rtf
+        :EXTENSIONS:    rtf
       - :TYPE:          :MSDOC
         :MIME:          application/msword
-        :EXTENSIONS:    doc,docx
+        :EXTENSIONS:    doc
+      - :TYPE:          :MSDOCX
+        :PUID:          fido-fmt/189.word
+        :MIME:          application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        :EXTENSIONS:    docx
       - :TYPE:          :MSXLS
         :MIME:          application/excel
-        :EXTENSIONS:    xls,xlsx
+        :EXTENSIONS:    xls
+      - :TYPE:          :MSXLSX
+        :PUID:          fido-fmt/189.xl
+        :MIME:          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+        :EXTENSIONS:    xslx
+      - :TYPE:          :MSPPT
+        :MIME:          application/vnd.ms-powerpoint
+        :EXTENSIONS:    ppt
+      - :TYPE:          :MSPPTX
+        :PUID:          fido-fmt/189.ppt
+        :MIME:          application/vnd.openxmlformats-officedocument.presentationml.presentation
+        :EXTENSIONS:    pptx
       - :TYPE:          :PDF
         :MIME:          application/pdf
         :EXTENSIONS:    pdf
       - :TYPE:          :PDFA
+        :PUID:          fmt/95
         :MIME:          application/pdfa # Note the invented mime type here. It requires implementation in theMimeType class.
         :EXTENSIONS:    pdfa
 
