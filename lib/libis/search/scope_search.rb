@@ -8,7 +8,7 @@ class ScopeSearch < GenericSearch
   end
 
   def query(term, index = nil, base = nil, options = {})
-    OracleClient.scope_client.call('kul_packages.scope_xml_meta_file_ed', [term])
+    OracleClient.scope_client.call('kul_packages.scope_xml_meta_file_ed', [term.upcase])
     doc = XmlDocument.open("/nas/vol03/oracle/scope01/#{term}_md.xml")
   end
 
