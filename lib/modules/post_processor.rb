@@ -16,10 +16,10 @@ class PostProcessor
       ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
-      when Status::Idle ... Status::PostProcessed
+      when Status::Idle ... Status::PostIngested
         # Oops! Not yet ready.
         error "Cannot yet PostProcess configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-      when Status::PostProcessed ... Status::PostProcessing
+      when Status::PostIngested ... Status::PostProcessing
         # Excellent! Continue ...
         process_config cfg
       when Status::PostProcessing ... Status::PostProcessed
@@ -30,13 +30,16 @@ class PostProcessor
           warn "Skipping PostProcess of configuration ##{config_id} because all objects are PostProcessed."
         else
           info "Continuing PostProcess of configuration #{config_id}. Some objects are not yet PostProcessed."
-          continue cfg
+          continue cfg.id
         end
       when Status::Finished
         warn "Skipping PostProcess of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
       end
 
     ensure
+      cfg.status = Status::PostProcessed
+      cfg.save
+
       ApplicationStatus.instance.cfg = nil
       ApplicationStatus.instance.run = nil
 
@@ -57,7 +60,7 @@ class PostProcessor
 
     unless Status.phase(cfg.status) == Status::PostProcess
       warn "Cannot undo configuration ##{config_id} because status is #{Status.to_string(cfg.status)}."
-      return cfg if cfg.status == Status::Ingested
+      return cfg if cfg.status == Status::PostIngested
       return nil
     end
 
@@ -99,7 +102,8 @@ class PostProcessor
   end
 
   def undo_config( cfg )
-
+    cfg.status == Status::PostIngested
+    cfg.save
   end
 
 end

@@ -49,14 +49,14 @@ class PostIngester
       when Status::PostIngesting ... Status::PostIngested
         info "PostIngest of configuration ##{config_id} failed the last time. The current status is unreliable, so we restart."
         process_config cfg
-      when Status::PostIngested ... Status::Finished
+      when Status::PostIngested
         if cfg.root_objects.all? { |obj| obj.status >= Status::PostIngested }
           warn "Skipping PostIngest of configuration ##{config_id} because all objects are PostIngested."
         else
           info "Continuing PostIngest of configuration #{config_id}. Some objects are not yet PostIngested."
           continue cfg
         end
-      when Status::Finished
+      else
         warn "Skipping PostIngest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
       end
       
@@ -168,8 +168,10 @@ class PostIngester
     obj.set_status_recursive Status::PostIngesting, Status::Ingested
     obj.save
 
-    update_pid_links(obj) if obj.ingest_config.ingest_type == :SHAREPOINT_XML
-    
+    if obj.ingest_config.ingest_type == :SHAREPOINT_XML
+      update_pid_links(obj)
+    end
+
     ### link the accessright records
     link_ar obj.get_config, obj
     
@@ -262,11 +264,12 @@ class PostIngester
     filename = obj.file_stream
     child_pids = []
     doc = XmlDocument.open filename
-    doc.xpath('//file').each do |file_element|
-      id = file_element.attribute('oid').content
-      pid = IngestObject.first(:id => id).pid
+    doc.xpath('//*').each do |element|
+      attr = element.attribute('oid')
+      next unless attr
+      pid = IngestObject.first(:id => attr.content).pid
       child_pids << pid
-      file_element.set_attribute 'pid', pid
+      element.set_attribute 'pid', pid
     end
     doc.save filename
     result = DigitalEntityManager.instance.update_stream(obj.pid, filename)

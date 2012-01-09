@@ -30,6 +30,7 @@ class SharepointCollector
   attr_accessor :work_dir
   attr_accessor :ingestmodel_map
   attr_accessor :metadata_map
+  attr_accessor :metadata_file
 
   def prepare
 
@@ -54,8 +55,8 @@ class SharepointCollector
     # step 2: read and parse the metadata file (@tree is built)
     collect_metadata
 
-    info "Creating tree file: #{print_tree('tree.txt')}"
-    info "Creating metadata file: #{print_metadata('metadata.out.txt')}"
+    info "Creating tree file: #{@tree.print('tree.txt')}"
+    info "Creating metadata file: #{@tree.print_metadata('metadata.out.txt', @mapping)}"
 
     # step 3: download files
     download_files
@@ -91,7 +92,7 @@ class SharepointCollector
     ApplicationStatus.instance.run = nil
     info 'Done'
 
-    result
+    return result
 
   end
 
@@ -129,7 +130,7 @@ class SharepointCollector
     else
       info "Collecting metadata for '#{@selection}'"
       tree.collect_metadata @mapping, @selection
-      tree.save 'tree.dat'
+      tree.save @metadata_file
     end
   end
 
@@ -170,6 +171,7 @@ class SharepointCollector
 
   end
 
+  #noinspection RubyResolve
   def write_ingest_config run
 
     info "Creating ingest configurations and objects"
@@ -178,7 +180,6 @@ class SharepointCollector
       config = fp.readlines( nil ).join('')
     end
 
-    #noinspection RubyResolve
     cfg_hash = YAML.load(config)
     cfg_hash['common']['packaging']['location'] = "#{@data_dir}"
     cfg_hash['common']['packaging']['selection'] = "#{@selection}"
@@ -215,67 +216,90 @@ class SharepointCollector
 
       if phase == :before
 
-        obj = nil
+        attributes = { 'name' => node.name }
 
-        if metadata and metadata.is_file?
+        if node.has_children?
 
-          file = File.join(@data_dir, metadata.relative_path)
+          if metadata and metadata.is_described?
 
-          unless test ?f, file
+            if options[:xml_doc]
+              xml_node = options[:xml_doc].create_node( 'folder', :attributes => attributes )
+              options[:this_node] = xml_node
+              options[:xml_container_node] << xml_node if options[:xml_container_node]
+            end
 
-            error "Expected to find the file '#{file}', but it did not exist or is a directory. Object skipped."
+            doc = XmlDocument.new
+            doc.root = doc.create_node 'tree'
+            doc.add_processing_instruction('xml-stylesheet', 'type="text/xsl" href="/view/sharepoint/viewer.xsl"')
 
-          else
+            options[:xml_doc] = doc
+            options[:xml_container_node] = doc.root
 
-            obj = create_ingest_object file, config, metadata
+            options[:xml_root_obj] = node
 
-            im_map[file] = metadata.ingest_model
+            attributes['path'] = metadata.relative_path
 
           end
 
-        end
+          xml_node = options[:xml_doc].create_node( 'folder', :attributes => attributes )
+          options[:xml_container_node] << xml_node
+          options[:xml_container_node] = xml_node
 
-        if parent_xml_node = options[:parent_xml_node]
-          attributes = { 'name' => node.name}
-          attributes['oid'] = metadata[:ingest_object_id].to_s if metadata and metadata[:ingest_object_id]
-          xml_node = options[:xml_doc].create_node ( metadata and metadata.is_file? ? 'file' : 'folder' ),
-                                                   :attributes => attributes
-          parent_xml_node << xml_node
+        else
 
-        end
+          if metadata and metadata.is_file?
 
-        if metadata and metadata.is_described? and node.has_children?
+            file = File.join(@data_dir, metadata.relative_path)
 
-          doc = XmlDocument.new
-          options[:xml_doc] = doc
-          options[:parent_object] = node
+            unless test ?f, file
+              error "Expected to find the file '#{file}', but it did not exist or is a directory. Object skipped."
+            else
+              create_ingest_object file, config, metadata
+              im_map[file] = metadata.ingest_model
+            end
 
-          doc.root = doc.create_node 'tree'
+            if parent_xml_node = options[:xml_container_node]
+              attributes['oid'] = metadata[:ingest_object_id].to_s if metadata and metadata[:ingest_object_id]
+              xml_node = options[:xml_doc].create_node('file', :attributes => attributes )
+              parent_xml_node << xml_node
 
-          doc.add_processing_instruction('xml-stylesheet', 'type="text/xsl" href="/view/sharepoint/viewer.xsl"')
+            end
 
-          xml_node = doc.create_node( 'folder', :attributes => { 'name' => node.name } )
-          #noinspection RubyResolve
-          doc.root << xml_node
-          options[:parent_xml_node] = xml_node
-
+          end
         end
 
       else # phase == :after
 
         FileUtils.mkdir_p xml_dir
 
-        if options[:parent_object] == node
-          file = File.join xml_dir, "map_#{metadata[:index].to_s}.xml"
-          options[:xml_doc].save file
+        if metadata and options[:xml_root_obj] == node and doc = options[:xml_doc]
 
-          create_ingest_object file, xml_config, metadata, true
+          if doc.has_element?('file[@oid]')
+            file = File.join xml_dir, "map_#{metadata[:index].to_s}.xml"
+            options[:xml_doc].save file
+
+            create_ingest_object file, xml_config, metadata, true
+
+            if options[:this_node]
+              options[:this_node]['oid'] = metadata[:ingest_object_id].to_s
+            end
+          end
+
+          doc.xpath('//folder/@oid').each do |id|
+            file = File.join xml_dir, "map_#{metadata[:index].to_s}.xml"
+            folder = XmlDocument.open(file)
+            folder.root['oid'] = metadata[:ingest_object_id].to_s
+            folder.save file
+          end
 
         end
 
       end
 
     end
+
+    config.save
+    xml_config.save
 
     return if im_map.empty?
 
@@ -294,7 +318,7 @@ class SharepointCollector
     obj.tree_index = metadata[:index].to_i
 
     config.add_object obj
-    config.save
+    obj.save
 
     ApplicationStatus.instance.obj = obj
     message = "New object ##{obj.id} for #{is_map ? 'map' : 'file'} '#{metadata.relative_path}'"
@@ -342,39 +366,6 @@ class SharepointCollector
     run.ingest_configs << config
 
     config
-  end
-
-  def print_tree( file_name )
-    File.open(file_name,'w:utf-8') do |f|
-      tree.visit( tree.root_node, prefix: '', in_map: false ) do |phase, node, options|
-        if phase == :before
-          node_string = ' ' * 11
-          prefix = ' ' * 2
-          prefix = '-' * 2 if options[:in_map]
-          if metadata = node.content
-            code = metadata.content_code
-            code += '*' if metadata.is_described?
-            if code == 'M'
-              options[:in_map] = true
-              prefix = '|-'
-            end
-            node_string = sprintf '%-2s %6d - ', code, metadata[:index].to_i
-          end
-          node_string += sprintf "%s%-130s", options[:prefix], node.name
-          node_string += ' [' + metadata[:content_type] + ']' if metadata
-          f.puts node_string
-          options[:prefix] += prefix
-        end
-      end
-    end
-    File.expand_path file_name
-  end
-
-  def print_metadata( file_name )
-    File.open(file_name,'w:utf-8') do |f|
-      tree.visit { |phase, node, _| node.content.print_metadata(f, @mapping) if (phase == :before and node.content) }
-    end
-    File.expand_path file_name
   end
 
 end
