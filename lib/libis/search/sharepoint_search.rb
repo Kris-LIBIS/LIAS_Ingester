@@ -48,7 +48,9 @@ class SharepointSearch < GenericSearch
     highline = HighLine.new($stdin, $stderr)
     @password = highline.ask("Password for #{self.username}: ") { |q| q.echo = '*'}.chomp
   end
+=begin
 
+=end
   def query(term, index, base, options = {})
 
     @term = term
