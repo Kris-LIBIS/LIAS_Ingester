@@ -7,9 +7,11 @@ require 'net/http'
 require 'net/https'
 require 'fileutils'
 
+require 'awesome_print'
+
 require 'ingester_task'
 require 'libis/record/sharepoint_record'
-require 'tools/xml_document'
+#require 'tools/xml_document'
 
 class SharepointMetadataTree
   include IngesterTask
@@ -123,15 +125,11 @@ class SharepointMetadataTree
     search.query '0', 'ID', 'Te verwerken documenten', value_type: 'Number', query_operator: '>', limit: 1000, selection: selection
     search.each do |record|
 
-      puts record.relative_path
-
       next unless selection.nil? or selection.empty? or
           record.relative_path =~ /^#{selection}$/ or
           record.relative_path =~ /^#{selection}\//
 
       tags_not_found += record.keys - mapping.keys
-
-      record = record.delete_if { |k, _| tags_not_found.include? k }
 
       debug "metadata: '#{record.inspect}''"
 
@@ -139,14 +137,14 @@ class SharepointMetadataTree
       record[:index] = count
 
       add record
-      info "Collected #{count} records so far ..." if count % 10 == 0
+      info "Collected #{count} records so far ..." if count % 100 == 0
 
     end
 
     info '%6d Records found.' % count
 
     tags_not_found.each do |tag|
-      error "Label '#{tag}' not found in the mapping table."
+      warn "Label '#{tag}' not found in the mapping table."
     end
 
   end
@@ -161,54 +159,38 @@ class SharepointMetadataTree
 
       next unless phase == :before and metadata
 
-      next unless metadata.is_file? and metadata[:url]
+      next unless metadata.is_file? and metadata.url
 
-      next if File.exist? File.join(download_dir, metadata.relative_path)
+      file_path = File.join( download_dir, metadata.relative_path )
+      path = File.dirname file_path
 
-      command = "wget --append-output=download.log"
-      command += " --force-directories --no-host-directories --cut-dirs=3"
-      command += " --http-user=#{search.username} --http-passwd='#{search.password}'"
-      command += " --directory-prefix='#{download_dir}' #{metadata[:url]}"
-
-      system command
-
-=begin
-      path = File.join( download_dir, File.dirname( metadata.relative_path ) )
+      next if File.exist? file_path
 
       FileUtils.mkpath path
 
-      http_to_file metadata.relative_path, metadata[:url], username: username, password: password
-=end
+      file_size = metadata.file_size
+
+      http_to_file file_path, metadata.url, username: search.username, password: search.password, ssl: true, file_size: file_size
 
     end
 
   end
   
   def visit( tree_node = @root_node, options = {}, &block )
+      yield :before, tree_node, options
+      visit_children tree_node, options, &block
+      yield :after, tree_node, options
+  end
+
+  def visit_children( tree_node = @root_node, options = {}, &block )
     tree_node.children.each do |child|
       my_options = options.dup
       yield :before, child, my_options
-      visit child, my_options, &block
+      visit_children child, my_options, &block
       yield :after, child, my_options
     end
   end
 
-  def save( file )
-    File.open(file, 'wb') do |f|
-      Marshal::dump self, f
-    end
-  end
-
-  def self.open( file )
-    tree = nil
-    File.open(file, 'rb') do |f|
-      #noinspection RubyResolve
-      tree = Marshal.load(f)
-    end
-    tree
-  end
-
-=begin
   def save( file )
     xml_doc = XmlDocument.new
     xml_doc.root = xml_doc.create_node 'records'
@@ -230,56 +212,60 @@ class SharepointMetadataTree
     tree
   end
 
-=end
+  def print( file_name )
+    File.open(file_name,'w:utf-8') do |f|
+      visit( root_node, prefix: '', in_map: false ) do |phase, node, options|
+        if phase == :before
+          node_string = ' ' * 11
+          prefix = ' ' * 2
+          prefix = '-' * 2 if options[:in_map]
+          if metadata = node.content
+            code = metadata.content_code
+            code += '*' if metadata.is_described?
+            if code == 'M'
+              options[:in_map] = true
+              prefix = '|-'
+            end
+            node_string = sprintf '%-2s %6d - ', code, metadata[:index].to_i
+          end
+          node_string += sprintf "%s%-130s", options[:prefix], node.name
+          node_string += ' [' + metadata.content_type + ']' if metadata
+          f.puts node_string
+          options[:prefix] += prefix
+        end
+      end
+    end
+    File.expand_path file_name
+  end
+
+  def print_metadata( file_name, mapping )
+    File.open(file_name,'w:utf-8') do |f|
+      visit { |phase, node, _| node.content.print_metadata(f, mapping) if (phase == :before and node.content) }
+    end
+    File.expand_path file_name
+  end
 
   protected
   
-  # Copied from http://stackoverflow.com/questions/2263540/how-do-i-download-a-binary-file-over-http-using-ruby
+  # Based on http://stackoverflow.com/questions/2263540/how-do-i-download-a-binary-file-over-http-using-ruby
   def http_to_file(filename, url, opt={})
-    opt = {
-        :ssl => false,        #user
-        :init_pause => 0.1,   #start by waiting this long each time
-                              # it's deliberately long so we can see
-                              # what a full buffer looks like
-        :learn_period => 0.3, #keep the initial pause for at least this many seconds
-        :drop => 1.5,         #fast reducing factor to find roughly optimized pause time
-        :adjust => 1.05       #during the normal period, adjust up or down by this factor
-    }.merge(opt)
-    pause = opt[:init_pause]
-    learn = 1 + (opt[:learn_period]/pause).to_i
-    drop_period = true
-    #delta = 0
-    max_delta = 0
-    last_pos = 0
-    File.open(filename, 'w') { |f|
+    debug "Downloading: '#{url}' -> '#{filename}'"
+    opt = { :ssl => false }.merge(opt)
+    File.open(filename, 'wb') { |f|
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = opt[:ssl]
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       request = Net::HTTP::Get.new(uri.request_uri)
       request.basic_auth(opt[:username], opt[:password])
+      received_size = 0
       http.request(request) { |response|
-        response.read_body { |seg|
-          f << seg
-          delta = f.pos - last_pos
-          last_pos += delta
-          if delta > max_delta then
-            max_delta = delta
-          end
-          if learn <= 0 then
-            learn -= 1
-          elsif delta == max_delta then
-            if drop_period then
-              pause /= opt[:drop_factor]
-            else
-              pause /= opt[:adjust]
-            end
-          elsif delta < max_delta then
-            drop_period = false
-            pause *= opt[:adjust]
-          end
-          sleep(pause)
-        }
+        f << response.body
+        received_size = f.pos
       }
+      if received_size.to_s != opt[:file_size]
+        warn "File size mismatch for '#{filename}'. Expected #{opt[:file_size].to_s}. Got #{received_size.to_s}."
+      end
     }
   end
 
