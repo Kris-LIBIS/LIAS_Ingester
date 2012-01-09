@@ -54,7 +54,7 @@ class ConverterRepository
     return chains_found unless current_chain.length < 8 # upper limit of converter chain we want to consider
 
     self.get_converters.each do |converter|
-      if converter.support_conversion? src_type, tgt_type and !current_chain.any? { |c|
+      if converter.conversion? src_type, tgt_type and !current_chain.any? { |c|
         c[:converter] == converter and c[:target] == tgt_type }
         node = Hash.new
         node[:converter] = converter
@@ -81,8 +81,8 @@ class ConverterRepository
     return chains_found unless chains_found.empty? or current_chain.length + 1 < chains_found[0].length
 
     self.get_converters.each do |converter|
-      next unless converter.support_input_type? src_type
-      converter.supported_output_types(src_type).each do |tmp_type|
+      next unless converter.input_type? src_type
+      converter.output_types(src_type).each do |tmp_type|
         # would like to enable the following for optimalizationn, but some operation may require such a step
         # next if tmp_type == src_type
         # next if current_chain.any? { |c| c[:target] == tmp_type}
