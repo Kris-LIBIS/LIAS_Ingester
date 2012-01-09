@@ -22,6 +22,10 @@ class String
     self.gsub(/['"]/) { |s| '\\' + s[0].to_s }
   end
 
+  def escape_for_sql
+    self.gsub(/'/) { |s| ($` == '' || $' == '' ? '' : '\'') + s[0].to_s }
+  end
+
   def dot_net_clean
     self.gsub /^(\d+|error|float|string);\\?#/, ''
   end
