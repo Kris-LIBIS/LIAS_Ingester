@@ -1,0 +1,18 @@
+
+:NAME:      Afbeeldingen archivering cag
+:MEDIA:     :IMAGE
+:QUALITY:   :ARCHIVE
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESAMPLE:      75
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESIZE:        500
+      :QUALITY:       50%
+
