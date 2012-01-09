@@ -8,22 +8,28 @@ class SharepointMapping < Hash
 
   def initialize( mapping_file )
 
-    CSV.foreach(mapping_file) do |row|
+    CSV.foreach(mapping_file, headers: true, skip_blanks: true) do |row|
       next unless row[1]
-      next unless row[1].match(/^ows_/)
+      next unless (row[2] || row[3])
 
       name = row[0] ? row[0].strip : nil
       label = row[1].strip.to_sym
-      db_column = row[2] ? row[2].strip : nil
-      dc_tag = row[3] ? row[3].strip : ''
-      scope_tag = row[4] ? row[4].strip : nil
-      scope_id = row[5] and row[5] != '?' ? Integer(row[5].strip) : nil
+      dc_tag = row[2] ? row[2].strip : ''
+      db_column = row[3] ? row[3].strip : nil
+      db_datatype = row[4] ? row[4].strip.upcase.to_sym : nil
+      db_valuemask = row[5] ? row[5] : nil
+#      scope_tag = row[6] ? row[6].strip : nil
+#      scope_id = (row[7] and row[7] =~ /[0-9]+/ ? Integer(row[7].strip) : nil)
 
       mapping = {}
       mapping[:fancy_name] = name if name
       mapping[:db_column] = db_column if db_column
-      mapping[:scope_tag] = scope_tag if scope_tag
-      mapping[:scope_id] = scope_id if scope_id
+      mapping[:db_datatype] = :STRING
+      mapping[:db_datatype] = db_datatype if db_datatype
+      mapping[:db_valuemask] = (mapping[:db_datatype] == :STRING ? "'@@'" : "@@")
+      mapping[:db_valuemask] = db_valuemask if db_valuemask
+#      mapping[:scope_tag] = scope_tag if scope_tag
+#      mapping[:scope_id] = scope_id if scope_id
 
       if dc_tag.match(/^\s*"(.*)"\s*(<.*)$/)
         mapping[:dc_prefix] = $1
@@ -43,16 +49,24 @@ class SharepointMapping < Hash
         mapping[:dc_postfix] = $1
       end
 
-      if ref = SharepointRecord::REF_MAPPER.invert[label]
-        mapping[:ref] = ref
-      end
-
       self[label] = mapping.empty? ? nil : mapping
 
     end
 
     super nil
 
+  end
+
+  def name( label )
+    mapping = self[label]
+    mapping = mapping[:fancy_name] if mapping
+    mapping || label
+  end
+
+  def fancy_label( label )
+    mapping = self[label]
+    mapping = mapping[:fancy_name] if mapping
+    "#{label}#{mapping ? '(' + mapping + ')' : ''}"
   end
 
   def dc_tag( label )
@@ -77,6 +91,19 @@ class SharepointMapping < Hash
     mapping = self[label]
     mapping = mapping[:fancy_name] if mapping
     mapping
+  end
+
+  def db_column( label )
+    mapping = self[label]
+    mapping = mapping[:db_column] if mapping
+    mapping
+  end
+
+  def db_value( label, value )
+    mapping = self[label]
+    return nil unless mapping
+    mask = mapping[:db_valuemask]
+    mask.gsub("@@", value.to_s)
   end
 
 end
