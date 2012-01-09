@@ -6,5 +6,6 @@
   - :GIF
 :INPUT_TYPES:
   - :JPEG2000
+  - :PDF
 :OUTPUT_TYPES:
   - :JPEG2000
