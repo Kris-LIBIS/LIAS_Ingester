@@ -24,19 +24,15 @@ end
 
 module DublinCore
 
-  def tag(_)
-    raise NotImplementedError, "method needs to be implemented in record implementation '#{self.class}'"
-  end
-  
   def to_dc(label)
     aleph_record = self
     
     return nil if aleph_record.nil?
     
     Nokogiri::XML::Builder.new do |xml|
-      xml.record('xmlns:dc' => 'http://purl.org/dc/elements/1.1',
+      xml.record('xmlns:dc' => 'http://purl.org/dc/elements/1.1/',
                  'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
-                 'xmlns:dcterms' => 'http://purl.org/dc/terms') {
+                 'xmlns:dcterms' => 'http://purl.org/dc/terms/') {
         
         # ######## DC:IDENTIFIER for label
         xml['dc'].identifier label

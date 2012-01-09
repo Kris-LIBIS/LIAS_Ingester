@@ -5,10 +5,6 @@ require 'builder'
 
 module OaiPmh
 
-  def tag(_)
-    raise NotImplementedError, "method needs to be implemented in record implementation '#{self.class}'"
-  end
-
   def to_oai_pmh
     aleph_record = self
 
