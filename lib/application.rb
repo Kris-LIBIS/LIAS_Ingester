@@ -164,7 +164,7 @@ class Application
     return unless self.instance.log_file
     self.instance.log_file.puts "[#{datetime.to_s}] #{severity} -- #{progname}: #{msg}"
     self.instance.flush_counter += 1
-    if self.instance.flush_counter > 10
+    if self.instance.flush_counter > 20
       self.instance.log_file.flush
       self.instance.flush_counter = 0
     end
