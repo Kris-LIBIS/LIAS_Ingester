@@ -5,8 +5,8 @@
 
 :MANIFESTATIONS:
 
-  - :MANIFESTATION:   ARCHIVE
-    :FORMAT:          :PDFA
+  - :MANIFESTATION:   VIEW
+    :FORMAT:          :PDF
 
   - :MANIFESTATION:   VIEW_MAIN
     :FORMAT:          :PDF

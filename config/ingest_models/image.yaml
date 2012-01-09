@@ -5,9 +5,6 @@
 
 :MANIFESTATIONS:
 
-  - :MANIFESTATION:   ARCHIVE
-    :FORMAT:          :TIFF
-
   - :MANIFESTATION:   VIEW_MAIN
     :FORMAT:          :JPEG
     :OPTIONS:
