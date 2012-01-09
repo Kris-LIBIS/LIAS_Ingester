@@ -22,7 +22,7 @@ class TestMetadata < MiniTest::Unit::TestCase
     a = SharepointRecord.new
     a[:ows_ContentType] = 'Bestanddeel of stuk (document)'
     assert_equal('Bestanddeel of stuk (document)', a[:ows_ContentType], 'regular lookup')
-    assert_equal('Bestanddeel of stuk (document)', a[:content_type], 'automatic REFMAPPER lookup')
+    assert_equal('Bestanddeel of stuk (document)', a.simple_content_type, 'method lookup')
     assert_equal(nil, a[:no_value_to_expect], 'no match lookup')
   end
   
@@ -54,31 +54,31 @@ class TestMetadata < MiniTest::Unit::TestCase
   
   def test_content_type()
     a = SharepointRecord.new
-    assert_equal(:unknown, a.content_type)
+    assert_equal(:unknown, a.simple_content_type)
     a[:ows_ContentType] = 'Something Unknown'
-    assert_equal(:unknown, a.content_type)
+    assert_equal(:unknown, a.simple_content_type)
     a[:ows_ContentType] = 'Archief'
-    assert_equal(:archive, a.content_type)
+    assert_equal(:archive, a.simple_content_type)
     a[:ows_ContentType] = 'Bestanddeel of stuk (document)'
-    assert_equal(:file, a.content_type)
+    assert_equal(:file, a.simple_content_type)
     a[:ows_ContentType] = 'Bestanddeel of stuk (document) (korte beschrijving)'
-    assert_equal(:file, a.content_type)
+    assert_equal(:file, a.simple_content_type)
     a[:ows_ContentType] = 'Bestanddeel (folder)'
-    assert_equal(:map, a.content_type)
+    assert_equal(:map, a.simple_content_type)
     a[:ows_ContentType] = 'Bestanddeel (folder) (korte beschrijving)'
-    assert_equal(:map, a.content_type)
+    assert_equal(:map, a.simple_content_type)
     a[:ows_ContentType] = 'Meervoudige beschrijving (folder)'
-    assert_equal(:mmap, a.content_type)
+    assert_equal(:mmap, a.simple_content_type)
     a[:ows_ContentType] = 'Meervoudige beschrijving (document)'
-    assert_equal(:mfile, a.content_type)
+    assert_equal(:mfile, a.simple_content_type)
     a[:ows_ContentType] = 'Tussenniveau'
-    assert_equal(:map, a.content_type)
+    assert_equal(:map, a.simple_content_type)
     a[:ows_ContentType] = 'Film'
-    assert_equal(:file, a.content_type)
+    assert_equal(:file, a.simple_content_type)
     a[:ows_ContentType] = 'Object'
-    assert_equal(:file, a.content_type)
+    assert_equal(:file, a.simple_content_type)
     a[:ows_ContentType] = 'Document'
-    assert_equal(:file, a.content_type)
+    assert_equal(:file, a.simple_content_type)
   end
   
   def test_content_code()
