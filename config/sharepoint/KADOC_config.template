@@ -10,14 +10,15 @@ common:
     check_ingested:   true
 
   pre_ingest:
-    work_dir:         /nas/vol03/acquire/temp
+    work_dir:         /nas/vol01/temp/ingest
     
   checksum:
     type:             md5
     file:             MD5/md5sums.txt
 
   control_fields:
-    partition_c:     test sharepoint
+    partition_c:      test sharepoint
+    status:           SUPRESSED
 
   accessrights:
     original:         id = 31682
