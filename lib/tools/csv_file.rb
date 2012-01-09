@@ -4,16 +4,13 @@ require 'csv'
 
 require_relative 'xml_document'
 
-class CsvFile < XmlDocument
+class CsvFile
 
   FIXED_HEADER  = ['vpid', 'file_name', 'relation_type', 'related_to', 'usage_type', 'preservation_level', 'entity_type', 'label']
   FIXED_MAPPING = ['vpid', 'stream_ref/file_name', 'relations/relation/type', 'relations/relation/vpid', 'control/usage_type', 'control/preservation_level', 'control/entity_type', 'control/label']
-#  FixedOptions = [:file_name, :usage_type, :preservation_level, :entity_type, :label]
 
   attr_reader :header
   attr_reader :files
-#  attr_reader :extra_header
-#  attr_reader :extra_mapping
 
   def initialize
     @next_id = 0
@@ -67,7 +64,7 @@ class CsvFile < XmlDocument
   end
 
   def write( file )
-    CSV.open( file, 'w') do |csv|
+    CSV.open( file, 'w:utf-8', force_quotes: true) do |csv|
       csv << @header
       0.upto(@next_id - 1) do |n|
         file_info = @files[n]
@@ -82,43 +79,45 @@ class CsvFile < XmlDocument
     end
   end
 
-  def create_mapping( position, target )
-    x_map = create_node 'x_map'
-    x_map << create_node('x_source',
-                         :attributes => { 'position' => position })
-    x_map << create_text_node( 'x_target', target)
+  def create_mapping( doc, position, target )
+    x_map = doc.create_node 'x_map'
+    x_map << doc.create_node('x_source',
+                             :attributes => { 'position' => position })
+    x_map << doc.create_text_node( 'x_target', target)
     x_map
   end
 
   def write_mapping( file )
 
-    root = create_node('x_mapping',
-                       :namespaces => { :node_ns  =>  'tm',
-                                        'tm'      =>  'http://com/exlibris/digitool/repository/transMap/xmlbeans'
-                                      },
-                       :attributes => { 'start_from_line' => '2' }
-                      )
+    doc = XmlDocument.new
+
+    doc.root = doc.create_node('x_mapping',
+                               :namespaces => { :node_ns  =>  'tm',
+                                                'tm'      =>  'http://com/exlibris/digitool/repository/transMap/xmlbeans'
+                               },
+                               :attributes => { 'start_from_line' => '2' }
+    )
     
-    stream_map = create_node 'x_map'
-    stream_map << create_text_node('x_target', 'stream_ref')
-    stream_map << create_text_node('x_attr',   'store_command')
-    stream_map << create_text_node('x_default','copy')
+    stream_map = doc.create_node 'x_map'
+    stream_map << doc.create_text_node('x_target', 'stream_ref')
+    stream_map << doc.create_text_node('x_attr',   'store_command')
+    stream_map << doc.create_text_node('x_default','copy')
     
-    root << stream_map
+    doc.root << stream_map
     
-    stream_map = create_node 'x_map'
-    stream_map << create_text_node('x_target', 'stream_ref/directory_path')
-    stream_map << create_text_node('x_default','default')
+    stream_map = doc.create_node 'x_map'
+    stream_map << doc.create_text_node('x_target', 'stream_ref/directory_path')
+    stream_map << doc.create_text_node('x_default','default')
     
-    root << stream_map
+    doc.root << stream_map
     
     0.upto(FIXED_HEADER.size - 1) do |n|
-      root << create_mapping( (n+1).to_s, FIXED_MAPPING[n] )
+      doc.root << create_mapping( doc, (n+1).to_s, FIXED_MAPPING[n] )
     end
     
-    root << create_mapping('4','stream_ref/file_id')
+    doc.root << create_mapping( doc, '4', 'stream_ref/file_id')
     
-    save file
+    doc.save file
     
   end
 

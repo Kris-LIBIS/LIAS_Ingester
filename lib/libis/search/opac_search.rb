@@ -56,7 +56,7 @@ class OpacSearch < GenericSearch
 
         if response
           #noinspection RubyResolve
-          response.root << element = Nokogiri::XML::Node.new('search', response)
+          response.root << element = response.create_node('search')
           element['type'] = 'opac'
           element['host'] = @host
           element['base'] = @base
@@ -79,7 +79,7 @@ class OpacSearch < GenericSearch
 
   def str_to_xml(str)
     error = ''
-    xml_document = XmlDocument.parse str
+    xml_document = XmlDocument.parse(str)
 
     error = xml_get_text(xml_document.xpath('//error')) if xml_document.valid?
 
@@ -179,6 +179,7 @@ class OpacSearch < GenericSearch
           Application.warn('OPAC_Search') { "OPAC Service temporarily unavailable - retrying after #{sleep_time} minutes" }
         else
           Application.error('OPAC_Search') { "Problem with OPAC: '#{ex.message}' - retrying after #{sleep_time} minutes" }
+          ex.backtrace.each { |x| Application.error('OPAC_Search') { "#{x}" } }
         end
         redo_search = true
       end

@@ -19,15 +19,16 @@ class XmlDocument
     @document.encoding = encoding
   end
 
-  def XmlDocument.open( file )
+  def self.open( file )
     doc = XmlDocument.new
     doc.document = Nokogiri::XML(File.open(file))
     doc
   end
 
-  def XmlDocument.parse( xml )
+  def self.parse( xml )
     doc = XmlDocument.new
     doc.document = Nokogiri::parse(xml)
+    doc
   end
 
   def save( file, indent = 2, encoding = 'utf-8' )
@@ -113,6 +114,11 @@ class XmlDocument
   def xpath(path)
     raise ArgumentError, "XML document not valid." if self.invalid?
     @document.xpath(path)
+  end
+
+  def has_element?(element_name)
+    list = xpath("//#{element_name}")
+    list.nil? ? 0 : list.size()
   end
 
 =begin
