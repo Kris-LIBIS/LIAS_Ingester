@@ -22,8 +22,6 @@ class IngestRun
   property    :recursive,             Boolean
   property    :selection,             Regexp
 
-  # post_processing options
-  property    :scope_push_file,       String
 
   has n,      :protections,           :child_key => :ingest_run_id
   has n,      :ingest_objects,        :child_key => :ingest_run_id

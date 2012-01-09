@@ -127,8 +127,7 @@ class Initializer
     end
     
     run.status = Status::Initialized
-    run.init_end = Time.now
-    
+
     info "Placed run ##{run.id} on the queue"
     
   rescue Exception => e
