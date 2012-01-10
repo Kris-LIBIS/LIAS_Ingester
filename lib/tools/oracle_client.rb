@@ -13,17 +13,17 @@ class OracleClient
   def call(procedure, parameters = [])
     params = ''
     params = "'" + parameters.join("','") + "'" if parameters and parameters.size > 0
-    system "echo \"call #{procedure}(#{params});\" | sqlplus #{@user}/#{@password}@#{@database}"
+    system "echo \"call #{procedure}(#{params});\" | sqlplus -S #{@user}/#{@password}@#{@database}"
   end
 
   def run(script, parameters = [])
     params = ''
     params = "\"" + parameters.join("\" \"") + "\"" if parameters and parameters.size > 0
-    system "sqlplus #{@user}/#{@password}@#{@database} @#{script} #{params}"
+    system "sqlplus -S #{@user}/#{@password}@#{@database} @#{script} #{params}"
   end
 
   def execute(sql)
-    system "echo \"#{sql}\" | sqlplus #{@user}/#{@password}@#{@database}"
+    system "echo \"#{sql}\" | sqlplus -S #{@user}/#{@password}@#{@database}"
   end
 
 end
