@@ -168,10 +168,6 @@ class PostIngester
     obj.set_status_recursive Status::PostIngesting, Status::Ingested
     obj.save
 
-    if obj.ingest_config.ingest_type == :SHAREPOINT_XML
-      update_pid_links(obj)
-    end
-
     ### link the accessright records
     link_ar obj.get_config, obj
     
@@ -260,36 +256,6 @@ class PostIngester
     obj.children.each       { |c| create_and_link_dc c }
   end
 
-  def update_pid_links( obj )
-    filename = obj.file_stream
-    child_pids = []
-    doc = XmlDocument.open filename
-    doc.xpath('//*').each do |element|
-      attr = element.attribute('oid')
-      next unless attr
-      pid = IngestObject.first(:id => attr.content).pid
-      child_pids << pid
-      element.set_attribute 'pid', pid
-    end
-    doc.save filename
-    result = DigitalEntityManager.instance.update_stream(obj.pid, filename)
-    if result[:error]
-      result[:error].each { |e| error "Error calling web service: #{e}"}
-      error "Failed to update record file stream for object ##{obj.pid}"
-      obj.status = Status::PostIngestFailed
-    else
-      info "Updated object links for object #{obj.pid}"
-    end
-    result = DigitalEntityManager.instance.add_relations(obj.pid, 'include', child_pids)
-    if result[:error]
-      result[:error].each { |e| error "Error calling web service: #{e}"}
-      error "Failed to link child objects for object ##{obj.pid}"
-      obj.status = Status::PostIngestFailed
-    else
-      info "Linked child objects for object #{obj.pid}"
-    end
-  end
-  
   def undo_config( cfg )
     start_time = Time.now
     ApplicationStatus.instance.run = cfg.ingest_run
