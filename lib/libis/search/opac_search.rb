@@ -106,9 +106,9 @@ class OpacSearch < GenericSearch
 
       #noinspection RubyResolve
       response.root.xpath('//item').each do |r|
-        collection = r.xpath('//collection').first.content
-        location = r.xpath('//sub-library').first.content
-        classification = r.xpath('//call-no-1').first.content
+        collection = r.xpath('collection').first.content
+        location = r.xpath('sub-library').first.content
+        classification = r.xpath('call-no-1').first.content
 
         varfield = Nokogiri::XML::Node.new('varfield', xml_document)
         varfield['id'] = '852'
