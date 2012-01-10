@@ -29,7 +29,7 @@ class Protection
       prot.pinfo   = $2
       prot.mid     = $2
       prot.negate  = true if $1 == "!"
-    elsif v =~ /WATERMARK\s*=\s*(.+)$/i
+    elsif v =~ /WATERMARK\s*=\s*"(.+)"$/i
       prot.ptype   = :WATERMARK
       prot.pinfo   = $1
     else
