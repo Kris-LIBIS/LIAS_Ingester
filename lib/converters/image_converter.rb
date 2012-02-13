@@ -41,7 +41,6 @@ class ImageConverter < Converter
   protected
 
   def init(source)
-    @options ||= {}
     @source = source
     Application.error('ImageConverter') { "Cannot find image file '#{source}'."} unless File.exist? source
   end
@@ -63,7 +62,7 @@ class ImageConverter < Converter
       command += " -#{o.to_s} '#{v}'"
     end
 
-    command += " '#{@source + ([:PDF, :TIFF].include? TypeDatabase.instance.mime2type(MimeType.get(@source)) ? '[0]' : '')}' '#{target_file}'"
+    command += " '#{@source + ([:PDF, :TIFF].include?(TypeDatabase.instance.mime2type(MimeType.get(@source))) ? '[0]' : '')}' '#{target_file}'"
 
     command += " '#{@wm_image}'" if @wm_image
 
