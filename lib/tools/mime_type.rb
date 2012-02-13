@@ -1,17 +1,32 @@
 # coding: utf-8
 
 require 'tools/string'
-require 'faster_csv'
+require 'csv'
+require 'stringio'
+
 
 class MimeType
+
+  def capture_stderr
+    # The output stream must be an IO-like object. In this case we capture it in
+    # an in-memory IO object so we can return the string value. You can assign any
+    # IO object here.
+    previous_stderr, $stderr = $stderr, StringIO.new
+    yield
+    $stderr.string
+  ensure
+    # Restore the previous value of stderr (typically equal to STDERR).
+    $stderr = previous_stderr
+  end
+
 
   def self.get( file_path )
 
     # first attempt: use FIDO
 
     fp = file_path.to_s.escape_for_string
-    result = %x(fido -loadformats #{Application.dir}/config/lias_formats.xml "#{fp}")
-    r = FasterCSV.parse(result)[0]
+    result = %x(fido -loadformats #{Application.dir}/config/lias_formats.xml "#{fp}" 2>/dev/null)
+    r = CSV.parse(result)[0]
     status = r[0]
     format = r[2]
     mimetype = r[7]
