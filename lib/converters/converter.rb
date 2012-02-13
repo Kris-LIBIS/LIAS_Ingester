@@ -93,8 +93,10 @@ class Converter
         class_variable_set :@@conversions, my_conversions
       end
 
-      def initialize( source = nil )
+      def initialize( source = nil, options = {} )
         init(source) if source
+        @options ||= {}
+        @options.merge! options if options
       end
 
       private
