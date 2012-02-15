@@ -110,20 +110,20 @@ class OpacSearch < GenericSearch
         location = r.xpath('sub-library').first.content
         classification = r.xpath('call-no-1').first.content
 
-        varfield = Nokogiri::XML::Node.new('varfield', xml_document)
+        varfield = xml_document.create_node('varfield')
         varfield['id'] = '852'
         varfield['i1'] = ' '
         varfield['i2'] = ' '
 
-        subfield_b = Nokogiri::XML::Node.new('subfield', xml_document)
+        subfield_b = xml_document.create_node('subfield')
         subfield_b['label'] = 'b'
         subfield_b.content = collection
 
-        subfield_c = Nokogiri::XML::Node.new('subfield', xml_document)
+        subfield_c = xml_document.create_node('subfield')
         subfield_c['label'] = 'c'
         subfield_c.content = location
 
-        subfield_h = Nokogiri::XML::Node.new('subfield', xml_document)
+        subfield_h = xml_document.create_node('subfield')
         subfield_h['label'] = 'h'
         subfield_h.content = classification.gsub('$$h', '')
 
