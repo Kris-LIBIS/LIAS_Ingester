@@ -25,9 +25,10 @@ class MimeType
     # first attempt: use FIDO
 
     fp = file_path.to_s.escape_for_string
-    result = %x(fido -loadformats #{Application.dir}/config/lias_formats.xml "#{fp}" 2>/dev/null)
+    result = %x(/nas/vol03/app/bin/fido -loadformats #{Application.dir}/config/lias_formats.xml "#{fp}" 2>/dev/null)
     r = CSV.parse(result)[0]
     status = r[0]
+    #noinspection RubyUnusedLocalVariable
     format = r[2]
     mimetype = r[7]
     return mimetype if status == "OK" && mimetype != "None"
@@ -43,6 +44,7 @@ class MimeType
       x = x.strip if x
       result = 'image/jp2' if x.eql?('JP2')
     rescue Exception
+      #noinspection RubyClassVariableUsageInspection,RubyResolve
       @@logger.warn(self.class) {"Could not identify MIME type of '#{file_path.to_s}''"}
       result = ""
     end
