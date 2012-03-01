@@ -2,17 +2,15 @@
 source "http://rubygems.org"
 
 # gem "rails"
-gem 'nokogiri'
-gem 'awesome_print'
-gem 'rubytree'
 gem 'dm-core'
-gem 'dm-is-tree'
 gem 'dm-types'
 gem 'dm-timestamps'
 gem 'dm-migrations'
-gem 'highline'
+gem 'dm-is-tree'
 gem 'chronic_duration'
+gem 'nokogiri'
+gem 'highline'
+gem 'awesome_print'
 gem 'savon'
-gem 'nori'
-
+gem 'rubytree'
 
