@@ -121,6 +121,10 @@ class Application
               '  0: DEBUG, 1: INFO (default), 2: WARN, 3: ERROR, 4: FATAL') do |level|
         @options[:log_level] = level
       end
+
+      opts.on('--test', 'test mode - clears the database!') do
+        @@test_mode = true
+      end
       
     end.parse!
     
@@ -233,6 +237,7 @@ class Logger
 end
 
 # to force initialization of the database
+@@test_mode = false
 @@app = Application.instance
 @@app.init
 @@logger = @@app.logger
