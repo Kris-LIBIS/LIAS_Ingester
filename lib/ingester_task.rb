@@ -14,47 +14,57 @@ module IngesterTask
   def IngesterTask.included(klass)
     klass.class_eval {
 
-      def self.debug(msg)
+      def self.debug(msg, trace = false)
         Application.debug self.name, &lambda{msg}
+        Thread.current.backtrace.each { |x| Application.debug self.name, &lambda{x} } if trace
       end
 
-      def self.info(msg)
+      def self.info(msg, trace = false)
         Application.info self.name, &lambda{msg}
+        Thread.current.backtrace.each { |x| Application.info self.name, &lambda{x} } if trace
       end
 
-      def self.warn(msg)
+      def self.warn(msg, trace = false)
         Application.warn self.name, &lambda{msg}
+        Thread.current.backtrace.each { |x| Application.warn self.name, &lambda{x} } if trace
       end
 
-      def self.error(msg)
+      def self.error(msg, trace = false)
         Application.error self.name, &lambda{msg}
+        Thread.current.backtrace.each { |x| Application.error self.name, &lambda{x} } if trace
       end
 
-      def self.fatal(msg)
+      def self.fatal(msg, trace = false)
         Application.fatal self.name, &lambda{msg}
+        Thread.current.backtrace.each { |x| Application.fatal self.name, &lambda{x} } if trace
       end
 
     }
   end
 
-  def debug(msg)
+  def debug(msg, trace = false)
     Application.debug self.class, &lambda{msg}
+    Thread.current.backtrace.each { |x| Application.debug self.name, &lambda{x} } if trace
   end
 
-  def info(msg)
+  def info(msg, trace = false)
     Application.info self.class, &lambda{msg}
+    Thread.current.backtrace.each { |x| Application.info self.name, &lambda{x} } if trace
   end
 
-  def warn(msg)
+  def warn(msg, trace = false)
     Application.warn self.class, &lambda{msg}
+    Thread.current.backtrace.each { |x| Application.warn self.name, &lambda{x} } if trace
   end
 
-  def error(msg)
+  def error(msg, trace = false)
     Application.error self.class, &lambda{msg}
+    Thread.current.backtrace.each { |x| Application.error self.name, &lambda{x} } if trace
   end
 
-  def fatal(msg)
+  def fatal(msg, trace = false)
     Application.fatal self.class, &lambda{msg}
+    Thread.current.backtrace.each { |x| Application.fatal self.name, &lambda{x} } if trace
   end
 
   def handle_exception(e)
@@ -64,8 +74,7 @@ module IngesterTask
 
   def print_exception(e)
     unless e.instance_of?(AbortException)
-      error "Exception in #{self.class}: #{e.message}"
-      e.backtrace.each { |x| error "#{x}" }
+      error "Exception in #{self.class}: #{e.message}", true
     end
   end
   
