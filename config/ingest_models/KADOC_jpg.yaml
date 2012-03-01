@@ -1,0 +1,23 @@
+
+:NAME:      jpg-watermark_jpg_tn
+:MEDIA:     :IMAGE
+:QUALITY:   :KADOC
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :SCALE:         80%
+      :QUALITY:       70%
+
+  - :MANIFESTATION:   VIEW
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :DPI:           75
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESIZE:        107x150
+      :QUALITY:       50%

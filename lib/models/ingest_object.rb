@@ -28,17 +28,20 @@ class IngestObject
   property    :more_info,       DataMapper::Property::Text
   
   has 1,      :file_info
+
+  is          :tree,            order: :id, required: false
   
-  is          :tree, :order => :id, :required => false
+  has n,      :manifestations,  'IngestObject', child_key: :master_id
   
-  has n,      :manifestations,  'IngestObject', :child_key => :master_id
+  has n,      :log_entries,     child_key: :ingest_object_id
   
-  has n,      :log_entries, :child_key => :ingest_object_id
-  
-  belongs_to  :ingest_run,      :required => false
-  belongs_to  :ingest_config,   :required => false
-  belongs_to  :master,          :model => "IngestObject", :child_key => :master_id, :required => false
-  
+  belongs_to  :ingest_run,      required: false
+  belongs_to  :ingest_config,   required: false
+  belongs_to  :master,          required: false, model: "IngestObject", child_key: :master_id
+
+  belongs_to  :accessright_model,required: false
+  belongs_to  :accessright,     required: false
+
   before :destroy do
     self.manifestations.destroy
     self.clear_filestream
@@ -91,6 +94,24 @@ class IngestObject
     end
     self.message        = ''
     self.status         = Status::New
+    self.accessright    = nil
+  end
+
+  def get_accessright_model
+    obj =  get_master
+    unless obj.accessright_model
+      cfg_or_run = obj.ingest_config || obj.ingest_run
+      obj.accessright_model = cfg_or_run.get_accessright_model obj if cfg_or_run
+    end
+    obj.accessright_model
+  end
+
+  def get_accessright()
+    unless self.accessright
+      ar_model = get_accessright_model
+      self.accessright = ar_model.get_accessright(self.usage_type)
+    end
+    self.accessright
   end
   
   def root?
@@ -117,8 +138,12 @@ class IngestObject
     self.manifestations.size != 0
   end
   
+  def get_master()
+    self.master || self
+  end
+
   def manifestation?
-    self.master
+    !self.master.nil?
   end
   
   def file_path
@@ -221,7 +246,7 @@ class IngestObject
     end
     nil
   end
-  
+
   def set_status_recursive( status, old_status = nil )
     self.status = status if old_status.nil? or self.status == old_status
     self.manifestations.each  { |obj| obj.set_status_recursive status, old_status }
@@ -233,6 +258,7 @@ class IngestObject
     indent += 2
     self.file_info { |i| i.debug_print }
     self.manifestations.each  { |i| i.debug_print indent }
+    self.protection.debug_print indent
     self.children.each { |i| i.debug_print indent }
   end
   

@@ -14,22 +14,23 @@ class IngestModelDispatcher < IngestModel
   end
   
   def get_manifestation(manifestation, media_type)
+    #noinspection RubyClassVariableUsageInspection
     @@logger.error(self.class) { 'Method \'get_manifestation\' not supported here.' }
     nil
   end
   
   protected
   
-  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file, obj)
+  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_file_name, obj)
     
     src_path = Pathname.new(src_file_path).relative_path_from(@base_path)
-    
-    return nil unless ingest_model = @ingestmodel_map[src_path.to_s]
-    return nil unless ingest_model = ModelFactory.instance.get_model1(ingest_model)
+
+    return nil if (ingest_model = @ingestmodel_map[src_path.to_s]).nil?
+    return nil if (ingest_model = ModelFactory.instance.get_model1(ingest_model)).nil?
 
     ingest_model.custom_config @custom_config
     
-    ingest_model.make_manifestation( src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file, obj )
+    ingest_model.make_manifestation( src_file_path, src_mime_type, manifestation, tgt_file_name, obj )
     
   end
   

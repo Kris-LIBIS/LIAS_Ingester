@@ -19,7 +19,7 @@ class IngestModel
   def initialize(config)
     @config = config
     @config.key_strings_to_symbols! :upcase => true, :recursive => true
-    @@logger.debug(self.class) {"Creating ingest model: #{config}"}
+    debug "Creating ingest model: #{config}"
     @custom_config = nil
   end
 
@@ -41,8 +41,8 @@ class IngestModel
     nil
   end
 
-  def create_manifestation(obj, manifestation, workdir, protection, watermark_file)
-    
+  def create_manifestation(obj, manifestation)
+
     if obj.parent? and obj.file_info.nil? # complex object - we create a thumbnail from the first child object
       return nil unless manifestation == 'THUMBNAIL'
       obj = obj.children[0]
@@ -54,20 +54,26 @@ class IngestModel
     
     tgt_file_name = File.basename( obj.stream_name, '.*' )
 
+    #noinspection RubyResolve
     src_file_path = obj.file_stream ? obj.file_stream : obj.absolute_path
     src_mime_type = obj.mime_type
     
     return nil unless src_file_path and src_mime_type
     
-    make_manifestation(src_file_path.to_s, src_mime_type, manifestation, workdir, tgt_file_name,
-                       protection, "#{watermark_file}#{manifestation}", obj)
+    make_manifestation(src_file_path.to_s, src_mime_type, manifestation, tgt_file_name, obj)
     
   end
   
   protected
-  
-  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_dir, tgt_file_name, protection, watermark_file, obj)
-    
+
+  #noinspection RubyResolve
+  def make_manifestation(src_file_path, src_mime_type, manifestation, tgt_file_name, obj)
+
+    cfg = obj.get_config
+    tgt_dir = "#{cfg.ingest_dir}/transform/streams/"
+    accessright = cfg.get_accessright(manifestation, obj)
+    watermark_file = "#{cfg.ingest_dir}/watermark_#{manifestation}"
+
     target = tgt_dir + (tgt_file_name.nil? ? File.basename(src_file_path, '.*') : tgt_file_name)
     
     src_type = TypeDatabase.mime2type src_mime_type
@@ -120,11 +126,11 @@ class IngestModel
       end
     end
 
-    if protection and protection.ptype == :WATERMARK
-      conversion_operations[:WATERMARK] = { :watermark_info =>protection.pinfo, :watermark_file => watermark_file }
+    if accessright and accessright.is_watermark?
+      conversion_operations[:WATERMARK] = { :watermark_info =>accessright.get_watermark, :watermark_file => watermark_file }
     end
 
-    if (src_type == m[:FORMAT] && conversion_operations.empty?)
+    if src_type == m[:FORMAT] && conversion_operations.empty?
       debug  "Skipping manifestation. Target is identical to source."
       return nil
     end

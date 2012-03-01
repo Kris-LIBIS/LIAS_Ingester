@@ -19,8 +19,8 @@ class IngestConfig
   property    :ingest_model,          String
   property    :ingest_model_map,      String
   property    :manifestations_config, Yaml
-  property    :media_type,            Enum[:IMAGE, :DOCUMENT, :ARCHIVE, :CONTAINER, :AUDIO, :VIDEO, :ANY]
-  property    :quality,               Enum[:ARCHIVE, :HIGH, :LOW, :STORAGE]
+  property    :media_type,            String
+  property    :quality,               String
 
   # complex options
   property    :complex,               Boolean
@@ -39,7 +39,6 @@ class IngestConfig
 
   belongs_to  :ingest_run,            :required => false
 
-  has n,      :protections,           :child_key => :ingest_config_id
   has n,      :ingest_objects,        :child_key => :ingest_config_id
 
   has n,      :log_entries,           :child_key => :ingest_config_id
@@ -47,7 +46,6 @@ class IngestConfig
   before :destroy do
     self.root_objects.each { |o| o.delete }
     self.ingest_objects.clear
-    self.protections.destroy
     self.log_entries.destroy
     true
   end
@@ -89,12 +87,13 @@ class IngestConfig
               when :model
                 self.ingest_model = v
               when :media_type
-                self.media_type = v.to_s.upcase.to_sym
+                self.media_type = v.to_s.upcase
               when :quality
-                self.quality = v.to_s.upcase.to_sym
+                self.quality = v.to_s.upcase
               when :manifestations
                 v.each { |c| c.key_strings_to_symbols! :upcase => true, :recursive => true }
                 self.manifestations_config = v
+              else
             end # case k
           end # value.each
         when :complex
@@ -104,9 +103,7 @@ class IngestConfig
           self.complex_label = value[:label]
           self.complex_utype = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]
           if value[:accessright]
-            prot = Protection.from_value(value[:accessright])
-            prot.usage_type = self.complex_utype
-            self.protections << prot
+            self.ar_model_data[:custom][self.complex_utype.to_sym] = value[:accessright]
           end
         when :mets
           self.mets = true
@@ -116,14 +113,21 @@ class IngestConfig
             self.complex_label = value[:label]
             self.complex_utype = 'COMPLEX_' + value[:usage_type].upcase if value[:usage_type]
             if value[:accessright]
-              prot = Protection.from_value(value[:accessright])
-              prot.usage_type = self.complex_utype
-              self.protections << prot
+              self.ar_model_data[:custom][self.complex_utype.to_sym] = value[:accessright]
             end
           end
+        else
       end # case label
     end # config.each
 
+  end
+
+  def media_type
+    self.media_type.to_sym
+  end
+
+  def quality
+    self.quality.to_sym
   end
 
   def get_or_create_object(label)
@@ -170,7 +174,6 @@ class IngestConfig
   def debug_print(indent = 0)
     p ' ' * indent + self.inspect
     indent += 2
-    self.protections.each { |p| p.debug_print indent }
     self.ingest_objects.each { |o| o.debug_print indent }
   end
 

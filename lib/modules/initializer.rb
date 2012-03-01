@@ -165,18 +165,4 @@ class Initializer
     ApplicationStatus.instance.run = nil
   end
   
-  def undo_config( cfg )
-    ApplicationStatus.instance.cfg = cfg
-    debug "Destroying config ##{cfg.id}."
-    ApplicationStatus.instance.cfg = nil
-    cfg.destroy
-  end
-  
-  def undo_object( obj )
-    ApplicationStatus.instance.obj = obj
-    debug "Deleting object ##{obj.id}."
-    ApplicationStatus.instance.obj = nil
-    obj.delete
-  end
-  
 end

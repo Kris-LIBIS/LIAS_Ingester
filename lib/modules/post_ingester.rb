@@ -190,11 +190,11 @@ class PostIngester
     obj.children.each       { |c| link_ar cfg, c }
     return unless obj.pid
     obj.manifestations.each { |m| link_ar cfg, m }
-    ar = cfg.get_protection obj.usage_type
+    ar = obj.get_accessright
     return if ar.nil?
-    case ar.ptype
-    when :CUSTOM
-      if ar.mid.nil?
+    return if ar.is_watermark?
+    if ar.is_custom?
+      if ar.get_id.nil?
         acl_record = MetaDataManager.instance.create_acl_record(ar.pinfo)
         result = MetaDataManager.instance.create_acl acl_record
         result[:error].each { |error| @@app.logger.error "Error calling web service: #{error}" } if result[:error]
@@ -202,20 +202,18 @@ class PostIngester
           error "Failed to create accessrights metadata for #{ar.inspect}"
           obj.status = Status::PostIngestFailed
         else
-          ar.mid = result[:mids][0]
+          ar.set_id result[:mids][0]
           ar.save
-          info "Created accessrights metadata record #{ar.mid} for protection ##{ar.id}"
+          info "Created accessrights metadata record #{ar.get_id} for accessright ##{ar.id}"
         end
       end
-    when :WATERMARK
-      return
     end
-    if ar.mid.nil?
+    if ar.get_id.nil?
       error "Could not link accessright to object #{obj.pid}"
       obj.status = Status::PostIngestFailed
       return
     end
-    result = DigitalEntityManager.instance.link_acl obj.pid, ar.mid
+    result = DigitalEntityManager.instance.link_acl obj.pid, ar.get_id
     if result[:error]
       result[:error].each { |e| error "Error calling web service: #{e}" }
       error "Failed to link accessright #{ar.mid} to object #{obj.pid}"
@@ -224,7 +222,7 @@ class PostIngester
       info "Linked accessright #{ar.mid} to object #{obj.pid}"
     end
   end
-  
+
   def create_and_link_dc( obj, mid = nil )
     if obj.metadata
       unless obj.pid
@@ -310,9 +308,8 @@ class PostIngester
     obj.children.each       { |c| unlink_ar cfg, c }
     return unless obj.pid
     obj.manifestations.each { |m| unlink_ar cfg, m }
-    ar = cfg.get_protection obj.usage_type
-    return if ar.nil?
-    return if ar.mid.nil?
+    ar = obj.get_accessright
+    return unless ar && ar.mid
     result = DigitalEntityManager.instance.unlink_acl obj.pid, ar.mid
     unless result[:error].empty?
       result[:error].each { |e| error "Error calling web service: #{e}" }

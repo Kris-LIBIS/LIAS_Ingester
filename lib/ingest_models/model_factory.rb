@@ -36,11 +36,13 @@ class ModelFactory
     @models = {}
     Dir.glob("#{Application.dir}/config/ingest_models/*.yaml").each do |m|
       @@logger.debug(self.class) {"Loading ingest model: #{m}"}
-      f = File.open(m)
-      #noinspection RubyResolve
-      model = YAML.load(f)
-      @models[model[:NAME].downcase] = model
-      f.close
+      File.open(m) do |f|
+        #noinspection RubyResolve
+        model = YAML.load(f)
+        @models[model[:NAME].downcase] = model
+        model[:ALIASES] ||= []
+        model[:ALIASES].each { name | @models[name.downcase] = model }
+      end rescue @@logger.error(self.class) {"Cannot load ingest model '#{m}'"}
     end
   end
 

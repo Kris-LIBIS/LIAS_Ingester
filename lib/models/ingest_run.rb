@@ -23,7 +23,6 @@ class IngestRun
   property    :selection,             Regexp
 
 
-  has n,      :protections,           :child_key => :ingest_run_id
   has n,      :ingest_objects,        :child_key => :ingest_run_id
 
   has n,      :ingest_configs
@@ -33,7 +32,6 @@ class IngestRun
   before :destroy do
     self.ingest_configs.destroy
     self.ingest_objects.destroy
-    self.protections.destroy
     self.log_entries.destroy
     true
   end
@@ -47,7 +45,6 @@ class IngestRun
   def reset
     self.ingest_configs.destroy
     self.ingest_objects.destroy
-    self.protections.destroy
     self.log_entries.destroy
   end
 
@@ -131,7 +128,6 @@ class IngestRun
   def debug_print( indent = 0 )
     p ' ' * indent + self.inspect
     indent += 2
-    self.protections.each     { |p| p.debug_print indent }
     self.ingest_configs.each  { |c| c.debug_print indent }
     self.ingest_objects.each  { |o| o.debug_print indent }
   end

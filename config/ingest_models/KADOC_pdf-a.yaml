@@ -1,0 +1,17 @@
+
+:NAME:      pdf-a
+:ALIAS:
+            - pdf-a_tn
+:MEDIA:     :DOCUMENT
+:QUALITY:   :KADOC
+
+:MANIFESTATIONS:
+
+  - :MANIFESTATION:   VIEW_MAIN
+    :FORMAT:          :PDFA
+
+  - :MANIFESTATION:   THUMBNAIL
+    :FORMAT:          :JPEG
+    :OPTIONS:
+      :RESIZE:        107x150
+      :QUALITY:       50%

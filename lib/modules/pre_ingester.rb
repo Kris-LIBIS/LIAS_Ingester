@@ -27,37 +27,39 @@ class PreIngester
 
   end
 
-  def start( config_id )
+  def start(config_id)
 
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
+    end unless (cfg = IngestConfig.first(:id => config_id))
 
     begin
 
+      #noinspection RubyResolve
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
-      when Status::Idle ... Status::PreProcessed
-        # Oops! Not yet ready.
-        error "Cannot yet PreIngest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-      when Status::PreProcessed ... Status::PreIngesting
-        # Excellent! Continue ...
-        process_config cfg, false
-      when Status::PreIngesting ... Status::PreIngested
-        info "PreIngest of configuration ##{config_id} failed the last time. The current status is unreliable, so we restart."
-        process_config cfg, false
-      when Status::PreIngested ... Status::Ingesting
-        if cfg.root_objects.all? { |obj| obj.status >= Status::PreIngested }
-          warn "Skipping PreIngest of configuration ##{config_id} because all objects are PreIngested."
+        when Status::Idle ... Status::PreProcessed
+          # Oops! Not yet ready.
+          error "Cannot yet PreIngest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+        when Status::PreProcessed ... Status::PreIngesting
+          # Excellent! Continue ...
+          process_config cfg, false
+        when Status::PreIngesting ... Status::PreIngested
+          info "PreIngest of configuration ##{config_id} failed the last time. The current status is unreliable, so we restart."
+          process_config cfg, false
+        when Status::PreIngested ... Status::Ingesting
+          if cfg.root_objects.all? { |obj| obj.status >= Status::PreIngested }
+            warn "Skipping PreIngest of configuration ##{config_id} because all objects are PreIngested."
+          else
+            info "Continuing PreIngest of configuration #{config_id}. Some objects are not yet PreIngested."
+            continue cfg
+          end
+        when Status::Ingesting .. Status::Finished
+          warn "Skipping PreIngest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
         else
-          info "Continuing PreIngest of configuration #{config_id}. Some objects are not yet PreIngested."
-          continue cfg
-        end
-      when Status::Ingesting .. Status::Finished
-        warn "Skipping PreIngest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
       end
 
     ensure
@@ -70,7 +72,7 @@ class PreIngester
 
   end
 
-  def undo( config_id )
+  def undo(config_id)
 
     cfg = IngestConfig.first(:id => config_id)
 
@@ -80,6 +82,7 @@ class PreIngester
     end
 
     unless Status.phase(cfg.status) == Status::PreIngest
+      #noinspection RubyResolve
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
       warn "Cannot undo configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
@@ -93,9 +96,10 @@ class PreIngester
 
   end
 
-  def restart( config_id )
+  def restart(config_id)
 
-    if cfg = undo(config_id)
+    if (cfg = undo(config_id))
+      #noinspection RubyResolve
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
       info "Restarting config ##{config_id}"
@@ -109,7 +113,7 @@ class PreIngester
 
   end
 
-  def continue( config_id )
+  def continue(config_id)
 
     cfg = IngestConfig.first(:id => config_id)
 
@@ -120,18 +124,19 @@ class PreIngester
 
     begin
 
+      #noinspection RubyResolve
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
-      when Status::Idle ... Status::PreProcessed
-        error "Configuration ##{config_id} not yet ready for PreIngest. Status is '#{Status.to_string(cfg.status)}'."
-        config_id = nil
-      when Status::PreProcessed .. Status::PreIngested
-        # OK, continue the PreIngest
-        process_config cfg, true
-      else
-        warn "Configuration ##{config_id} allready finished PreIngesting."
+        when Status::Idle ... Status::PreProcessed
+          error "Configuration ##{config_id} not yet ready for PreIngest. Status is '#{Status.to_string(cfg.status)}'."
+          config_id = nil
+        when Status::PreProcessed .. Status::PreIngested
+          # OK, continue the PreIngest
+          process_config cfg, true
+        else
+          warn "Configuration ##{config_id} allready finished PreIngesting."
       end
 
     ensure
@@ -146,9 +151,10 @@ class PreIngester
 
   private
 
-  def process_config( cfg, continue = false )
+  def process_config(cfg, continue = false)
 
     start_time = Time.now
+    #noinspection RubyResolve
     ApplicationStatus.instance.run = cfg.ingest_run
     ApplicationStatus.instance.cfg = cfg
     info "Processing config ##{cfg.id}"
@@ -158,7 +164,7 @@ class PreIngester
 
     failed_objects = []
 
-    setup_ingest cfg, continue != true
+    setup_ingest cfg, !continue
 
     valid_states = [Status::PreProcessed]
     if continue
@@ -194,9 +200,11 @@ class PreIngester
     ApplicationStatus.instance.cfg = nil
     ApplicationStatus.instance.run = nil
 
-  end # process_config
+  end
 
-  def process_object( obj )
+  # process_config
+
+  def process_object(obj)
 
     ApplicationStatus.instance.obj = obj
 
@@ -227,16 +235,19 @@ class PreIngester
     obj.save
     ApplicationStatus.instance.obj = nil
 
-  end # process_object
+  end
+
+  # process_object
 
   private
 
-  def setup_ingest( cfg, clear_dir )
+  def setup_ingest(cfg, clear_dir)
     setup_ingest_dir cfg, clear_dir
     create_ingester_setup cfg
   end
 
-  def finalize_ingest( cfg )
+  #noinspection RubyResolve
+  def finalize_ingest(cfg)
 
     cfg.mets = @ingester_setup.requires_mets?
     cfg.complex = !cfg.mets
@@ -244,18 +255,20 @@ class PreIngester
 
   end
 
-  def setup_ingest_dir( cfg, clear_dir )
+  #noinspection RubyResolve
+  def setup_ingest_dir(cfg, clear_dir)
 
-    cfg.ingest_id = "#{ConfigFile['ingest_name']}_#{format('%d',cfg.id)}"
+    cfg.ingest_id = "#{ConfigFile['ingest_name']}_#{format('%d', cfg.id)}"
 
-    load_dir = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_ingest_dir']}/load_#{cfg.ingest_id}"
-    unless cfg.work_dir.nil?
+    load_dir = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_ingest_dir']}/load_#{
+    cfg.ingest_id}"
+    if cfg.work_dir.nil?
+      cfg.ingest_dir = load_dir
+    else
       FileUtils.mkdir(cfg.work_dir) unless Dir.exist?(cfg.work_dir)
       cfg.ingest_dir = "#{cfg.work_dir}/load_#{cfg.ingest_id}"
       FileUtils.rm_r("#{load_dir}", :force => true) if clear_dir
       FileUtils.ln_s(cfg.ingest_dir, load_dir, :force => true) unless File.exist? load_dir
-    else
-      cfg.ingest_dir = load_dir
     end
 
     info "Setting up ingest directory: #{cfg.ingest_dir}"
@@ -277,19 +290,20 @@ class PreIngester
 
   end
 
-  def create_ingester_setup( cfg )
+  def create_ingester_setup(cfg)
     info 'Preparing ingester setup'
     @ingester_setup = IngesterSetup.new
     @ingester_setup.add_control_fields cfg.get_control_fields, ''
   end
 
-  def get_metadata( object )
+  def get_metadata(object)
     result = @metadata.get_dc_record(object)
-    object.children.each{ |child| get_metadata child }
+    object.children.each { |child| get_metadata child }
     result
   end
 
-  def copy_stream( object )
+  #noinspection RubyResolve
+  def copy_stream(object)
     if object.file_info
       info "Copying original stream '#{object.file_path}'"
       object.file_stream = "#{object.get_config.ingest_dir}/transform/streams/#{object.stream_name}"
@@ -299,11 +313,11 @@ class PreIngester
     object.children.each { |child| copy_stream child }
   end
 
-  def create_manifestations( object )
-    cfg = object.get_config
+  #noinspection RubyResolve
+  def create_manifestations(object)
     ModelFactory.manifestations.each do |m|
       debug "Manifestation: #{m}"
-      file = @model.create_manifestation object, m, "#{cfg.ingest_dir}/transform/streams/", cfg.get_protection(m), "#{cfg.ingest_dir}/watermark_"
+      file = @model.create_manifestation object, m
       if file
         info "Created manifestation file: #{file}"
         mobj = IngestObject.new file, :MD5
@@ -317,8 +331,9 @@ class PreIngester
     object.children.each { |child| create_manifestations child }
   end
 
-  def add_to_ingest( object )
-    if (object.root? and object.parent?)
+  #noinspection RubyResolve
+  def add_to_ingest(object)
+    if object.root? and object.parent?
       object.vpid = @ingester_setup.add_complex_object object.label, object.usage_type
     else
       object.vpid = @ingester_setup.add_file object.label, object.usage_type, '', object
@@ -326,20 +341,22 @@ class PreIngester
     end
     @ingester_setup.set_relation object.vpid, 'manifestation', object.master.vpid if object.manifestation?
     object.manifestations.each { |obj| add_to_ingest obj }
-    object.children.each       { |obj| add_to_ingest obj }
+    object.children.each { |obj| add_to_ingest obj }
     object.save
   end
 
-  def delete_ingest_dir( cfg )
+  #noinspection RubyResolve
+  def delete_ingest_dir(cfg)
     load_dir = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_ingest_dir']}/load_#{cfg.ingest_id}"
-      FileUtils.rm_r "#{load_dir}", :force => true
-      if load_dir != cfg.ingest_dir
-        FileUtils.rm_r cfg.ingest_dir, :force => true
-      end
+    FileUtils.rm_r "#{load_dir}", :force => true
+    if load_dir != cfg.ingest_dir
+      FileUtils.rm_r cfg.ingest_dir, :force => true
+    end
   end
 
-  def undo_config( cfg )
+  def undo_config(cfg)
     start_time = Time.now
+    #noinspection RubyResolve
     ApplicationStatus.instance.run = cfg.ingest_run
     ApplicationStatus.instance.cfg = cfg
     info "Undo configuration ##{cfg.id} PreIngest."
@@ -347,6 +364,7 @@ class PreIngester
       undo_object obj
     end
     delete_ingest_dir cfg
+    #noinspection RubyResolve
     cfg.ingest_dir = nil
     cfg.status = Status::PreProcessed
     cfg.save
@@ -356,9 +374,10 @@ class PreIngester
     cfg
   end
 
-  def undo_object( obj )
+  def undo_object(obj)
     ApplicationStatus.instance.obj = obj
     info "Undo object ##{obj.id} PreIngest."
+    #noinspection RubyResolve
     obj.vpid = nil
     obj.children.each { |child| undo_object child }
     obj.manifestations.each { |m| m.delete }
@@ -369,5 +388,5 @@ class PreIngester
     info "Object ##{obj.id} PreIngest undone."
     ApplicationStatus.instance.obj = nil
   end
-  
+
 end
