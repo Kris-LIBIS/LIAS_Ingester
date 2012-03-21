@@ -18,7 +18,7 @@ common:
 
   control_fields:
     partition_c:      test sharepoint
-    status:           SUPRESSED
+    status:           SUPPRESSED
 
   accessrights:
     original:         id = 31682
