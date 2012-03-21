@@ -23,7 +23,7 @@
         :MIME:          image/png
         :EXTENSIONS:    png
       - :TYPE:          :BMP
-        :MIME:          image/bmp
+        :MIME:          image/x-ms-bmp
         :EXTENSIONS:    bmp
       - :TYPE:          :GIF
         :MIME:          image/gif
@@ -72,29 +72,38 @@
       - :TYPE:          :WMV
         :MIME:          video/x-ms-wmv
         :EXTENSIONS:    wmv
+      - :TYPE:          :DV
+        :MIME:          video/dv
+        :EXTENSIONS:    dv
 
 # Office document types
   - :MEDIA:         :DOCUMENT
     :TYPE_INFO:
+      - :TYPE:          :TXT
+        :MIME:          text/plain
+        :EXTENSIONS:    txt
       - :TYPE:          :RTF
-        :MIME:          application/rtf
+        :MIME:          text/rtf
         :EXTENSIONS:    rtf
+      - :TYPE:          :HTML
+        :MIME:          text/html
+        :EXTENSIONS:    html, htm
       - :TYPE:          :MSDOC
-        :MIME:          application/msword
+        :MIME:          application/vnd.ms-word,application/msword
         :EXTENSIONS:    doc
       - :TYPE:          :MSDOCX
         :PUID:          fido-fmt/189.word
         :MIME:          application/vnd.openxmlformats-officedocument.wordprocessingml.document
         :EXTENSIONS:    docx
       - :TYPE:          :MSXLS
-        :MIME:          application/excel
+        :MIME:          application/vnd.ms-excel,application/msexcel
         :EXTENSIONS:    xls
       - :TYPE:          :MSXLSX
         :PUID:          fido-fmt/189.xl
         :MIME:          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
         :EXTENSIONS:    xslx
       - :TYPE:          :MSPPT
-        :MIME:          application/vnd.ms-powerpoint
+        :MIME:          application/vnd.ms-powerpoint,application/mspowerpoint
         :EXTENSIONS:    ppt
       - :TYPE:          :MSPPTX
         :PUID:          fido-fmt/189.ppt
@@ -107,6 +116,10 @@
         :PUID:          fmt/95
         :MIME:          application/pdfa # Note the invented mime type here. It requires implementation in theMimeType class.
         :EXTENSIONS:    pdfa
+      - :TYPE:          :WORDPERFECT
+        :PUID:          x-fmt/44
+        :MIME:          application/vnd.wordperfect
+        :EXTENSIONS:    wpd
 
 # Archive types
   - :MEDIA:         :ARCHIVE
