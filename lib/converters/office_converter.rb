@@ -22,8 +22,10 @@ class OfficeConverter < Converter
       Application.error(self.class.name) { "Wrong target format requested: '#{format.to_s}'."}
       return nil
     end
-    cmd = "ssh -i ~/.ssh/pdfconvert pdfconvert@10.32.32.167 \"#{@source}\" \"#{target}\""
-    cmd += " \"#{@options[:orig_fname].sub(' ', '\\ ')}\""
+    cmd = 'office_convert'
+    cmd += %{ "#{File.absolute_path(@source).to_s.escape_for_cmd}"}
+    cmd += %{ "#{File.absolute_path(target).to_s.escape_for_cmd}"}
+    cmd += %{ "#{@options[:orig_fname].to_s.escape_for_cmd}"}
 
     `#{cmd}`
 

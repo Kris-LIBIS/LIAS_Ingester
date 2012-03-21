@@ -14,12 +14,20 @@ class String
     downcase
   end
 
+  def quote
+    '\"' + self.gsub(/"/) { |s| '\\' + s[0] } + '\"'
+  end
+
   def escape_for_regexp
     self.gsub(/[\.\+\*\(\)\{\}\|\/\\\^\$"']/) { |s| '\\' + s[0].to_s }
   end
 
   def escape_for_string
-    self.gsub(/['"]/) { |s| '\\' + s[0].to_s }
+    self.gsub(/"/) { |s| '\\' + s[0].to_s }
+  end
+
+  def escape_for_cmd
+    self.gsub(/"/) { |s| '\\\\\\' + s[0].to_s }
   end
 
   def escape_for_sql
