@@ -23,7 +23,7 @@
         :MIME:          image/png
         :EXTENSIONS:    png
       - :TYPE:          :BMP
-        :MIME:          image/x-ms-bmp
+        :MIME:          image/bmp,image/x-ms-bmp
         :EXTENSIONS:    bmp
       - :TYPE:          :GIF
         :MIME:          image/gif
