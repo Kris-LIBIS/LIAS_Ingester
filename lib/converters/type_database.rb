@@ -40,7 +40,7 @@ class TypeDatabase
   end
 
   def type2mime(t)
-    @type2mime_map[t]
+    @type2mime_map[t].first
   end
 
   def type2ext(t)
@@ -54,7 +54,9 @@ class TypeDatabase
   end
 
   def mime2type(mime)
-    @type2mime_map.invert[mime]
+    @type2mime_map.each do |t,m|
+      return t if m.include? mime
+    end
   end
 
   def mime2media(mime)
@@ -87,7 +89,7 @@ class TypeDatabase
         type = t[:TYPE]
         @types.add type
         @type2media_map[type] = media
-        @type2mime_map[type] = t[:MIME]
+        @type2mime_map[type] = t[:MIME].split(',')
         @type2ext_map[type]  = t[:EXTENSIONS].split(',')
       end
     end
