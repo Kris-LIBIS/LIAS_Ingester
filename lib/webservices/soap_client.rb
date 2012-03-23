@@ -2,6 +2,7 @@
 
 require 'savon'
 require 'nori'
+require 'net/https'
 
 require 'tools/xml_document'
 
@@ -14,7 +15,14 @@ module SoapClient
     # does not care. Unfortunately SharePoint web services will send XML with illegal characters when they exist in
     # the document's metadata.
     # Nori.parser = :nokogiri
-    Nori.configure { |config| config.convert_tags_to { |tag| ['Envelope', 'Body'].include?(tag) ? tag.snakecase.to_sym : tag.to_sym } }
+    Nori.configure do |config|
+      config.convert_tags_to do |tag|
+        tag =~ /(^@ows_)|(^Etag$)/ ?
+            tag.gsub(/^@/,'').to_sym :
+            tag.snakecase.to_sym
+      end
+    end
+    Nori.strip_namespaces = true
   end
 
   #noinspection RubyResolve
@@ -33,13 +41,19 @@ module SoapClient
       HTTPI.log = ConfigFile['SOAP_logging']
     end
 
-    url = @base_url + service + @wsdl_extension
+    url = options[:wsdl_url] || @base_url + service + @wsdl_extension
     proxy = options[:proxy]
 
     @client = Savon::Client.new do |wsdl, http|
+      if options[:ssl]
+        http.auth.ssl.verify_mode = :none
+#        http.auth.ssl.ca_cert_file = Application.dir + '/config/cacert.pem'
+#        url = File.expand_path(Application.dir + '/config/sharepoint/' + service, __FILE__)
+      end
       http.read_timeout = 120
       http.open_timeout = 120
       wsdl.document = url
+      wsdl.element_form_default = :unqualified
       http.proxy = proxy if proxy
       if options[:username] and options[:password]
         http.auth.basic options[:username], options[:password]
@@ -59,6 +73,7 @@ module SoapClient
     Application.instance.logger.debug(self.class) { "Request '#{method.inspect}' '#{b.inspect}'"}
     response = @client.request method, method_options do |soap, wsdl, http, _|
       soap.body = body
+      soap.used_namespaces
       soap_options.each do |k, v|
         soap.send (k.to_s + '=').to_sym, v
       end

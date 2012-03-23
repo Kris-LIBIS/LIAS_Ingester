@@ -94,7 +94,7 @@ class XmlDocument
   def self.add_attributes( node, attributes )
 
     attributes.each do |name, value|
-      node.set_attribute name, value
+      node.set_attribute name.to_s, value
     end
 
     node
@@ -103,6 +103,7 @@ class XmlDocument
 
   def root=( node )
     raise ArgumentError, "XML document not valid." if @document.nil?
+    #noinspection RubyArgCount
     @document.root = node
   end
 

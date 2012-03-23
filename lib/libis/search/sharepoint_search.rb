@@ -1,21 +1,44 @@
 # coding: utf-8
 
 require 'highline'
-require 'awesome_print'
 
 require 'webservices/soap_client'
-
 require 'tools/string'
 require 'libis/record/sharepoint_record'
 
 require_relative 'generic_search'
 
+module Savon
+  module SOAP
+    class XML
+      def namespace_by_uri(uri)
+        namespaces.each do |candidate_identifier, candidate_uri|
+          return namespace_identifier if uri == namespace
+          return candidate_identifier.gsub(/^xmlns:/, '') if candidate_uri == uri
+        end
+        nil
+      end
+
+      private
+
+      def body_to_xml
+        return body.to_s unless body.kind_of? Hash
+        Gyoku.xml add_namespaces_to_body(body), :element_form_default => element_form_default, :namespace => namespace_identifier
+      end
+
+    end
+  end
+end
+
+#noinspection RubyTooManyInstanceVariablesInspection
 class SharepointSearch < GenericSearch
   include SoapClient
 
   private
 
+  #noinspection RubyStringKeysInHashInspection
   MY_QUERY_SYMBOLS = {
+      nil => 'Eq',
       '==' => 'Eq',
       '!=' => 'Neq',
       '>' => 'Gt',
@@ -27,13 +50,13 @@ class SharepointSearch < GenericSearch
 
   public
 
-  def initialize(username = nil, password = nil)
+  def initialize
     @options = {}
-    @options[:username] = username
-    @options[:password] = password
+    @options[:ssl] = true
     init
-    @server_url = 'https://groupware.kuleuven.be/sites/lias/'
+    @server_url = 'https://www.groupware.kuleuven.be/sites/lias/'
     @base_url = @server_url + '_vti_bin/'
+    @options[:wsdl_url] = "https://#{CGI.escape(username)}:#{CGI.escape(password)}@www.groupware.kuleuven.be/sites/lias/_vti_bin/Lists.asmx?wsdl"
     setup 'Lists.asmx', @options
   end
 
@@ -48,9 +71,7 @@ class SharepointSearch < GenericSearch
     highline = HighLine.new($stdin, $stderr)
     @password = highline.ask("Password for #{self.username}: ") { |q| q.echo = '*'}.chomp
   end
-=begin
 
-=end
   def query(term, index, base, options = {})
 
     @term = term
@@ -120,6 +141,7 @@ class SharepointSearch < GenericSearch
 
     begin
 
+      #noinspection RubyStringKeysInHashInspection
       query = {
           'Query' => {
               'Where' => {
@@ -139,6 +161,7 @@ class SharepointSearch < GenericSearch
           }
       }
 
+      #noinspection RubyStringKeysInHashInspection
       query_options =  {
           'QueryOptions' => {
               'ViewAttributes' => '',
@@ -150,20 +173,16 @@ class SharepointSearch < GenericSearch
           }
       }
 
-#    if @selection
-#      query_options['QueryOptions']['Folder'] = @server_url + 'Gedeelde%20documenten/' + @selection
-#      query_options['QueryOptions'][:attributes!]['ViewAttributes']['Scope'] = 'Recursive'
-#    end
-
       if @next_set
         query_options['QueryOptions']['Paging'] = ''
+        #noinspection RubyStringKeysInHashInspection
         query_options['QueryOptions'][:attributes!]['Paging'] = {'ListItemCollectionPositionNext' => @next_set}
       end
 
+      #noinspection RubyStringKeysInHashInspection
       result = request 'GetListItems', {
-          method_options: {xmlns: 'http://schemas.microsoft.com/sharepoint/soap/'},
           soap_options: {
-              endpoint: 'https://www.groupware.kuleuven.be/sites/lias/_vti_bin/lists.asmx',
+              endpoint: 'https://www.groupware.kuleuven.be/sites/lias/_vti_bin/lists.asmx'
           },
           wsse_options: @options,
           listName: @base,
@@ -175,9 +194,6 @@ class SharepointSearch < GenericSearch
           webID: ''
       }
 
-#puts 'Query result: '
-#ap result
-
       @result = result
       @set_count = result[:count]
       @next_set = result[:next_set]
@@ -188,14 +204,8 @@ class SharepointSearch < GenericSearch
 
   def result_parser( result )
 
-#puts 'Result: '
-#ap result
-
     records = []
-    result = result[:GetListItemsResponse][:GetListItemsResult]
-
-#puts 'Result: '
-#ap result
+    result = result[:get_list_items_response][:get_list_items_result]
 
     data = result[:listitems][:data]
 
@@ -204,12 +214,12 @@ class SharepointSearch < GenericSearch
 
     #noinspection RubyResolve
     rows.each do | row |
-      if @selection.nil? or row[:@ows_FileRef] =~ /^\d+;#sites\/lias\/Gedeelde documenten\/#{@selection}($|\/)/
+      if @selection.nil? or row[:ows_FileRef] =~ /^\d+;#sites\/lias\/Gedeelde documenten\/#{@selection}($|\/)/
         records << clean_row( row )
       end
     end
 
-    next_set = data[:@ListItemCollectionPositionNext]
+    next_set = data[:@list_item_collection_position_next]
 
     count = records.size
 
@@ -219,7 +229,7 @@ class SharepointSearch < GenericSearch
 
   def clean_row( row )
 
-    @fields_found = Set.new unless @fields_found
+    @fields_found ||= Set.new
     row.keys.each { |k| @fields_found << k }
 
     fields_to_be_removed = [:ows_MetaInfo]
@@ -228,10 +238,9 @@ class SharepointSearch < GenericSearch
     record = SharepointRecord.new
 
     row.each do | k, v |
-      k = k.to_s.gsub(/^@/, '').to_sym
-      next if fields_to_be_removed.include? k
-      v = v.dot_net_clean
-      record[k] = v
+      key = k.to_s.gsub(/^@/, '').to_sym
+      next if fields_to_be_removed.include? key
+      record[key] = v.dot_net_clean
     end
 
     record
