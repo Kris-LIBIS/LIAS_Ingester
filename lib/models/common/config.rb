@@ -62,9 +62,10 @@ module CommonConfig
           self.search_base = 'KADOC'
           self.search_match = nil
           self.search_term = nil
-          self.control_fields = '[]'
-          self.ar_model_data = {}
         end
+
+        self.control_fields = '[]'
+        self.ar_model_data = {}
 
         return unless config
 
