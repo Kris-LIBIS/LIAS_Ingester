@@ -32,7 +32,7 @@ class PreProcessor
     begin
       error "Run ##{run_id} not found"
       return []
-    end unless run = IngestRun.first(:id => run_id)
+    end unless (run = IngestRun.first(:id => run_id))
     
     begin
 
@@ -49,6 +49,8 @@ class PreProcessor
         restart run_id
       when Status::PreProcessed .. Status::Finished
         warn "Skipping preprocessing of run ##{run_id} because status is '#{Status.to_string(run.status)}'"
+        else
+          # type code here
       end
       
     ensure
@@ -65,7 +67,7 @@ class PreProcessor
     begin
       error "Run ##{run_id} not found"
       return nil
-    end unless run = IngestRun.first(:id => run_id)
+    end unless (run = IngestRun.first(:id => run_id))
     
     unless Status.phase(run.status) == Status::PreProcess
       warn "Cannot undo run ##{run_id} because status is #{Status.to_string(run.status)}."
@@ -81,7 +83,7 @@ class PreProcessor
   
   def restart( run_id )
     
-    if run = undo(run_id)
+    if (run = undo(run_id))
       info "Restarting run ##{run_id}"
       process_run run
       return collect_configs(run)
@@ -96,7 +98,7 @@ class PreProcessor
     begin
       error "Run ##{run_id} not found"
       return []
-    end unless run = IngestRun.first(:id => run_id)
+    end unless (run = IngestRun.first(:id => run_id))
     
     process_run( run )
     collect_configs run
@@ -106,6 +108,7 @@ class PreProcessor
   private
   
   def collect_configs( run )
+    #noinspection RubyResolve
     run.ingest_configs.collect { |cfg| cfg.status >= Status::PreProcessed ? cfg.id : nil }.compact
   end
   
@@ -119,9 +122,11 @@ class PreProcessor
     run.save
     
     # for each configuration
+    #noinspection RubyResolve
     run.ingest_configs.each do |config|
       process_config config
     end # ingest_configs.each
+    #noinspection RubyResolve
     unless run.ingest_objects.empty?
       warn "#{run.ingest_objects.size} Objects remain unprocessed in run ##{run.id}"
     end
@@ -148,10 +153,13 @@ class PreProcessor
     
     @checker = FileChecker.new config
     @collecter = nil
+    #noinspection RubyResolve
     @collecter = ComplexFileCollecter.new(config) if config.complex or config.mets
     
     info "Processing config ##{config.id}"
+    #noinspection RubyResolve
     collected_objects = config.ingest_run.ingest_objects
+    #noinspection RubyResolve
     collected_objects = config.ingest_objects.dup if collected_objects.empty?
     collected_objects.each do |object|
       process_object object, config
@@ -165,6 +173,7 @@ class PreProcessor
       # these files should be removed from the run
       # Note: do not attempt to remove them from the run set in process_object
       # as Ruby does not allow to change a set while iterating over it
+      #noinspection RubyResolve
       config.ingest_run.ingest_objects -= config.ingest_objects
       config.status = Status::PreProcessed if config.check_object_status(Status::PreProcessed)
       info "Placed config ##{config.id} on the queue."
@@ -193,10 +202,12 @@ class PreProcessor
     info "Processing object ##{object.id}: '#{object.file_path}'"
     object.status = Status::PreProcessing
     object.save
-    
+
+    #noinspection RubyControlFlowConversionInspection
     if not @checker.match object
       debug "Object ##{object.id} did not match: #{object.message}"
       object.status = Status::Initialized
+      #noinspection RubyResolve
       object.message = nil
     elsif not @checker.check object
       error "Object ##{object.id} failed tests: '#{object.message}'"
@@ -211,7 +222,7 @@ class PreProcessor
         error "Object ##{object.id} failed building complex object"
         object.status = Status::PreProcessFailed
       end
-      
+
     end
     
   rescue Exception => e
@@ -229,7 +240,8 @@ class PreProcessor
     
     info "Undo run ##{run.id} PreProcess."
     ApplicationStatus.instance.run = run
-    
+
+    #noinspection RubyResolve
     run.ingest_configs.each do |cfg|
       undo_config cfg
     end
@@ -248,6 +260,7 @@ class PreProcessor
     info "Undo configuration ##{cfg.id} PreProcess."
     ApplicationStatus.instance.cfg = cfg
 
+    #noinspection RubyResolve
     cfg.ingest_objects.each do |obj|
       undo_object obj
     end
@@ -266,7 +279,8 @@ class PreProcessor
     ApplicationStatus.instance.obj = obj
     
     obj.children.each { |child| undo_object child }
-    
+
+    #noinspection RubyResolve
     unless obj.usage_type == 'ORIGINAL'
       debug "Deleting object ##{obj.id} from database"
       obj.destroy

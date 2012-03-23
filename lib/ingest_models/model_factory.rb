@@ -15,7 +15,7 @@ class ModelFactory
   attr_accessor :models
 
   #noinspection RubyConstant
-  MANIFESTATIONS = [ 'ORIGINAL', 'VIEW_MAIN', 'ARCHIVE', 'VIEW', 'THUMBNAIL' ]
+  MANIFESTATIONS = %w(ORIGINAL VIEW_MAIN ARCHIVE VIEW THUMBNAIL)
 
   public
 
@@ -35,7 +35,9 @@ class ModelFactory
   def initialize
     @models = {}
     Dir.glob("#{Application.dir}/config/ingest_models/*.yaml").each do |m|
+      #noinspection RubyClassVariableUsageInspection
       @@logger.debug(self.class) {"Loading ingest model: #{m}"}
+      #noinspection RubyClassVariableUsageInspection
       File.open(m) do |f|
         #noinspection RubyResolve
         model = YAML.load(f)
@@ -47,8 +49,10 @@ class ModelFactory
   end
 
   def get_model_for_config(config)
+    #noinspection RubyResolve
     return IngestModelDispatcher.new(config.ingest_model_map, config.ingest_run.location, config.manifestations_config) if config.ingest_model_map
     return get_model1(config.ingest_model).custom_config(config.manifestations_config) if config.ingest_model
+    #noinspection RubyResolve
     get_model2(config.media_type, config.quality).custom_config(config.manifestations_config)
   end
 

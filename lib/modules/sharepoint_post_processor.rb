@@ -17,6 +17,7 @@ class SharepointPostProcessor < PostProcessor
 
   def process_config( cfg )
 
+    #noinspection RubyResolve
     unless cfg.ingest_type == :SHAREPOINT_XML
       cfg.status = Status::PostProcessed
       cfg.save
@@ -24,6 +25,7 @@ class SharepointPostProcessor < PostProcessor
     end
 
     start_time = Time.now
+    #noinspection RubyResolve
     ApplicationStatus.instance.run = cfg.ingest_run
     ApplicationStatus.instance.cfg = cfg
     info "Processing config ##{cfg.id}"
@@ -56,10 +58,11 @@ class SharepointPostProcessor < PostProcessor
     info "Enriching metadata with PIDs"
     dirty = false
     tree.visit do | phase, node, _ |
-      if phase == :before and metadata = node.content
-        if metadata[:pid].nil? and obj = IngestObject.first(:id => metadata[:ingest_object_id])
+      if phase == :before and (metadata = node.content)
+        if metadata[:pid].nil? and (obj = IngestObject.first(:id => metadata[:ingest_object_id]))
           metadata[:pid] = obj.pid
           metadata[:ingest_status] = 'ingested'
+          #noinspection RubyResolve
           metadata[:ingest_id] = obj.ingest_config.ingest_id
           dirty = true
         end
@@ -74,7 +77,7 @@ class SharepointPostProcessor < PostProcessor
     File.open(@metadata_sql_file, 'w') do |f|
       f.puts "set define off"
       tree.visit do |phase, node, _|
-        if phase == :before and metadata = node.content
+        if phase == :before and (metadata = node.content)
           f.puts metadata.to_sql(mapping).gsub('@TABLE_NAME@','KUL_SCP_DGTL_SHP')
         end
       end

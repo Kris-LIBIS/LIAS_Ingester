@@ -8,7 +8,7 @@ class Hash
 #    return result
 #  end
   def key_strings_to_symbols!(opts = {})
-    opts = {:resursive => false, :upcase => false, :downcase => false}.merge opts
+    opts = {resursive: false, upcase: false, downcase: false}.merge opts
     r = Hash.new
     self.each_pair do |k,v|
       if (k.kind_of? String)
@@ -32,7 +32,7 @@ class Hash
   end
 
   def key_symbols_to_strings!(opts = {})
-    opts = {:resursive => false, :upcase => false, :downcase => false}.merge opts
+    opts = {resursive: false, upcase: false, downcase: false}.merge opts
     r = Hash.new
     self.each_pair do |k,v|
       if (k.kind_of? Symbol)
