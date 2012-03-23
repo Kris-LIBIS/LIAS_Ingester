@@ -2,43 +2,50 @@
 
 require 'uri'
 
+require 'ingester_task'
 require 'tools/hash'
 require 'tools/xml_document'
 
 class SharepointRecord < Hash
+  include IngesterTask
+
+  attr_accessor :label_prefix
+  attr_accessor :node
   
   def initialize
+    @node = nil
+    @label_prefix = ''
     super nil
   end
 
   def label
-    self[:ows_Title1] || self[:ows_BaseName]
+    (@label_prefix.to_s + ' ' + (self[:ows_Title1] || self[:ows_BaseName]).to_s).strip
   end
 
-  def content_type()
+  def content_type
     self[:ows_ContentType]
   end
 
-  def file_name()
+  def file_name
     self[:ows_FileLeafRef]
   end
 
-  def file_path()
+  def file_path
     self[:ows_FileRef]
   end
 
-  def file_size()
+  def file_size
     self[:ows_FileSizeDisplay]
   end
 
-  def url()
+  def url
 #    self[:ows_EncodedAbsUrl]
 #    'https://www.groupware.kuleuven.be' + URI.escape(self[:ows_ServerUrl], Regexp.new("[^#{URI::PATTERN::UNRESERVED}]"))
 #    'https://www.groupware.kuleuven.be' + URI.escape(self[:ows_ServerUrl])
     URI.escape(URI.unescape(self[:ows_EncodedAbsUrl]))
   end
 
-  def relative_path()
+  def relative_path
     return file_path.gsub(/^sites\/lias\/Gedeelde documenten\//, '') if file_path
     nil
   end
@@ -50,20 +57,20 @@ class SharepointRecord < Hash
     nil
   end
 
-  def is_file?()
-    return true if [:file, :mfile].include? simple_content_type()
+  def is_file?
+    return true if [:file, :mfile].include? simple_content_type
     false
   end
 
   def is_described?
-    return false unless self[:ows_Title1] or
-        self[:ows_Creation_x0020_date_x0028_s_x0029_] or
-        self[:ows_Startdate] or
-        self[:ows_Enddate]
-    true
+    self[:ows_Title1] and
+        (   self[:ows_Creation_x0020_date_x0028_s_x0029_] or
+            self[:ows_Startdate] or
+            self[:ows_Enddate]
+        )
   end
 
-  def simple_content_type()
+  def simple_content_type
     case content_type
       when /^Archief/i
         return :archive
@@ -72,8 +79,12 @@ class SharepointRecord < Hash
       when /^Bestanddeel of stuk \(document\)/i
         return :file
       when /^Meervoudige beschrijving \(folder\)/i
+        warn "Meervoudige beschrijving (folder) gevonden: '#{relative_path}'"
+        #noinspection RubyDeadCode
         return :mmap
       when /^Meervoudige beschrijving \(document\)/i
+        warn "Meervoudige beschrijving (document) gevonden: '#{relative_path}'"
+        #noinspection RubyDeadCode
         return :mfile
       when /^Tussenniveau/i
         return :map
@@ -83,46 +94,44 @@ class SharepointRecord < Hash
         return :file
       when /^Document/i
         return :file
+      else
+        # type code here
     end
     :unknown
   end
 
-  def content_code()
+  def content_code
     case simple_content_type
       when :archive
-        return 'a'
+        'a'
       when :map
-        return 'm'
+        'm'
       when :file
-        return 'f'
+        'f'
       when :mmap
-        return 'v'
+        'v'
       when :mfile
-        return '<'
+        '<'
       when :unknown
-        return '-'
-    end
-    ' '
+        '-'
+      else
+        ' '
+    end + (is_described? ? '*' : ' ')
   end
 
-  def ingest_model()
-    result = 'Archiveren zonder manifestations'
-    if model = self[:ows_Ingestmodel]
-      case model
-        when 'jpg-watermark_jp2_tn'
-          result = 'Afbeeldingen hoge kwaliteit'
-        when 'jpg-watermark_jpg_tn'
-          result = 'Afbeeldingen lage kwaliteit'
-      end
-    end
-    result
+  def ingest_model
+    self[:ows_Ingestmodel]
+  end
+
+  def accessright_model
+    self[:ows_Access_x0020_rights_x0020_model]
   end
 
   def to_raw
     self
   end
   
-  def to_xml()
+  def to_xml
     
     xml_doc = XmlDocument.new
 
@@ -159,6 +168,7 @@ class SharepointRecord < Hash
     
     xml_doc = XmlDocument.new
 
+    #noinspection RubyStringKeysInHashInspection
     xml_doc.root = xml_doc.create_node(
         'record',
         namespaces: {
@@ -195,8 +205,10 @@ class SharepointRecord < Hash
       sql_values << db_value.escape_for_sql
     end
 
-    sql_fields.each_with_index { | element, index | (index % 10 == 0) && sql_fields[index] = "\n    " + element}
-    sql_values.each_with_index { | element, index | (index % 10 == 0) && sql_values[index] = "\n    " + element}
+    sql_fields.each_with_index { | element, index | (index % 10 == 0) && (sql_fields[index] = "\n    " + element)
+    }
+    sql_values.each_with_index { | element, index | (index % 10 == 0) && (sql_values[index] = "\n    " + element)
+    }
 
     'INSERT INTO @TABLE_NAME@ (' + sql_fields.join(',') + ")\n  VALUES (" + sql_values.join(',') + ');'
 

@@ -15,6 +15,7 @@ require 'tools/sharepoint_mapping'
 
 require_relative 'initializer'
 
+#noinspection RubyTooManyInstanceVariablesInspection
 class SharepointCollector
   include IngesterModule
 
@@ -31,6 +32,7 @@ class SharepointCollector
   attr_accessor :ingestmodel_map
   attr_accessor :metadata_map
   attr_accessor :metadata_file
+  attr_accessor :accessright_map
 
   def prepare
 
@@ -53,10 +55,11 @@ class SharepointCollector
     read_mapping
 
     # step 2: read and parse the metadata file (@tree is built)
-    collect_metadata
+    if collect_metadata
 
-    info "Creating tree file: #{@tree.print('tree.txt')}"
-    info "Creating metadata file: #{@tree.print_metadata('metadata.out.txt', @mapping)}"
+      info "Creating tree file: #{@tree.print('tree.txt')}"
+      info "Creating metadata file: #{@tree.print_metadata('metadata.out.txt', @mapping)}"
+    end
 
     # step 3: download files
     download_files
@@ -104,6 +107,7 @@ class SharepointCollector
 
     @ingestmodel_map = 'ingestmodel.map'
     @metadata_map = 'metadata.map'
+    @accessright_map = 'accessright_map'
 
     @work_dir = File.expand_path '.'
     @mapping_file = Application.dir + '/config/sharepoint/KADOC_Archives.mapping.csv'
@@ -127,10 +131,12 @@ class SharepointCollector
     if File.exists? @metadata_file
       info "Loading metadata from '#{@metadata_file}'"
       @tree = SharepointMetadataTree.open @metadata_file
+      false
     else
       info "Collecting metadata for '#{@selection}'"
       tree.collect_metadata @mapping, @selection
       tree.save @metadata_file
+      true
     end
   end
 
@@ -167,24 +173,25 @@ class SharepointCollector
 
     File.open(@metadata_map, 'w:utf-8') do |f|
       f.puts JSON.pretty_generate dc_map
-    end
+    end unless dc_map.empty?
 
   end
 
   #noinspection RubyResolve
-  def write_ingest_config run
+  def write_ingest_config(run)
 
-    info "Creating ingest configurations and objects"
+  info "Creating ingest configurations and objects"
     config = ''
     File.open(@ingest_template, 'r:utf-8') do |fp|
-      config = fp.readlines( nil ).join('')
+      config = fp.readlines( nil ).join('\n')
     end
 
     cfg_hash = YAML.load(config)
-    cfg_hash['common']['packaging']['location'] = "#{@data_dir}"
-    cfg_hash['common']['packaging']['selection'] = "#{@selection}"
+    cfg_hash.key_strings_to_symbols! recursive: true
+    cfg_hash[:common][:packaging][:location] = "#{@data_dir}"
+    cfg_hash[:common][:packaging][:selection] = "#{@selection}"
 
-    cfg_hash['metadata'] = { 'file' => @metadata_map }
+    cfg_hash[:metadata] = { file: @metadata_map }
 
     run.init_config cfg_hash
     run.status = Status::New
@@ -209,6 +216,7 @@ class SharepointCollector
     xml_dir = File.join @work_dir, 'xml_files'
 
     im_map = {}
+    ar_map = {}
 
     tree.visit( tree[@selection] ) do |phase, node, options|
 
@@ -216,11 +224,16 @@ class SharepointCollector
 
       if phase == :before
 
-        attributes = { 'name' => node.name }
+        if metadata
+          options[:accessright_model] = metadata.accessright_model if metadata.accessright_model
+          ar_map[metadata.relative_path] = options[:accessright_model]
+        end
+
+        attributes = { name: node.name }
 
         if node.has_children?
 
-          if metadata and metadata.is_described?
+          if metadata #and metadata.is_described?
 
             if options[:xml_doc]
               xml_node = options[:xml_doc].create_node( 'folder', :attributes => attributes )
@@ -245,48 +258,52 @@ class SharepointCollector
           options[:xml_container_node] << xml_node
           options[:xml_container_node] = xml_node
 
-        else
+        elsif metadata and metadata.is_file?
 
-          if metadata and metadata.is_file?
+          metadata.label_prefix = (metadata.label_prefix.to_s + ' ' + options[:label_prefix].to_s).strip
 
-            file = File.join(@data_dir, metadata.relative_path)
+          file = File.join(@data_dir, metadata.relative_path)
 
-            unless test ?f, file
-              error "Expected to find the file '#{file}', but it did not exist or is a directory. Object skipped."
-            else
-              create_ingest_object file, config, metadata
-              im_map[file] = metadata.ingest_model
-            end
+          if test ?f, file
+            create_ingest_object file, config, metadata
+            im_map[file] = metadata.ingest_model
+          else
+            error "Expected to find the file '#{file}', but it did not exist or is a directory. Object skipped."
+          end
 
-            if parent_xml_node = options[:xml_container_node]
-              attributes['oid'] = metadata[:ingest_object_id].to_s if metadata and metadata[:ingest_object_id]
-              xml_node = options[:xml_doc].create_node('file', :attributes => attributes )
-              parent_xml_node << xml_node
-
-            end
+          if (parent_xml_node = options[:xml_container_node])
+            attributes['oid'] = metadata[:ingest_object_id].to_s if metadata and metadata[:ingest_object_id]
+            xml_node = options[:xml_doc].create_node('file', :attributes => attributes )
+            parent_xml_node << xml_node
 
           end
+
+        end
+
+        if metadata and metadata.simple_content_type == :mmap
+          options[:label_prefix] = metadata.label
         end
 
       else # phase == :after
 
         FileUtils.mkdir_p xml_dir
 
-        if metadata and options[:xml_root_obj] == node and doc = options[:xml_doc]
+        if metadata and options[:xml_root_obj] == node and (doc = options[:xml_doc])
 
-          if doc.has_element?('file[@oid]')
+#          if doc.has_element?('file[@oid]') || doc.has_element?('folder[@oid]')
+
             file = File.join xml_dir, "map_#{metadata[:index].to_s}.xml"
             options[:xml_doc].save file
 
             create_ingest_object file, xml_config, metadata, true
 
-            if options[:this_node]
-              options[:this_node]['oid'] = metadata[:ingest_object_id].to_s
-            end
-          end
+            options[:this_node]['oid'] = metadata[:ingest_object_id].to_s if options[:this_node]
+            options[:this_node]['id'] = metadata[:index].to_s if options[:this_node]
 
-          doc.xpath('//folder/@oid').each do |id|
-            file = File.join xml_dir, "map_#{metadata[:index].to_s}.xml"
+#          end
+
+          doc.xpath('//folder[@oid]').each do |folder_node|
+            file = File.join xml_dir, "map_#{folder_node['id'].to_s}.xml"
             folder = XmlDocument.open(file)
             folder.root['oid'] = metadata[:ingest_object_id].to_s
             folder.save file
@@ -301,11 +318,13 @@ class SharepointCollector
     config.save
     xml_config.save
 
-    return if im_map.empty?
-
     File.open(@ingestmodel_map, 'w:utf-8') do |fp|
       fp.puts JSON.pretty_generate im_map
-    end
+    end unless im_map.empty?
+
+    File.open(@accessright_map, 'w:utf-8') do |f|
+      f.puts JSON.pretty_generate ar_map
+    end unless ar_map.empty?
 
   end
 
@@ -315,6 +334,7 @@ class SharepointCollector
 
     obj.status = Status::Initialized
     obj.label = metadata.relative_path if is_map
+    #noinspection RubyResolve
     obj.tree_index = metadata[:index].to_i
 
     config.add_object obj
@@ -334,17 +354,19 @@ class SharepointCollector
   end
 
   def write_file_configuration( run )
-    cfg = Hash.new
-
-    cfg[:match] = "\\/(([^\\/]+\\/)*)([^\\/]+)$"
-    cfg[:ingest_model] = { file: @ingestmodel_map }
-    cfg[:ingest_type] = :SHAREPOINT_DATA
-    cfg[:metadata] = { file: @metadata_map }
+    cfg = {
+        match:                  "\\/(([^\\/]+\\/)*)([^\\/]+)$",
+        ingest_model:           { file: @ingestmodel_map },
+        ingest_type:            :SHAREPOINT_DATA,
+        metadata:               { file: @metadata_map },
+        accessright_model_map:  @accessright_map
+    }
 
     config = IngestConfig.new
     config.init cfg
     config.save
 
+    #noinspection RubyResolve
     run.ingest_configs << config
     run.save
 
@@ -363,6 +385,7 @@ class SharepointCollector
     config.init cfg
     config.save
 
+    #noinspection RubyResolve
     run.ingest_configs << config
 
     config
