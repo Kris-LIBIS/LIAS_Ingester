@@ -23,14 +23,13 @@ class SharepointMetadataTree
   end
 
   def search
-    return @search if @search
-    @search = SharepointSearch.new
+    @search ||= SharepointSearch.new
   end
   
   def add( metadata )
     node = get(metadata.relative_path)
     return nil unless node
-#    metadata[:node] = node
+    metadata.node = node
     node.content = metadata
     node
   end
@@ -67,6 +66,15 @@ class SharepointMetadataTree
     end
     found
   end
+
+  def find(label, value)
+    result = []
+    each do node
+      next unless (metadata = node.content)
+      result << node if metadata[label] == value
+    end
+    result
+  end
   
   def file_path( to_node, from_node )
     
@@ -89,7 +97,7 @@ class SharepointMetadataTree
     tgt_path = to_node.parentage.reverse << to_node
     
     # from_node is parent of current node => we cut the tgt_path from the from_node
-    if i = tgt_path.find_index { |node| from_node == node }
+    if (i = tgt_path.find_index { |node| from_node == node })
       return tgt_path.drop(i+1).collect{|o| o.name }.join('/')
     end
     
@@ -219,10 +227,9 @@ class SharepointMetadataTree
           node_string = ' ' * 11
           prefix = ' ' * 2
           prefix = '-' * 2 if options[:in_map]
-          if metadata = node.content
+          if (metadata = node.content)
             code = metadata.content_code
-            code += '*' if metadata.is_described?
-            if code == 'M'
+            if %w(m v).include? code[0]
               options[:in_map] = true
               prefix = '|-'
             end
@@ -255,6 +262,7 @@ class SharepointMetadataTree
       uri = URI.parse(url)
       http = Net::HTTP.new(uri.host, uri.port)
       http.use_ssl = opt[:ssl]
+      #noinspection RubyResolve
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
       request = Net::HTTP::Get.new(uri.request_uri)
       request.basic_auth(opt[:username], opt[:password])
