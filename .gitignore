@@ -6,3 +6,8 @@ config.yml
 .project
 *.db
 *-libxml.rb
+.bundle
+Gemfile.lock
+doc
+issues.rb
+issues.txt
