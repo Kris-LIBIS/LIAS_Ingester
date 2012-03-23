@@ -4,9 +4,33 @@ require 'tools/string'
 require 'csv'
 require 'stringio'
 
+require 'ingester_task'
+
 
 class MimeType
+  include IngesterTask
 
+  BAD_MIMETYPES = [
+      'application/octet-stream',
+      'application/x-empty',
+      'CDF V2 Document'
+  ]
+
+  #noinspection RubyLiteralArrayInspection
+  RETRY_MIMETYPES = [
+      'application/vnd.ms-office',
+      'application/zip',
+      'application/x-zip',
+      'image/x-3ds',
+      'text/plain',
+      'video/x-ms-asf'
+  ] + BAD_MIMETYPES
+
+  #noinspection RubyLiteralArrayInspection
+  FIDO_FORMATS = [
+      '/nas/vol03/app/depot/fido/fido/conf/formats.xml',
+      '/nas/vol03/app/depot/fido/fido/conf/format_extensions.xml'
+  ]
   def capture_stderr
     # The output stream must be an IO-like object. In this case we capture it in
     # an in-memory IO object so we can return the string value. You can assign any
@@ -22,35 +46,60 @@ class MimeType
 
   def self.get( file_path )
 
-    # first attempt: use FIDO
-
     fp = file_path.to_s.escape_for_string
-    result = %x(/nas/vol03/app/bin/fido -loadformats #{Application.dir}/config/lias_formats.xml "#{fp}" 2>/dev/null)
-    r = CSV.parse(result)[0]
-    status = r[0]
-    #noinspection RubyUnusedLocalVariable
-    format = r[2]
-    mimetype = r[7]
-    return mimetype if status == "OK" && mimetype != "None"
+    debug "Determining MIME type of '#{fp}' ..."
 
-    # second attempt: use FILE
-    result = %x(file -ib "#{fp}").split[0]
-    return result unless result.eql?('application/octet-stream')
+    result = nil
 
-    # final attempt: use ImageMagik's identify
-    begin
-      x = %x(identify -format "%m" #{fp})
-      x = x.split[0] if x
-      x = x.strip if x
-      result = 'image/jp2' if x.eql?('JP2')
-    rescue Exception
-      #noinspection RubyClassVariableUsageInspection,RubyResolve
-      @@logger.warn(self.class) {"Could not identify MIME type of '#{file_path.to_s}''"}
-      result = ""
+    # use FILE
+    mimetype = %x(/usr/bin/file -ib "#{fp}").strip.split(';')[0].split(',')[0]
+    debug "File result: '#{mimetype}'"
+    result = mimetype unless BAD_MIMETYPES.include? mimetype
+
+    # use FIDO
+    if result.nil? or RETRY_MIMETYPES.include? mimetype
+      fido = %x(/nas/vol03/app/bin/fido -loadformats #{FIDO_FORMATS.join(',')} "#{fp}" 2>/dev/null)
+      debug "Fido result: '#{fido.to_s}'"
+      r = CSV.parse(fido)[0]
+      if r && r[0] == "OK"
+        format = r[2]
+        mimetype = r[7]
+        if mimetype == "None"
+          case format
+            when 'fido-fmt/189.word'
+              mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            when 'fido-fmt/189.xl'
+              mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            when 'fido-fmt/189.ppt'
+              mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            when 'x-fmt/44'
+              mimetype = 'application/vnd.wordperfect'
+            when 'x-fmt/394'
+              mimetype = 'application/vnd.wordperfect'
+            else
+              # nothing
+          end
+        end
+        debug "Fido MIME-type: #{mimetype} (PRONOM UID: #{format})"
+        result = mimetype unless mimetype == "None"
+      end
     end
 
-    result[-1] == ';' ? result[0...-1] : result
+    # use ImageMagik's identify to detect JPeg 2000 files
+    if result.nil?
+      begin
+        x = %x(identify -format "%m" "#{fp}")
+        debug "Identify result: '#{x.to_s}'"
+        x = x.split[0].strip if x
+        result = 'image/jp2' if x == 'JP2'
+      rescue Exception
+        # ignored
+      end
+    end
 
+    result ? debug("Final MIME-type: '#{result}'") : warn("Could not identify MIME type of '#{fp}'")
+
+    result
   end
-  
+
 end
