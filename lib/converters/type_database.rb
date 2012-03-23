@@ -57,6 +57,7 @@ class TypeDatabase
     @type2mime_map.each do |t,m|
       return t if m.include? mime
     end
+    nil
   end
 
   def mime2media(mime)
@@ -68,6 +69,13 @@ class TypeDatabase
       return k if v.include? ext
     end
     nil
+  end
+
+  def known_mime?(mime)
+    @type2mime_map.each do |t,m|
+      return true if m.include? mime
+    end
+    false
   end
 
   private
