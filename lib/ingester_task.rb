@@ -29,7 +29,7 @@ module IngesterTask
         Thread.current.backtrace.each { |x| Application.warn self.name, &lambda{x} } if trace
       end
 
-      def self.error(msg, trace = true)
+      def self.error(msg, trace = false)
         Application.error self.name, &lambda{msg}
         Thread.current.backtrace.each { |x| Application.error self.name, &lambda{x} } if trace
       end
@@ -57,7 +57,7 @@ module IngesterTask
     Thread.current.backtrace.each { |x| Application.warn self.class, &lambda{x} } if trace
   end
 
-  def error(msg, trace = true)
+  def error(msg, trace = false)
     Application.error self.class, &lambda{msg}
     Thread.current.backtrace.each { |x| Application.error self.class, &lambda{x} } if trace
   end
