@@ -8,6 +8,7 @@ require 'converters/converter_repository'
 require 'converters/type_database'
 require 'tools/hash'
 require 'tools/mime_type'
+require 'converters/type_database'
 
 class IngestModel
 
@@ -15,6 +16,7 @@ class IngestModel
 
   #noinspection RubyResolve
   attr_reader :config
+  attr_writer :custom_config
   
   def initialize(config)
     @config = config
@@ -24,17 +26,32 @@ class IngestModel
   end
 
   def custom_config(config)
-    @custom_config = config
-    self
+    return self unless config
+    result = self.dup
+    result.custom_config = config
+    result
+  end
+
+  def get_ingest_model(obj)
+    mime_type = obj.mime_type
+    return nil unless mime_type
+    get_ingest_model_by_media_type TypeDatabase.instance.mime2media(mime_type)
+  end
+
+  def get_ingest_model_by_media_type(media_type)
+    return (@config[:MEDIA] == media_type ? self : nil) unless @config[:MEDIA] == :ANY
+    ModelFactory.instance.get_model2( media_type, @config[:QUALITY] ).custom_config(@custom_config)
+  end
+
+
+  def valid_media_type(media_type)
+    @config[:MEDIA] == :ANY or @config[:MEDIA] == media_type.to_s.upcase.to_sym
   end
   
   def get_manifestation(manifestation, media_type)
-    if @config[:MEDIA] == :ANY and media_type
-      model = ModelFactory.instance.get_model2( media_type, @config[:QUALITY] ).custom_config(@custom_config)
-      return ( model.get_manifestation manifestation, nil )
-    end
-    
-    @config[:MANIFESTATIONS].each do |m|
+    model = get_ingest_model_by_media_type media_type
+
+    model.config[:MANIFESTATIONS].each do |m|
       return m if m[:MANIFESTATION] == manifestation
     end
     
