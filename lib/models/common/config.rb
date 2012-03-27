@@ -64,7 +64,8 @@ module CommonConfig
           self.search_term = nil
         end
 
-        self.control_fields = '[]'
+        self.metadata_fields = {}
+        self.control_fields = {}
         self.ar_model_data = {}
 
         return unless config

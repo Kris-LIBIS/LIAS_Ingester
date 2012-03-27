@@ -26,7 +26,7 @@ class IngestModel
   end
 
   def custom_config(config)
-    return self unless config
+    return self if config.nil? or config.empty?
     result = self.dup
     result.custom_config = config
     result

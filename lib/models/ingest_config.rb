@@ -69,6 +69,7 @@ class IngestConfig
     self.complex = false
     self.complex_utype = 'COMPLEX_VIEW_MAIN'
     self.mets = false
+    self.manifestations_config = {}
 
     config.each do |label, value|
       case label
