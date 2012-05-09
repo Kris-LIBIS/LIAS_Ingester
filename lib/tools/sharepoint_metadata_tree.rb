@@ -17,9 +17,13 @@ class SharepointMetadataTree
   include IngesterTask
   
   attr_reader :root_node
+  attr_reader :dir_count
+  attr_reader :file_count
   
   def initialize( root_node = nil )
     @root_node = root_node || Tree::TreeNode.new('')
+    @dir_count = 0
+    @file_count = 0
   end
 
   def search
@@ -29,6 +33,11 @@ class SharepointMetadataTree
   def add( metadata )
     node = get(metadata.relative_path)
     return nil unless node
+    if metadata.is_file?
+      @file_count += 1
+    else
+      @dir_count += 1
+    end
     metadata.node = node
     node.content = metadata
     node
@@ -161,6 +170,8 @@ class SharepointMetadataTree
 
     FileUtils.mkpath download_dir
 
+    count = 0
+
     visit( self[selection]) do | phase, node, _ |
 
       metadata = node.content
@@ -172,11 +183,15 @@ class SharepointMetadataTree
       file_path = File.join( download_dir, metadata.relative_path )
       path = File.dirname file_path
 
+      count += 1
+
       next if File.exist? file_path
 
       FileUtils.mkpath path
 
       file_size = metadata.file_size
+
+      info "Downloading file #{count} of #{@file_count} ..." if (count % 10 == 0)
 
       http_to_file file_path, metadata.url, username: search.username, password: search.password, ssl: true, file_size: file_size
 
