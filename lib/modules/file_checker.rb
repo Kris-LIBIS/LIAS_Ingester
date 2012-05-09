@@ -180,16 +180,17 @@ class FileChecker
 
       ingest_model = ModelFactory.instance.get_model_for_config(@config)
       ingest_model = ingest_model.get_ingest_model(obj)
-
+                                                                               0
       if ingest_model
         result = ingest_model.valid_media_type(TypeDatabase.instance.mime2media(mime_type))
+        obj.message = "Object '#{obj.relative_path}' mime type: '#{mime_type}' is incompatible with the ingest model media type: '#{ingest_model.config[:MEDIA].to_s}'"
       else
         #noinspection RubyResolve
         obj.message = "Object '#{obj.relative_path}' does not have an associated ingest model"
         result = false
       end
     else
-      obj.message "Object '#{obj.relative_path}' does not have a MIME Type"
+      obj.message = "Object '#{obj.relative_path}' does not have a MIME Type"
       result = false
     end
 
