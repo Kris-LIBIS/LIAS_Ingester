@@ -122,6 +122,20 @@ class Application
         @options[:log_level] = level
       end
 
+      @options[:log_buffer] = 20
+      opts.on('-b', '--log_buffer N', 'Set the logging buffer', Integer,
+              '  0: buffer off, n>0: buffer n lines before flusing the log file (default = 20)') do |buffer_size|
+        if buffer_size <= 0
+          #noinspection RubyArgCount
+          self.class.class_eval do
+            def flush_log
+              @log_file.flush
+            end
+          end
+        end
+        @options[:log_buffer] = buffer_size
+      end
+
       opts.on('--test', 'test mode - clears the database!') do
         @@test_mode = true
       end
@@ -157,21 +171,26 @@ class Application
     @log_file = File.open(@log_file,'w:utf-8') if @log_file
     
     @flush_counter = 0
+
   end
 
   def terminate
     @logger.close
     @log_file.close if @log_file
   end
-  
+
+  def flush_log
+    @flush_counter += 1
+    if @flush_counter > @options[:log_buffer]
+      @log_file.flush
+      @flush_counter = 0
+    end
+  end
+
   def self.write_log(severity, datetime, progname, msg)
     return unless self.instance.log_file
     self.instance.log_file.puts "[#{datetime.to_s}] #{severity} -- #{progname}: #{msg}"
-    self.instance.flush_counter += 1
-    if self.instance.flush_counter > 20
-      self.instance.log_file.flush
-      self.instance.flush_counter = 0
-    end
+    self.instance.flush_log
   end
 
   def self.send_log(severity, datetime, progname, msg)
