@@ -49,12 +49,6 @@
 			<body class="ui-layout-container mainbody">
 				
 				<div id="TreeDiv" class="ui-layout-west">
-					<xsl:if test="@pid">
-						<xsl:call-template name="link">
-							<xsl:with-param name="class">folder</xsl:with-param>
-							<xsl:with-param name="name">..</xsl:with-param>
-						</xsl:call-template>
-					</xsl:if>
 					<ul id="tree" class="treeview filetree">
 						<xsl:call-template name="process_folder"/>
 					</ul>
