@@ -82,6 +82,9 @@
       - :TYPE:          :TXT
         :MIME:          text/plain
         :EXTENSIONS:    txt
+      - :TYPE:          :XML
+        :MIME:          text/xml
+        :EXTENSIONS:    xml
       - :TYPE:          :RTF
         :MIME:          text/rtf
         :EXTENSIONS:    rtf
