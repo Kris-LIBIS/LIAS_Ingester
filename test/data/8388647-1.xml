@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008388647</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">VM</fixfield>
+<fixfield id="LDR">00000nka^a22^^^^^^a^4500</fixfield>
+<fixfield id="001">008388647</fixfield>
+<fixfield id="005">20120116150553.0</fixfield>
+<fixfield id="008">110204q16uu^^^^xx^nnn^^^^^^^^^^^^||fre^d</fixfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">du Plessis, Armand-Jean</subfield>
+<subfield label="c">cardinal and duke de Richelieu</subfield>
+<subfield label="d">1585-1642</subfield>
+<subfield label="g">L’éminence Rouge</subfield>
+<subfield label="4">dpc</subfield>
+</varfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Wierix, Antonius</subfield>
+<subfield label="c">III</subfield>
+<subfield label="d">1596-1624</subfield>
+<subfield label="g">Flemish printmaker</subfield>
+<subfield label="4">art</subfield>
+<subfield label="9">graphic artist</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Cardinal Richelieu</subfield>
+<subfield label="h">Static image</subfield>
+</varfield>
+<varfield id="260" i1=" " i2=" ">
+<subfield label="c">1612</subfield>
+<subfield label="9">date mentioned on print</subfield>
+</varfield>
+<varfield id="300" i1="9" i2=" ">
+<subfield label="b">Black-and-white ;</subfield>
+<subfield label="c">voorstelling: 235 x 93 mm</subfield>
+<subfield label="c">voorstelling met opschrift: 240 x 93 mm.</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="b">engraving(s)</subfield>
+</varfield>
+<varfield id="529" i1=" " i2=" ">
+<subfield label="a">Cardinal Richelieu</subfield>
+<subfield label="b">in de voorstelling: onderaan, centraal</subfield>
+</varfield>
+<varfield id="529" i1=" " i2=" ">
+<subfield label="a">Anton Wierix fecit 1612</subfield>
+<subfield label="b">buiten de voorstelling: onderaan, rechts</subfield>
+</varfield>
+<varfield id="655" i1="9" i2="4">
+<subfield label="a">Portraits</subfield>
+<subfield label="x">Portretten</subfield>
+<subfield label="y">Portraits</subfield>
+</varfield>
+<varfield id="088" i1=" " i2=" ">
+<subfield label="a">Graphic</subfield>
+<subfield label="x">Grafische voorstelling (niet gespecificeerd)</subfield>
+<subfield label="y">Graphique (non précisé)</subfield>
+</varfield>
+<varfield id="LKR" i1=" " i2=" ">
+<subfield label="a">ANA</subfield>
+<subfield label="b">008259166</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="r">773</subfield>
+<subfield label="m">Albertus Brandeburgensis</subfield>
+<subfield label="n">Eloges historiques des cardinaux illustres françois et estrangers mis en parallele avec leurs pourtraits : recueil de portraits des cardinaux illustres.</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">MM04</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">0942</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">MM04</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">0943</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL01</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1500</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1504</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1505</subfield>
+</varfield>
+<varfield id="852" i1=" " i2=" "><subfield label="b">BRES</subfield><subfield label="c">KULeuven Centrale Bibliotheek</subfield><subfield label="h">R3A20117</subfield></varfield></oai_marc>
+</metadata>
+</record>
+<session-id>NB5RQBC9SMCMD139INXK221KR3G4RRICM453AP2HBQXQKQXSFR</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>

@@ -1,9 +1,9 @@
 # coding: utf-8
 
-require_relative 'test_converter'
+require 'helpers/dummy_converter'
 
 class ConverterB < Converter
-  include TestConverter
+  include DummyConverter
 
   def do_something( _ = {} )
   end

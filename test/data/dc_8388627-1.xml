@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008388627</dc:identifier>
+  <dc:title>Justus Lipsius [Static image]</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dc:creator>Rubens, Peter Paul, 1577-1640, Flemish painter and draughtsman (artist)</dc:creator>
+  <dc:creator>Harrewijn, François, 1700-1764, Flemish etcher, bookseller (artist)</dc:creator>
+  <dc:description>Naam uitgever niet goed leesbaar
+P. Rubens pinxit, F. Harrewyn sculpsit, in de voorstelling: onderaan, links
+[...] excudit, in de voorstelling: onderaan, rechts
+Justus Lipsius, buiten de voorstelling: onderaan, centraal</dc:description>
+  <dc:contributor>Lipsius, Justus, 1547-1606, ( depicted)</dc:contributor>
+  <dcterms:provenance>BRES KULeuven Centrale Bibliotheek</dcterms:provenance>
+  <dc:publisher>s.d. 1700-1800</dc:publisher>
+  <dc:date>17uu -     </dc:date>
+  <dc:type>Portraits</dc:type>
+  <dc:type>Visual Materials</dc:type>
+  <dc:type xml:lang="en" class="text">Graphic</dc:type>
+  <dc:type xml:lang="en" class="text">Portraits</dc:type>
+  <dc:type xml:lang="nl" class="text">Grafische voorstelling (niet gespecificeerd)</dc:type>
+  <dc:type xml:lang="nl" class="text">Portretten</dc:type>
+  <dc:type xml:lang="fr" class="text">Graphique (non précisé)</dc:type>
+  <dc:type xml:lang="fr" class="text">Portraits</dc:type>
+  <dcterms:extent>Black-and-white ; voorstelling: 150 x 120 mm;voorstelling met opschrift: 155 x 125 mm;plaatrand: 170 x 130 mm.</dcterms:extent>
+  <dcterms:medium>etching(s)</dcterms:medium>
+  <dcterms:medium>engraving(s)</dcterms:medium>
+  <dc:source>BRES KULeuven Centrale Bibliotheek</dc:source>
+  <dc:language>fr</dc:language>
+</record>

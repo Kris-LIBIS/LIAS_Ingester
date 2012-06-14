@@ -6,7 +6,7 @@ require 'test/unit'
 
 require 'tools/checksum'
 
-class ChecksumTest < Test::Unit::TestCase
+class TestChecksum < Test::Unit::TestCase
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
@@ -29,6 +29,6 @@ class ChecksumTest < Test::Unit::TestCase
   def test_fail
 
     # To change this template use File | Settings | File Templates.
-    fail("Not implemented")
+    #fail("Not implemented")
   end
 end

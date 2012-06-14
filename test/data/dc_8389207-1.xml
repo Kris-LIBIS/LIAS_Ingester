@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008389207</dc:identifier>
+  <dc:title>Cartularium van ’s Hertogenbosch.</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dcterms:isPartOf>Die Blyde Incomste den Hertochdomme van Brabant [...]</dcterms:isPartOf>
+  <dc:temporal>1301-1400</dc:temporal>
+  <dc:temporal>1401-1500</dc:temporal>
+  <dc:temporal>1501-1600</dc:temporal>
+  <dc:temporal>1601-1700</dc:temporal>
+  <dc:description>The pagination follows pagination b, unless otherwise stated.</dc:description>
+  <dcterms:tableOfContents>1. Table of contents (p. 1-4)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Remark left upper corner: Dit taeffele salmen ver[…] vynden […]an[…] lxxxv.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Title: Hier beghinne die tafele vanden copie vanden carthen hier na bescreven.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>2. Official documents regarding the city of Den Bosch for the period 1305-1430, issued by the Dukes John III, Wenceslas, Anton, John V and Philip the Good and Duchess Johanna (p. 5-98)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Privilegium civitatis [3 words] der stadt rechten</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Inden name der heilicher ende den onghesceydenre drievoldicheit, wy Jan bider gracien gods hertoghe van Lothar, van brabant ende van lymborch […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: Ghegeven in onser stat bay louc (?) vijf dage iij october int jair ons heren dusent vierhondert ende dertich.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>3. (p. 99-101)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Nu toent die ghene die dien anderen verstaen wil ende bidt den scht (abbreviation) of hy spreken moet met orlof ende bidt eens voersprekers ende als die voerspreker in syn woert comen is, dan seghet hy aldus.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Her scht (abbreviation) wildi horen.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] Dats voert met recht sal sijn etc.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>4. Hoemen ene stat regeren sal (p. 102)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Die een stat wael wil regeren</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: Die gode in sinen raet ontsiet. Amen.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>5. Official documents regarding the city of Den Bosch for the period 1321-1499 regarding or issued by John III, Mary of Burgundy, Maximilian of Austria and Charles the Bold (p. 103-279)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Marie bider gracien Gods hertoginne van bourgoingnen</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] int jair ons heren alsmen scrieff duysent driehondert tsestich ende huit des womsdagches naden zuust (?) Margritten dach.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>6. Official documents regarding the city of Den Bosch drawn up by Philip the Good, Charles V and the aldermen for the period 1458-1515 (p. 279-318)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Vander disposicie des stadt ende […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Philips bijden gracien gods hertoge van bourgondy […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: [...] ende getekent haneton</dcterms:tableOfContents>
+  <dcterms:tableOfContents>7. Feudal law and other official documents regarding the city of Den Bosch drawn up by Philip the Good, Charles the Bold, Maximilian of Austria and Duchess Johanna for the period 1403-1555 (p. 319-342)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Dit zijn die leenrechten van ons genadlichen heren […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Boe (?) wijs [2 words] spreken wilt [...]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: [...] ende is bevonden accorderen bij mij ondertekent Bechy (?)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>8. Pseudo-Aristotelian maxims (p. 343)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Hec sunt documenta que misis Aristoteles ad (?) Alexandro</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Cela secreta</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: [...] in honestate conservare.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>9. Privileges under Philip the Good (p. 344-352)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Copia [1 word] libertatis [2 words] per philippum archiducem austrie concessum.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Philippus die gracia archidux austrie […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] verworven zijn […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>10. Official documents 1497-1514 (p. 353-372)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Instructis vander boden anno xiiijC xcvij.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Philips etc allen den ghenen die desen onsen brieff sullen zien […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] rappoort zollen doen</dcterms:tableOfContents>
+  <dcterms:tableOfContents>11. Official document issued by the emperor Charles (p. 373-392)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Auctentica copia copie auctentice confirmationis bulle a… Caroli quinti Romanorum Imperatoris [1 word] et contesse in civitate imperiali Angusta die primo mensis julii anno MCCCCCXXX.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Carolus quintus divina sanctitate clementia Romanorum imperator semper augustus […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] admissum in opido busciducense residens.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>12. Family history of Godefridus Grootaert van Os (p. 393-398)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Ego Godefridus grootaert de os, filius naturalis quidam godefridi grooterts de os, filii quidam arnodli grootaert de os, notarius ac clericus [1 word] opidi busciducense leodiense diocese [...]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] corporis [2 words]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>13. Miscellaneous documents on Philip the Bold, including inventory / estimates of gold and silver and financial notes (p. 399-449)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Inden jaer ons heeren CCC XII waert ontfangen […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] per mede te vroeg was</dcterms:tableOfContents>
+  <dcterms:tableOfContents>14. Financial notes (exchange rates, tolls, ...), 13th-16th century, with emphasis on the period 1419-1522 (numbering c)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Evalution vander munten vanden jare xiiijC xix novembris vjta.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>15. Commission rights (?) under Margaret of Austria (p. 450-457)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Copie van eenre copien vanden commissien onser gender vrouwen vrouwe (sic) margrieten […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Kaerle byder gracein goidsconinc van Castillien […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] ende accordeert mitter zelve bij mij M. de greve</dcterms:tableOfContents>
+  <dcterms:tableOfContents>16. Official document under emperor Charles (1531) (p. 458-463)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Kaerle byder gracien goids Roomsch keysere […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: [...] in brabant by usancen (?) ende onderteekent Crobaert</dcterms:tableOfContents>
+  <dcterms:tableOfContents>17. Appeal of the citizens of Den Bosch (p. 464-471)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Copie vanden supplicatien bij gedeputeerden vanden bossche […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Ic en mijn geere […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: [...] der scepenen ende raidt onser stadt van shertogenbossche</dcterms:tableOfContents>
+  <dcterms:tableOfContents>18. Official and legal documents regarding Den Bosch (p. 472-502, 503)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Dese naktscreven (?) heren zijn die ghene geweest die welcke inden jaer onser heren duysent vierhondert ende vierendenegentich den zestiensten den maent decembre bynnen den stadt vanden bossche gecomen sijn […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] illius exaudiet autem cum qui fecit illum.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>19. Copy of the income of Leuven (Emperor Charles V and Philip of Spain, 1549) (p. 506-537)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Copie vanden incompste […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Kaerle byder gracien goids Roomsch keyser altijt vermeerder […]</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] bij mij ondergeteekent Verreyken</dcterms:tableOfContents>
+  <dcterms:tableOfContents>20. Document drawn up between the city of Den Bosch and the Prince of Spain (p. 538-542)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>(Incipit: hard to read)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: [...] ende excellentien.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>21. Oaths taken in Leuven by Prince Philip and the members of the council of Brabant and the city of Leuven (p. 543-556)</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Heading: Iuxamentum principis prestandum in ecclesia sancti petri lovanii</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Incipit: Ego Philippus deo gratia princeps hispaniarum utriusque Sicilie, hierusalem etc.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>Explicit: […] ducatus brabantie et (?) bonus administrator</dcterms:tableOfContents>
+  <dcterms:tableOfContents>22. List of prelates and nobles (p. 557-559)</dcterms:tableOfContents>
+  <dcterms:hasPart>Cartularium van ’s Hertogenbosch</dcterms:hasPart>
+  <dc:date>1400 - 1699</dc:date>
+  <dc:type>Books</dc:type>
+  <dc:type xml:lang="en" class="text">Manuscripts</dc:type>
+  <dc:type xml:lang="nl" class="text">Handschriften</dc:type>
+  <dc:type xml:lang="fr" class="text">Manuscrits</dc:type>
+  <dcterms:spatial>Nederland (the Netherlands) 's Hertogenbosch</dcterms:spatial>
+  <dcterms:extent>I + 599 numbered p. (b); 164 p. (c), 31 irregular quires: (1 VII + 2 VI + 1 V + 1 II + 1 V + 6 VI + 1 IV + 1 XXIII + 1 VI-5 + 1 VI + 2 X + 1 VI+2 + 1 XII+2 + 1 XVI + 1 XII-1 + 1 III + 1 I + 1 II + 1 XII + 1 X + 1 XII + 1 VI-1 + 1 VI+1 + 1 VIII-3) : ill. ; 293 x 220 mm (varying lay-out).</dcterms:extent>
+  <dcterms:extent>p. 1-102 2 columns, from p. 103 1 column/page.</dcterms:extent>
+  <dcterms:extent>some horizontal catchwords, quire-signatures, foliation in ink (a), pagination (b and c).</dcterms:extent>
+  <dcterms:extent>script: gothic bastarde and italic, more than twenty different hands, marginal remarks.</dcterms:extent>
+  <dcterms:extent>cover: non-contemporary cardboard, completely detached.</dcterms:extent>
+  <dc:format>Paper ((watermarks))</dc:format>
+  <dc:format>Parchment</dc:format>
+  <dcterms:medium>initials (red)</dcterms:medium>
+  <dcterms:medium>(red underlining and red pieds-de-mouche)</dcterms:medium>
+  <dcterms:medium>(display script red highlighted)</dcterms:medium>
+  <dc:language>dum</dc:language>
+  <dc:language>Middle Dutch</dc:language>
+  <dc:language>Latin</dc:language>
+  <dc:language>Middle French</dc:language>
+  <dcterms:references>SELMER, Carl. “An Unpublished Latin Collection of Pseudo-Aristotelian Paroimiai”. Speculum 15/1 (1940). p. 92-94. (partial edition of text 8)</dcterms:references>
+  <dcterms:references>CLAASSENS, Geert H.M. “17. Hoemen ene stat regeren sal […]”. Chris Coppens (red.), Van Croesus tot Keizer Karel: preciosa tot circa. 1550: een selectie uit de aanwinsten 1971-1996. Catalogus bij de gelijknamige tentoonstelling in de Universiteitsbibliotheek van 27 juni tot 23 augustus 1996. Leuven: Centrale Bibliotheek, 1996. p. 35-36. (edition of text 19)</dcterms:references>
+</record>

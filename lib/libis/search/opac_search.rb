@@ -5,7 +5,7 @@ require 'tools/xml_document'
 require 'pp'
 
 require 'tools/hash'
-
+require 'libis/record/marc_record_factory'
 require_relative 'generic_search'
 
 class OpacSearch < GenericSearch
@@ -29,7 +29,7 @@ class OpacSearch < GenericSearch
     @session_id = 0
     @set_number = 0
 
-    response = execute_http_query("op=find&code=#{@index}&request=#{@term}&base=#{@base}")
+    response = execute_http_query("op=find&code=#@index&request=#@term&base=#@base")
     if response
       #noinspection RubyResolve
       @set_number = xml_get_text(response.xpath('//find/set_number'))
@@ -51,27 +51,47 @@ class OpacSearch < GenericSearch
 
     while @record_pointer <= @num_records
 
-      if @record_pointer <= @num_records
-        response = execute_http_query("op=present&set_entry=#{@record_pointer}&set_number=#{@set_number}&base=#{@base}")
-
-        if response
-          #noinspection RubyResolve
-          response.root << element = response.create_node('search')
-          element['type'] = 'opac'
-          element['host'] = @host
-          element['base'] = @base
-          set_entry = xml_get_text(response.root.xpath('//set_entry')).to_i
-          if set_entry == @record_pointer
-            add_item_data(response)
-            yield response
-          end
-        end
-      else
-        puts 'no record found'
+      next_record do |r|
+        yield r
       end
 
-      @record_pointer += 1
     end
+  end
+
+  def next_record(set_number = nil, &block)
+
+    if !set_number.nil? && @set_number != set_number
+      @record_pointer = 1
+      @set_number = set_number
+    elsif @set_number.nil?
+      return
+    end
+
+    if @record_pointer <= @num_records
+      response = execute_http_query("op=present&set_entry=#@record_pointer&set_number=#@set_number&base=#@base")
+
+
+      if response
+        #noinspection RubyResolve
+        response.root << element = response.create_node('search')
+        element['type'] = 'opac'
+        element['host'] = @host
+        element['base'] = @base
+        set_entry = xml_get_text(response.root.xpath('//set_entry')).to_i
+        if set_entry == @record_pointer
+          add_item_data(response)
+          return RecordFactory.parse(response.to_xml).first if block.nil?
+          yield response
+        end
+      end
+    else
+      puts 'no record found'
+    end
+
+    @record_pointer += 1
+
+    nil
+
   end
 
 
@@ -99,7 +119,7 @@ class OpacSearch < GenericSearch
   def add_item_data(xml_document)
 
     doc_number = xml_get_text(xml_document.root.xpath('//doc_number'))
-    response = execute_http_query("op=item-data&base=#{@base}&doc-number=#{doc_number}")
+    response = execute_http_query("op=item-data&base=#@base&doc-number=#{doc_number}")
 
     if response
       oai_marc = xml_document.root.xpath('//oai_marc').first
@@ -145,6 +165,8 @@ class OpacSearch < GenericSearch
     redo_count = 10
     xml_document = nil
 
+    redo_search = false
+
     begin
       redo_search = false
 
@@ -158,11 +180,10 @@ class OpacSearch < GenericSearch
           xml_document, error = str_to_xml(response.body)
           if xml_document && error.size == 0
             #puts " Found #{xml_get_text(xml_document.xpath('//find/no_records'))} records"
-            nil
           else
             unless error == 'empty set'
               puts
-              puts "----------> Error searching for #{@term} --> '#{error}'"
+              puts "----------> Error searching for #@term --> '#{error}'"
               puts
             end
             if error =~ /license/

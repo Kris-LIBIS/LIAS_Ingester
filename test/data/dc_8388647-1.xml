@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008388647</dc:identifier>
+  <dc:title>Cardinal Richelieu [Static image]</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dcterms:isPartOf>Eloges historiques des cardinaux illustres françois et estrangers mis en parallele avec leurs pourtraits : recueil de portraits des cardinaux illustres.</dcterms:isPartOf>
+  <dc:creator>Wierix, Antonius, III, 1596-1624, Flemish printmaker (artist)</dc:creator>
+  <dc:description>Cardinal Richelieu, in de voorstelling: onderaan, centraal
+Anton Wierix fecit 1612, buiten de voorstelling: onderaan, rechts</dc:description>
+  <dcterms:hasPart>Albertus Brandeburgensis</dcterms:hasPart>
+  <dc:contributor>du Plessis, Armand-Jean, cardinal and duke de Richelieu, 1585-1642, L’éminence Rouge ( depicted)</dc:contributor>
+  <dcterms:provenance>BRES KULeuven Centrale Bibliotheek</dcterms:provenance>
+  <dc:publisher>1612 date mentioned on print</dc:publisher>
+  <dc:date>16uu -     </dc:date>
+  <dc:type>Portraits</dc:type>
+  <dc:type>Visual Materials</dc:type>
+  <dc:type xml:lang="en" class="text">Graphic</dc:type>
+  <dc:type xml:lang="en" class="text">Portraits</dc:type>
+  <dc:type xml:lang="nl" class="text">Grafische voorstelling (niet gespecificeerd)</dc:type>
+  <dc:type xml:lang="nl" class="text">Portretten</dc:type>
+  <dc:type xml:lang="fr" class="text">Graphique (non précisé)</dc:type>
+  <dc:type xml:lang="fr" class="text">Portraits</dc:type>
+  <dcterms:extent>Black-and-white ; voorstelling: 235 x 93 mm;voorstelling met opschrift: 240 x 93 mm.</dcterms:extent>
+  <dcterms:medium>engraving(s)</dcterms:medium>
+  <dc:source>BRES KULeuven Centrale Bibliotheek R3A20117</dc:source>
+  <dc:language>fr</dc:language>
+</record>

@@ -3,10 +3,10 @@
 require 'json'
 
 require 'ingester_task'
-require 'libis/record'
-require 'libis/search'
+require 'libis/search_factory'
 require 'tools/xml_document'
 
+#noinspection RubyResolve
 class Metadata
   include IngesterTask
   
@@ -17,7 +17,7 @@ class Metadata
     @cfg = cfg
     
     @metadata_map = {}
-    if mf = @cfg.metadata_file
+    if (mf = @cfg.metadata_file)
       @metadata_map = JSON.parse File.open(mf, 'r:utf-8').readlines.join
     end
   end
@@ -37,9 +37,9 @@ class Metadata
     options = MY_SEARCH_OPTIONS.merge @cfg.get_search_options
     search_term = obj.label
     if options[:term]
-      if (options[:match])
+      if options[:match]
         search_term = obj.file_name if obj.file_name
-        if (search_term =~ options[:match])
+        if search_term =~ options[:match]
           search_term = eval options[:term]
         end
       end
@@ -64,16 +64,7 @@ class Metadata
   def load_record(search_term, options)
       search = SearchFactory.new(options[:target]).new_search
       search.query(search_term, options[:index], options[:base], options)
-      found = nil
-      # i = 0
-      search.each do |r|
-        record = Record.new(r)
-        # is this required?
-        # save(obj, record, :file_name => "#{search_term}_#{i}")
-        found = record unless found
-      end
-      
-      found
+      search.next_record
   end
   
   def read_record(obj)
@@ -81,7 +72,7 @@ class Metadata
     search_term = [obj.label]
     search_term << obj.relative_path.to_s if obj.file_name
     search_term.reverse.each do |term|
-      if dc_file = @metadata_map[term]
+      if (dc_file = @metadata_map[term])
         doc = XmlDocument.open dc_file
         break
       end
@@ -103,15 +94,11 @@ class Metadata
   def copy_metadata_from_aleph(obj, record)
     begin
       obj.metadata = "#{@cfg.ingest_dir}/transform/dc_#{obj.id}.xml"
-      doc = XmlDocument.new
-      records = doc.create_node('records')
-      record_doc = XmlDocument.parse(record.to_dc(obj.label))
-      records << record_doc.root
+      record_doc = record.to_dc(obj.label)
       obj.get_run.get_metadata_fields.each do |tag,value|
-        records << doc.create_text_node(tag,value)
+        record_doc.root << doc.create_text_node(tag,value)
       end
-      doc.root = records
-      doc.save(obj.metadata)
+      record_doc.save(obj.metadata)
     rescue Exception => e
       obj.metadata = nil
       handle_exception e

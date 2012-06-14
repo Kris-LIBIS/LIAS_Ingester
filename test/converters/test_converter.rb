@@ -1,41 +1,43 @@
 # coding: utf-8
 
-$: << File.expand_path(File.dirname(__FILE__) + '/..')
+require "test_helper"
 
-require "test/unit"
+require 'helpers/dummy_converter_repository'
 
-require_relative 'data/test_converter_repository'
-
-class ConverterTest < MiniTest::Unit::TestCase
+class TestConverter < MiniTest::Unit::TestCase
 
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    # Do nothing
+    @old_db_level = Application.instance.db_log_level
+    @old_log_level = Application.instance.logger.level
+    Application.instance.db_log_level = 4
+    Application.instance.logger.level = 4
   end
 
   # Called after every test method runs. Can be used to tear
   # down fixture information.
 
   def teardown
-    # Do nothing
+    Application.instance.db_log_level = @old_db_level
+    Application.instance.logger.level = @old_log_level
   end
 
   def test_chain
-    chain = TestConverterRepository.get_converter_chain :DOC, :XLS
+    chain = DummyConverterRepository.get_converter_chain :DOC, :XLS
     assert_equal([{:converter => ConverterA, :target => :XLS}], chain.to_array)
-    chain = TestConverterRepository.get_converter_chain :XLS, :PDF
+    chain = DummyConverterRepository.get_converter_chain :XLS, :PDF
     assert_equal([{:converter => ConverterA, :target => :PDFA}, {:converter => ConverterB, :target => :PDF}], chain.to_array)
-    chain = TestConverterRepository.get_converter_chain :DOC, :GIF
+    chain = DummyConverterRepository.get_converter_chain :DOC, :GIF
     assert_equal([{:converter  => ConverterA, :target  => :PDFA}, {:converter => ConverterD, :target => :JPEG}, {:converter => ConverterE, :target => :GIF}], chain.to_array)
   end
 
   def test_chain_operations
-    chain = TestConverterRepository.get_converter_chain :DOC, :JPEG
+    chain = DummyConverterRepository.get_converter_chain :DOC, :JPEG
     assert_equal([{:converter => ConverterA, :target => :PDFA}, {:converter => ConverterD, :target => :JPEG}], chain.to_array)
-    chain = TestConverterRepository.get_converter_chain :DOC, :JPEG, { :DUMMY => nil }
+    chain = DummyConverterRepository.get_converter_chain :DOC, :JPEG, { :DUMMY => nil }
     assert_nil(chain)
-    chain = TestConverterRepository.get_converter_chain :DOC, :JPEG, { :DO_SOMETHING => nil }
+    chain = DummyConverterRepository.get_converter_chain :DOC, :JPEG, { :DO_SOMETHING => nil }
     assert_equal([{:converter => ConverterA, :target => :PDFA}, {:converter => ConverterB, :target => :PDFA}, {:converter => ConverterD, :target => :JPEG}], chain.to_array)
   end
 end

@@ -19,4 +19,9 @@ class GenericSearch
   def each
     puts "to be implemented"    
   end
+
+  def next_record
+    puts "to be implemented"
+  end
+
 end

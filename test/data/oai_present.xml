@@ -1,0 +1,42 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008248986</doc_number>
+<metadata>
+<oai_marc>
+<fixfield id="FMT">VM</fixfield>
+<fixfield id="LDR">00000ngm^a22^^^^^^a^4500</fixfield>
+<fixfield id="005">20110726121346.0</fixfield>
+<fixfield id="008">110726u^^^^^^^^be^nnn^^^^^^^^^^^^m|dut^d</fixfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Zusters van de Jacht, missiewerking op de Filippijnen</subfield>
+<subfield label="h">Static image</subfield>
+</varfield>
+<varfield id="598" i1=" " i2=" ">
+<subfield label="a">Met knipsels uit de eigen tijdschriften</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="2">
+<subfield label="a">Congregatie van de Zusters Missionarissen van het Onbevlekt Hart van Maria, Heverlee (1897-heden)</subfield>
+<subfield label="0">(ODIS-ORG)1005</subfield>
+</varfield>
+<varfield id="088" i1=" " i2=" ">
+<subfield label="9">1</subfield>
+<subfield label="a">Photograph album</subfield>
+<subfield label="x">Fotoalbum</subfield>
+<subfield label="y">Album de photos</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">GDN01</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20110726</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1213</subfield>
+</varfield>
+</oai_marc>
+</metadata>
+</record>
+<session-id>IQXXD14JM7HEGIP1HE1QPC13XKR72GQ9TSANCTJX1SS8NFFSYC</session-id>
+</present>

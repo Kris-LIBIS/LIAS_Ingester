@@ -2,6 +2,7 @@
 
 require 'nokogiri'
 
+#noinspection RubyResolve
 class XmlDocument
 
   attr_accessor :document
@@ -37,14 +38,30 @@ class XmlDocument
     fd.close
   end
 
+  def to_xml( options = {} )
+    options = { indent: 2, encoding: 'utf-8' }.merge(options)
+    @document.to_xml(options)
+  end
+
+  def validates_against?(schema)
+    schema_doc = Nokogiri::XML::Schema.new(File.open(schema))
+    schema_doc.valid?(@document)
+  end
+
   def add_processing_instruction( name, content )
     processing_instruction = Nokogiri::XML::ProcessingInstruction.new( @document, name, content )
     @document.root.add_previous_sibling processing_instruction
     processing_instruction
   end
 
-  def build( at_node = @document.root, &block )
-    Nokogiri::XML::Builder.with(at_node, &block)
+  def build( at_node = nil, &block )
+    if at_node
+      Nokogiri::XML::Builder.with(at_node, &block)
+    else
+      xml = Nokogiri::XML::Builder.new(&block)
+      @document = xml.doc
+    end
+    self
   end
 
   def create_text_node( name, text, options = {} )
@@ -122,14 +139,8 @@ class XmlDocument
     list.nil? ? 0 : list.size()
   end
 
-=begin
-  def method_missing(m, *args, &block)
-    raise ArgumentError, "XML document not valid." if self.invalid?
-    @document.send(m, args, block) if !args.empty? && !block.nil?
-    @document.send(m, args       ) if !args.empty? &&  block.nil?
-    @document.send(m,       block) if  args.empty? && !block.nil?
-    @document.send(m             ) if  args.empty? &&  block.nil?
+  def self.get_content(nodelist)
+    (nodelist.first && nodelist.first.content) || ''
   end
-=end
 
 end

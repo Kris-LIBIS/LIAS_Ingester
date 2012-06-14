@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008389207</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">BK</fixfield>
+<fixfield id="LDR">00000ntm^a22^^^^^^u^4500</fixfield>
+<fixfield id="001">008389207</fixfield>
+<fixfield id="005">20120116150948.0</fixfield>
+<fixfield id="008">080926q14001699ne^^^^^^|^^^^^000^0^dum^c</fixfield>
+<varfield id="752" i1=" " i2=" ">
+<subfield label="a">Nederland (the Netherlands)</subfield>
+<subfield label="d">'s Hertogenbosch</subfield>
+</varfield>
+<varfield id="752" i1=" " i2="9">
+<subfield label="a">1301-1400</subfield>
+</varfield>
+<varfield id="752" i1=" " i2="9">
+<subfield label="a">1401-1500</subfield>
+</varfield>
+<varfield id="752" i1=" " i2="9">
+<subfield label="a">1501-1600</subfield>
+</varfield>
+<varfield id="752" i1=" " i2="9">
+<subfield label="a">1601-1700</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Cartularium van ’s Hertogenbosch.</subfield>
+</varfield>
+<varfield id="300" i1=" " i2=" ">
+<subfield label="a">I + 599 numbered p. (b); 164 p. (c), 31 irregular quires: (1 VII + 2 VI + 1 V + 1 II + 1 V + 6 VI + 1 IV + 1 XXIII + 1 VI-5 + 1 VI + 2 X + 1 VI+2 + 1 XII+2 + 1 XVI + 1 XII-1 + 1 III + 1 I + 1 II + 1 XII + 1 X + 1 XII + 1 VI-1 + 1 VI+1 + 1 VIII-3) :</subfield>
+<subfield label="b">ill. ;</subfield>
+<subfield label="c">293 x 220 mm (varying lay-out).</subfield>
+</varfield>
+<varfield id="300" i1=" " i2=" ">
+<subfield label="a">p. 1-102 2 columns, from p. 103 1 column/page.</subfield>
+</varfield>
+<varfield id="300" i1=" " i2=" ">
+<subfield label="a">some horizontal catchwords, quire-signatures, foliation in ink (a), pagination (b and c).</subfield>
+</varfield>
+<varfield id="300" i1=" " i2=" ">
+<subfield label="a">script: gothic bastarde and italic, more than twenty different hands, marginal remarks.</subfield>
+</varfield>
+<varfield id="300" i1=" " i2=" ">
+<subfield label="a">cover: non-contemporary cardboard, completely detached.</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="b">initials</subfield>
+<subfield label="9">red</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="9">red underlining and red pieds-de-mouche</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="9">display script red highlighted</subfield>
+</varfield>
+<varfield id="319" i1="9" i2=" ">
+<subfield label="a">Paper</subfield>
+<subfield label="9">(watermarks)</subfield>
+</varfield>
+<varfield id="319" i1="9" i2=" ">
+<subfield label="a">Parchment</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">1. Table of contents</subfield>
+<subfield label="9">p. 1-4</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Remark left upper corner: Dit taeffele salmen ver[…] vynden […]an[…] lxxxv.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Title: Hier beghinne die tafele vanden copie vanden carthen hier na bescreven.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">2. Official documents regarding the city of Den Bosch for the period 1305-1430, issued by the Dukes John III, Wenceslas, Anton, John V and Philip the Good and Duchess Johanna</subfield>
+<subfield label="9">p. 5-98</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Privilegium civitatis [3 words] der stadt rechten</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Inden name der heilicher ende den onghesceydenre drievoldicheit, wy Jan bider gracien gods hertoghe van Lothar, van brabant ende van lymborch […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: Ghegeven in onser stat bay louc (?) vijf dage iij october int jair ons heren dusent vierhondert ende dertich.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">3.</subfield>
+<subfield label="9">p. 99-101</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Nu toent die ghene die dien anderen verstaen wil ende bidt den scht (abbreviation) of hy spreken moet met orlof ende bidt eens voersprekers ende als die voerspreker in syn woert comen is, dan seghet hy aldus.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Her scht (abbreviation) wildi horen.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] Dats voert met recht sal sijn etc.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">4. Hoemen ene stat regeren sal</subfield>
+<subfield label="9">p. 102</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Die een stat wael wil regeren</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: Die gode in sinen raet ontsiet. Amen.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">5. Official documents regarding the city of Den Bosch for the period 1321-1499 regarding or issued by John III, Mary of Burgundy, Maximilian of Austria and Charles the Bold</subfield>
+<subfield label="9">p. 103-279</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Marie bider gracien Gods hertoginne van bourgoingnen</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] int jair ons heren alsmen scrieff duysent driehondert tsestich ende huit des womsdagches naden zuust (?) Margritten dach.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">6. Official documents regarding the city of Den Bosch drawn up by Philip the Good, Charles V and the aldermen for the period 1458-1515</subfield>
+<subfield label="9">p. 279-318</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Vander disposicie des stadt ende […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Philips bijden gracien gods hertoge van bourgondy […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: [...] ende getekent haneton</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">7. Feudal law and other official documents regarding the city of Den Bosch drawn up by Philip the Good, Charles the Bold, Maximilian of Austria and Duchess Johanna for the period 1403-1555</subfield>
+<subfield label="9">p. 319-342</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Dit zijn die leenrechten van ons genadlichen heren […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Boe (?) wijs [2 words] spreken wilt [...]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: [...] ende is bevonden accorderen bij mij ondertekent Bechy (?)</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">8. Pseudo-Aristotelian maxims</subfield>
+<subfield label="9">p. 343</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Hec sunt documenta que misis Aristoteles ad (?) Alexandro</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Cela secreta</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: [...] in honestate conservare.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">9. Privileges under Philip the Good</subfield>
+<subfield label="9">p. 344-352</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Copia [1 word] libertatis [2 words] per philippum archiducem austrie concessum.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Philippus die gracia archidux austrie […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] verworven zijn […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">10. Official documents 1497-1514</subfield>
+<subfield label="9">p. 353-372</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Instructis vander boden anno xiiijC xcvij.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Philips etc allen den ghenen die desen onsen brieff sullen zien […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] rappoort zollen doen</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">11. Official document issued by the emperor Charles</subfield>
+<subfield label="9">p. 373-392</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Auctentica copia copie auctentice confirmationis bulle a… Caroli quinti Romanorum Imperatoris [1 word] et contesse in civitate imperiali Angusta die primo mensis julii anno MCCCCCXXX.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Carolus quintus divina sanctitate clementia Romanorum imperator semper augustus […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] admissum in opido busciducense residens.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">12. Family history of Godefridus Grootaert van Os</subfield>
+<subfield label="9">p. 393-398</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Ego Godefridus grootaert de os, filius naturalis quidam godefridi grooterts de os, filii quidam arnodli grootaert de os, notarius ac clericus [1 word] opidi busciducense leodiense diocese [...]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] corporis [2 words]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">13. Miscellaneous documents on Philip the Bold, including inventory / estimates of gold and silver and financial notes</subfield>
+<subfield label="9">p. 399-449</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Inden jaer ons heeren CCC XII waert ontfangen […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] per mede te vroeg was</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">14. Financial notes (exchange rates, tolls, ...), 13th-16th century, with emphasis on the period 1419-1522</subfield>
+<subfield label="9">numbering c</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Evalution vander munten vanden jare xiiijC xix novembris vjta.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">15. Commission rights (?) under Margaret of Austria</subfield>
+<subfield label="9">p. 450-457</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Copie van eenre copien vanden commissien onser gender vrouwen vrouwe (sic) margrieten […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Kaerle byder gracein goidsconinc van Castillien […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] ende accordeert mitter zelve bij mij M. de greve</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">16. Official document under emperor Charles (1531)</subfield>
+<subfield label="9">p. 458-463</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Kaerle byder gracien goids Roomsch keysere […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: [...] in brabant by usancen (?) ende onderteekent Crobaert</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">17. Appeal of the citizens of Den Bosch</subfield>
+<subfield label="9">p. 464-471</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Copie vanden supplicatien bij gedeputeerden vanden bossche […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Ic en mijn geere […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: [...] der scepenen ende raidt onser stadt van shertogenbossche</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">18. Official and legal documents regarding Den Bosch</subfield>
+<subfield label="9">p. 472-502, 503</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Dese naktscreven (?) heren zijn die ghene geweest die welcke inden jaer onser heren duysent vierhondert ende vierendenegentich den zestiensten den maent decembre bynnen den stadt vanden bossche gecomen sijn […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] illius exaudiet autem cum qui fecit illum.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">19. Copy of the income of Leuven (Emperor Charles V and Philip of Spain, 1549)</subfield>
+<subfield label="9">p. 506-537</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Copie vanden incompste […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Kaerle byder gracien goids Roomsch keyser altijt vermeerder […]</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] bij mij ondergeteekent Verreyken</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">20. Document drawn up between the city of Den Bosch and the Prince of Spain</subfield>
+<subfield label="9">p. 538-542</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">(Incipit: hard to read)</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: [...] ende excellentien.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">21. Oaths taken in Leuven by Prince Philip and the members of the council of Brabant and the city of Leuven</subfield>
+<subfield label="9">p. 543-556</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Heading: Iuxamentum principis prestandum in ecclesia sancti petri lovanii</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Incipit: Ego Philippus deo gratia princeps hispaniarum utriusque Sicilie, hierusalem etc.</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">Explicit: […] ducatus brabantie et (?) bonus administrator</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">22. List of prelates and nobles</subfield>
+<subfield label="9">p. 557-559</subfield>
+</varfield>
+<varfield id="546" i1="9" i2=" ">
+<subfield label="a">Middle Dutch</subfield>
+</varfield>
+<varfield id="546" i1="9" i2=" ">
+<subfield label="a">Latin</subfield>
+</varfield>
+<varfield id="546" i1="9" i2=" ">
+<subfield label="a">Middle French</subfield>
+</varfield>
+<varfield id="500" i1=" " i2=" ">
+<subfield label="a">The pagination follows pagination b, unless otherwise stated.</subfield>
+</varfield>
+<varfield id="581" i1=" " i2=" ">
+<subfield label="a">SELMER, Carl. “An Unpublished Latin Collection of Pseudo-Aristotelian Paroimiai”. Speculum 15/1 (1940). p. 92-94. (partial edition of text 8)</subfield>
+</varfield>
+<varfield id="581" i1=" " i2=" ">
+<subfield label="a">CLAASSENS, Geert H.M. “17. Hoemen ene stat regeren sal […]”. Chris Coppens (red.), Van Croesus tot Keizer Karel: preciosa tot circa. 1550: een selectie uit de aanwinsten 1971-1996. Catalogus bij de gelijknamige tentoonstelling in de Universiteitsbibliotheek van 27 juni tot 23 augustus 1996. Leuven: Centrale Bibliotheek, 1996. p. 35-36. (edition of text 19)</subfield>
+</varfield>
+<varfield id="655" i1=" " i2="4">
+<subfield label="a">Manuscripts</subfield>
+<subfield label="x">Handschriften</subfield>
+<subfield label="y">Manuscrits</subfield>
+</varfield>
+<varfield id="LKR" i1=" " i2=" ">
+<subfield label="a">UP</subfield>
+<subfield label="b">8095261</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="m">Cartularium van ’s Hertogenbosch</subfield>
+<subfield label="n">Die Blyde Incomste den Hertochdomme van Brabant [...]</subfield>
+<subfield label="r">776</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL01</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1458</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL01</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1459</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1503</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1509</subfield>
+</varfield>
+</oai_marc>
+</metadata>
+</record>
+<session-id>B4M22IBMGTB4H4F5YCQQ5NDXL5HTEUGC7R5K69S6GQ1D2IVC4Q</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>

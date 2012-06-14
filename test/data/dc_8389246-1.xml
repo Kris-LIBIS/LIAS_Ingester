@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008389246</dc:identifier>
+  <dc:title>Eloges historiques des cardinaux illustres françois et estrangers mis en parallele avec leurs pourtraits : recueil de portraits des cardinaux illustres.</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dc:creator>Albi, Henri, S.J., +1658, (author)</dc:creator>
+  <dc:temporal>1601-1650</dc:temporal>
+  <dc:description>portrettenalbum samengesteld uit: Eloges Historiques des cardinaux illustres...</dc:description>
+  <dc:publisher>(druk: ) 1644</dc:publisher>
+  <dc:publisher>de Cay, Antoine(drukker)</dc:publisher>
+  <dc:date>1644 -     </dc:date>
+  <dc:type>Books before 1840</dc:type>
+  <dc:type>Books</dc:type>
+  <dc:type xml:lang="en" class="text">Books before 1840</dc:type>
+  <dc:type xml:lang="nl" class="text">Boeken vóór 1840</dc:type>
+  <dc:type xml:lang="fr" class="text">Livres avant 1840</dc:type>
+  <dcterms:extent>40 f. (4°)</dcterms:extent>
+  <dcterms:medium>40 engraving(s) (portraits)</dcterms:medium>
+  <dc:language>fr</dc:language>
+</record>
