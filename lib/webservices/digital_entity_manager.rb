@@ -4,6 +4,7 @@ require 'singleton'
 
 require 'webservices/soap_client'
 
+#noinspection RubyStringKeysInHashInspection
 class DigitalEntityManager
   include Singleton
   include SoapClient
@@ -201,7 +202,7 @@ class DigitalEntityManager
         end
       end
     end
-    if f = de_info['stream_ref']
+    if (f = de_info['stream_ref'])
       attributes = {}
       if (cmd = f.delete 'cmd')
         attributes['cmd'] = cmd

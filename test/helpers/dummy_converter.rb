@@ -2,12 +2,12 @@
 
 require 'converters/converter'
 
-module TestConverter
+module DummyConverter
 
-  def TestConverter.included(klass)
+  def DummyConverter.included(klass)
     klass.class_eval {
       def self.config_file
-        File.dirname(__FILE__) + '/' + self.name.underscore + '.yaml'
+        'test/data/' + self.name.underscore + '.yaml'
       end
     }
   end

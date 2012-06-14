@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008389280</dc:identifier>
+  <dc:identifier xsi:type="dcterms:URI" class="text">http://www.odis.be/lnk/ps_13723#Dehaene%2C+Jean-Luc+%281940-%29</dc:identifier>
+  <dc:title>Onderwerpen KULeuven, Kadoc, UDC, LCSH, MESH en twee andere LBS-partners.</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dc:subject xsi:type="http://purl.org/dc/terms/LCSH" class="text">Lancashire (England) History 17th century</dc:subject>
+  <dc:subject xsi:type="http://purl.org/dc/terms/LCSH" class="text">Mogul Empire History</dc:subject>
+  <dc:subject xsi:type="http://purl.org/dc/terms/MESH" class="text">Blindness rehabilitation.</dc:subject>
+  <dc:subject xsi:type="http://purl.org/dc/terms/UDC" xml:lang="nl" class="text">Homiletiek. Verkondiging. Prediking</dc:subject>
+  <dc:subject xsi:type="http://purl.org/dc/terms/UDC" xml:lang="nl" class="text">Oude en merkwaardige drukken. Kostbare en zeldzame boeken. Preciosa en rariora</dc:subject>
+  <dc:subject>#SBIB:1H6</dc:subject>
+  <dc:subject>GOSAA.01.03.19</dc:subject>
+  <dc:subject>VoL Gebouw</dc:subject>
+  <dc:subject>Dehaene, Jean-Luc (1940-)</dc:subject>
+  <dc:subject>catechumenaat (x)</dc:subject>
+  <dc:subject>genetische test</dc:subject>
+  <dc:subject>Beckman, Thea ; Vrijgevochten</dc:subject>
+  <dc:date>2011 -     </dc:date>
+  <dc:type>Books</dc:type>
+  <dc:language>nl</dc:language>
+</record>

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008389246</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">BK</fixfield>
+<fixfield id="LDR">00000nam^a22^^^^^^u^4500</fixfield>
+<fixfield id="001">008389246</fixfield>
+<fixfield id="005">20120116152136.0</fixfield>
+<fixfield id="008">110822s1644^^^^fr^^^^^^|^^^^^000^0^fre^c</fixfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Albi, Henri</subfield>
+<subfield label="c">S.J.</subfield>
+<subfield label="d">+1658</subfield>
+<subfield label="4">aut</subfield>
+</varfield>
+<varfield id="710" i1="2" i2="9">
+<subfield label="a">de Cay, Antoine</subfield>
+<subfield label="4">prt</subfield>
+</varfield>
+<varfield id="752" i1="9" i2=" ">
+<subfield label="9">1601-1650</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Eloges historiques des cardinaux illustres françois et estrangers mis en parallele avec leurs pourtraits :</subfield>
+<subfield label="b">recueil de portraits des cardinaux illustres.</subfield>
+</varfield>
+<varfield id="260" i1=" " i2="9">
+<subfield label="e">Paris</subfield>
+<subfield label="f">Antoine de Cay</subfield>
+<subfield label="g">1644</subfield>
+</varfield>
+<varfield id="300" i1=" " i2=" ">
+<subfield label="a">40 f.</subfield>
+<subfield label="9">4°</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="a">40</subfield>
+<subfield label="b">engraving(s)</subfield>
+<subfield label="9">portraits</subfield>
+</varfield>
+<varfield id="500" i1=" " i2=" ">
+<subfield label="a">portrettenalbum samengesteld uit: Eloges Historiques des cardinaux illustres...</subfield>
+</varfield>
+<varfield id="655" i1="9" i2="4">
+<subfield label="a">Books before 1840</subfield>
+<subfield label="x">Boeken vóór 1840</subfield>
+<subfield label="y">Livres avant 1840</subfield>
+</varfield>
+<varfield id="041" i1="9" i2=" ">
+<subfield label="a">fre</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1521</subfield>
+</varfield>
+</oai_marc>
+</metadata>
+</record>
+<session-id>2F5XBJQB2YPDBPFR7CI8ER5RPBYU3PUHC754SBQTRA25RR6887</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>

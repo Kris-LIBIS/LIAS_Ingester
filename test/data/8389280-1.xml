@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008389280</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">BK</fixfield>
+<fixfield id="LDR">00000nam^a22^^^^^^u^4500</fixfield>
+<fixfield id="001">008389280</fixfield>
+<fixfield id="005">20120116153631.0</fixfield>
+<fixfield id="008">120116s2011^^^^xxx^^^^^|^^^^^000^0^dut^c</fixfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Onderwerpen KULeuven, Kadoc, UDC, LCSH, MESH en twee andere LBS-partners.</subfield>
+</varfield>
+<varfield id="650" i1="1" i2="0">
+<subfield label="a">Lancashire (England)</subfield>
+<subfield label="x">History</subfield>
+<subfield label="y">17th century</subfield>
+<subfield label="v">Sermons</subfield>
+<subfield label="v">Early works to 1800.</subfield>
+</varfield>
+<varfield id="650" i1="1" i2="0">
+<subfield label="a">Mogul Empire</subfield>
+<subfield label="x">History</subfield>
+<subfield label="v">Early works to 1800.</subfield>
+</varfield>
+<varfield id="650" i1=" " i2="2">
+<subfield label="a">Blindness</subfield>
+<subfield label="x">rehabilitation.</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="1">
+<subfield label="a">#SBIB:1H6</subfield>
+<subfield label="x">Taalfilosofie</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="1">
+<subfield label="a">GOSAA.01.03.19</subfield>
+<subfield label="x">AUGUSTINUS. Biografie. Relaties en bronnen. Christelijke latijnse schrijvers</subfield>
+<subfield label="y">AUGUSTINE. Biography. Relationships and sources. Christian Latin writers</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="1">
+<subfield label="a">VoL Gebouw</subfield>
+<subfield label="x">Leuven, Anatomisch Theater (Amphiteatrum anatomicum)</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="2">
+<subfield label="a">Dehaene, Jean-Luc (1940-)</subfield>
+<subfield label="0">(ODIS-PS)13723</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="2">
+<subfield label="a">catechumenaat (x)</subfield>
+</varfield>
+<varfield id="690" i1="2" i2="1">
+<subfield label="a">genetische test</subfield>
+<subfield label="x">test génétique</subfield>
+<subfield label="y">genetic testing</subfield>
+</varfield>
+<varfield id="690" i1="3" i2="4">
+<subfield label="a">Beckman, Thea ; Vrijgevochten</subfield>
+<subfield label="9">trefwoord</subfield>
+<subfield label="5">HUBNL</subfield>
+</varfield>
+<varfield id="691" i1="E" i2="1">
+<subfield label="8">251</subfield>
+<subfield label="a">Homiletiek. Verkondiging. Prediking</subfield>
+<subfield label="9">dut</subfield>
+</varfield>
+<varfield id="691" i1="E" i2="1">
+<subfield label="8">094</subfield>
+<subfield label="a">Oude en merkwaardige drukken. Kostbare en zeldzame boeken. Preciosa en rariora</subfield>
+<subfield label="9">dut</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1536</subfield>
+</varfield>
+</oai_marc>
+</metadata>
+</record>
+<session-id>9FQ2A2Q8R8TKEI7HKXKULTB9G2LE4GBQ9Q54DEN6XXR7JGRUVQ</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>
