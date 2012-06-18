@@ -85,11 +85,11 @@ class FileChecker
 
     if (mimetype = obj.mime_type)
       unless TypeDatabase.instance.known_mime? mimetype
-        obj.message("File's MIME-Type '#{mimetype}' is not supported.")
+        obj.message = "File's MIME-Type '#{mimetype}' is not supported."
         return false
       end
     else
-      obj.message("File's MIME-Type was not detected.")
+      obj.message = "File's MIME-Type was not detected."
       return false
     end
 

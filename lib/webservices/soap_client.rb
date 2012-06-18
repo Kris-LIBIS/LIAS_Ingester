@@ -137,7 +137,7 @@ module SoapClient
   end
 
   def get_xml_response( response )
-    response.first[1][response.first[1][:result].to_sym]
+    response.first[1][response.first[1][:result].snakecase.to_sym]
   end
 
 end
