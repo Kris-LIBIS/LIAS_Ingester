@@ -5,7 +5,7 @@ require 'tools/xml_document'
 require 'pp'
 
 require 'tools/hash'
-require 'libis/record/marc_record_factory'
+require 'libis/record_factory'
 require_relative 'generic_search'
 
 class OpacSearch < GenericSearch
