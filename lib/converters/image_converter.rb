@@ -28,6 +28,10 @@ class ImageConverter < Converter
     @options[:resample] = value
   end
 
+  def colorspace(value)
+    @options[:colorspace] = value
+  end
+
   def watermark(options = {})
     watermark_info = options[:watermark_info]
     watermark_file = options[:watermark_file]
