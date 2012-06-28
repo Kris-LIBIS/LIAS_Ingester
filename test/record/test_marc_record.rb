@@ -1,5 +1,6 @@
 # coding: utf-8
 
+#noinspection RubyResolve
 require 'test_helper'
 
 require 'test/helpers/unixdiff'
@@ -173,6 +174,7 @@ REC2_DUMP
 
   end
 
+  #noinspection RubyResolve
   def test_04_to_dc_sample_records
 
 

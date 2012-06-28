@@ -1,4 +1,5 @@
 # coding: utf-8
+#noinspection RubyResolve
 require 'test_helper'
 
 class TestMarc21Record < Test::Unit::TestCase

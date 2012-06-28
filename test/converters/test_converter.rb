@@ -1,7 +1,9 @@
 # coding: utf-8
 
+#noinspection RubyResolve
 require "test_helper"
 
+#noinspection RubyResolve
 require 'helpers/dummy_converter_repository'
 
 class TestConverter < MiniTest::Unit::TestCase

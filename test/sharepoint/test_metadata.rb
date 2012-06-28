@@ -1,10 +1,9 @@
 # coding: utf-8
 
-require 'test/unit'
+#noinspection RubyResolve
+require  'test_helper'
 require 'tmpdir'
 require 'fileutils'
-
-$: << File.expand_path(File.dirname(__FILE__) + '/..')
 
 require 'libis/record/sharepoint_record'
 
@@ -165,7 +164,7 @@ class TestMetadata < MiniTest::Unit::TestCase
     a[:bothfixed] = 'bothfixed text'
     a[:namespace] = 'namespace text'
     
-    dir = Dir.mktmpdir(['ruby-unit-test-', '.tmp'])
+    dir = Dir.mktmpdir(%w(ruby-unit-test- .tmp))
     a.create_dc(dir, mapping)
     
     dc_record = File.open(dir + '/dc_1.xml', 'r:utf-8').readlines.join

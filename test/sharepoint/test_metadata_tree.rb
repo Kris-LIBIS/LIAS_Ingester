@@ -1,8 +1,7 @@
 # coding: utf-8
 
-require 'test/unit'
-
-$: << File.expand_path(File.dirname(__FILE__) + '/..')
+#noinspection RubyResolve
+require 'test_helper'
 
 require 'tools/sharepoint_metadata_tree'
 

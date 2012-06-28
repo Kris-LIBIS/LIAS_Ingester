@@ -1,5 +1,6 @@
 # coding: utf-8
 
+#noinspection RubyResolve
 require "test_helper"
 
 class TestVarField < Test::Unit::TestCase
@@ -134,6 +135,7 @@ class TestVarField < Test::Unit::TestCase
 
   end
 
+  #noinspection RubyResolve
   def test_07_method_unknown
 
     ####### we redo the tests with shorthand notation
