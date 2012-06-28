@@ -2,6 +2,7 @@
 
 require 'savon'
 require 'nori'
+require 'gyoku'
 require 'net/https'
 
 require 'tools/xml_document'
@@ -31,17 +32,19 @@ module SoapClient
   def setup( service, options = {} )
     init unless @base_url
     Savon.configure do |cfg|
-      cfg.logger = Application.instance.logger
-      cfg.log_level = ConfigFile['SOAP_logging_level'] || :info
-      cfg.log = ConfigFile['SOAP_logging']
+      cfg.logger = ::Application.instance.logger
+      cfg.log_level = ::ConfigFile['SOAP_logging_level'] || :info
+      cfg.log = ::ConfigFile['SOAP_logging']
+      #noinspection RubyResolve
       cfg.soap_version = 2
+      #noinspection RubyResolve
       cfg.raise_errors = false
-      HTTPI.logger = Application.instance.logger
-      HTTPI.log_level = ConfigFile['SOAP_logging_level'] || :info
-      HTTPI.log = ConfigFile['SOAP_logging']
+      HTTPI.logger = ::Application.instance.logger
+      HTTPI.log_level = ::ConfigFile['SOAP_logging_level'] || :info
+      HTTPI.log = ::ConfigFile['SOAP_logging']
     end
 
-    url = options[:wsdl_url] || @base_url + service + @wsdl_extension
+    url = options[:wsdl_url] || @wsdl_url || (@base_url + service + @wsdl_extension)
     proxy = options[:proxy]
 
     @client = Savon::Client.new do |wsdl, http|
@@ -59,11 +62,9 @@ module SoapClient
         http.auth.basic options[:username], options[:password]
       end
     end
-
-    @client
   end
   
-  def request( method, body)
+  def request( method, body = {})
     b = body.clone; b.delete(:general)
     soap_options = body.delete(:soap_options) || {}
     wsdl_options = body.delete(:wsdl_options) || {}
@@ -87,8 +88,7 @@ module SoapClient
         http.auth.basic wsse_options[:username], wsse_options[:password]
       end
     end
-    result = parse_result response
-    result
+    parse_result response
   end
 
   def parse_result( response )
@@ -100,13 +100,13 @@ module SoapClient
       return { error: error }
     end
 
-    result = result_parser(response.to_hash)
-    result
+    result_parser(response.to_hash)
   end
 
   def general( owner = 'LIA01', user = 'super:lia01', password = 'super' )
     doc = XmlDocument.new
     root = doc.create_node('general')
+    #noinspection RubyStringKeysInHashInspection
     doc.add_namespaces(root, {
       :node_ns   => 'xb',
       'xb'       => 'http://com/exlibris/digitool/repository/api/xmlbeans'})
