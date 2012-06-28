@@ -5,19 +5,30 @@ require 'tools/xml_document'
 
 class ScopeSearch < GenericSearch
   def initialize
+    @doc = nil
   end
 
-  def query(term, index = nil, base = nil, options = {})
+  def query(term, _ = nil, _ = nil, _ = {})
     OracleClient.scope_client.call('kul_packages.scope_xml_meta_file_ed', [term.upcase])
-    err_file = "/nas/vol03/oracle/scope01/#{term}_err.xml"
+    err_file = "/nas/vol03/oracle/scope01/#{term}_err.XML"
     if File.exist? err_file
       doc = XmlDocument.open(err_file)
       msg = doc.xpath('/error/error_msg').first.content
       msg_detail = doc.xpath('/error/error_').first.content
-      File.delete(err_file);
-      return nil
+      File.delete(err_file)
+      Application.error('ScopeSearch') {"Scope search failed: '#{msg}'. Details: '#{msg_detail}'"}
+      @doc = nil
+    else
+      @doc = XmlDocument.open("/nas/vol03/oracle/scope01/#{term}_md.XML")
     end
-    doc = XmlDocument.open("/nas/vol03/oracle/scope01/#{term}_md.xml")
+  end
+
+  def each
+    yield @doc
+  end
+
+  def next_record
+    yield @doc
   end
 
 end
