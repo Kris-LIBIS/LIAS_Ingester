@@ -6,6 +6,7 @@ require 'ingester_module'
 require 'webservices/digital_entity_manager'
 require 'tools/xml_document'
 
+#noinspection RubyResolve
 class Ingester
   include IngesterModule
   
@@ -34,7 +35,7 @@ class Ingester
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
+    end unless (cfg = IngestConfig.first(:id => config_id))
     
     begin
 
@@ -53,6 +54,8 @@ class Ingester
         restart config_id
       when Status::Ingested .. Status::Finished
         warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        else
+          # type code here
       end
 
     ensure
@@ -88,7 +91,7 @@ class Ingester
 
   def restart( config_id )
 
-    if cfg = undo(config_id)
+    if (cfg = undo(config_id))
       info "Restarting config ##{config_id}"
       process_config cfg
       return config_id
@@ -102,7 +105,7 @@ class Ingester
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
+    end unless (cfg = IngestConfig.first(:id => config_id))
     
     begin
 
@@ -121,6 +124,8 @@ class Ingester
         process_config cfg, true
       when Status::PostIngesting .. Status::Finished
         warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        else
+          # type code here
       end
 
     ensure
@@ -175,7 +180,7 @@ class Ingester
 
     end # process_config
 
-  def run_ingest cfg
+  def run_ingest( cfg )
     # run ingest task
     Dir.chdir("#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}") do
       info "Running ./tasker_fg.sh #{ConfigFile['user']} staff creator:staff #{cfg.ingest_id}"
@@ -281,13 +286,13 @@ class Ingester
   def delete_object( obj )
     return unless obj.pid
     result = DigitalEntityManager.instance.delete_object obj.pid
-    unless result[:error].empty?
+    if result[:error].empty?
+      info "Deleted object #{obj.pid}"
+      obj.pid = nil
+    else
       result[:error].each { |e| error "Error calling web service: #{e}" }
       error "Failed to delete object #{obj.pid}"
-    obj.status = Status::IngestFailed
-    else
-      info "Deleted object #{obj.pid}"
-    obj.pid = nil
+      obj.status = Status::IngestFailed
     end
   end
 

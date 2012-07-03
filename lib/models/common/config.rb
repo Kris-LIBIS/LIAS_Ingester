@@ -21,11 +21,17 @@ module CommonConfig
       property :created_at, DataMapper::Property::DateTime
       property :updated_at, DataMapper::Property::DateTime
 
-      # flow info
+      # preprocess
       property :check_virus1, DataMapper::Property::Boolean
       property :check_checksum1, DataMapper::Property::Boolean
       property :check_ingested1, DataMapper::Property::Boolean
+
+      # preingest
       property :work_dir1, DataMapper::Property::String
+
+      # postprocess
+      property :link_type, DataMapper::Property::Enum[:CollectiveAccess]
+      property :link_options, DataMapper::Property::Yaml, :length => 2000
 
       # checksum info
       property :checksum_type1, DataMapper::Property::Enum[:MD5, :SHA1, :SHA256, :SHA384, :SHA512]
@@ -62,6 +68,8 @@ module CommonConfig
           self.search_base = 'KADOC'
           self.search_match = nil
           self.search_term = nil
+          self.link_type = nil
+          self.link_host = nil
         end
 
         self.metadata_fields = {}
@@ -111,6 +119,28 @@ module CommonConfig
               content.key_strings_to_symbols! :downcase => true
               content.each do |k, _|
                 Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
+              end
+
+            when :post_process
+              content.key_strings_to_symbols! :downcase => true
+              content.each do |k, v|
+                case k
+                  when :add_link
+                    v.key_strings_to_symbols! :downcase => true
+                    v.each do |k1, v1|
+                      case k1
+                        when :type
+                          self.link_type = v1.to_sym
+                        when :options
+                          self.link_options = v1
+                        else
+                          Application.warn('Configuration') { "Ongekende optie '#{k1.to_s}' opgegeven in sectie '#{k.to_s}'" }
+                      end # case k1
+                    end # v.each
+
+                  else
+                    Application.warn('Configuration') { "Ongekende optie '#{k.to_s}' opgegeven in sectie '#{label.to_s}'" }
+                end
               end
 
             when :checksum
@@ -272,6 +302,18 @@ module CommonConfig
 
       def get_objects
         self.ingest_objects.all(:parent => nil)
+      end
+
+      def get_link_type
+        return self.link_type unless self.link_type.nil?
+        return self.ingest_run.link_type if self.respond_to? :ingest_run and self.ingest_run
+        nil
+      end
+
+      def get_link_options
+        return self.link_options unless self.link_options.nil?
+        return self.ingest_run.link_options if self.respond_to? :ingest_run and self.ingest_run
+        nil
       end
 
     end
