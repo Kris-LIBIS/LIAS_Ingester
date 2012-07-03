@@ -10,30 +10,27 @@ class TestCaSearch < Test::Unit::TestCase
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
-    @client ||= CaSearch.new()
+    @ca = CollectiveAccess.new
+    @ca.authenticate
+    @object_label = 'TEST.0001.0001'
+    @object_id = @ca.add_object @object_label
+
   end
 
   # Called after every test method runs. Can be used to tear
   # down fixture information.
-
   def teardown
+    @ca.delete_object @object_id
   end
 
-  def test_01_authorize
-    assert_equal false, @client.authenticate('dummy', 'dummy')
-    assert_equal true, @client.authenticate
-  end
-
-  def test_02_search
-    term = 'CRKC.0003.0011'
-    @client.authenticate
-    result = @client.query(term)
+  def test_01_search
+    result = @ca.search.query(@object_label)
     #noinspection RubyStringKeysInHashInspection
     expected = {
-        '9031' => {
-            'display_label' => 'H. Margaretha van Budapest',
-            'idno' => 'CRKC.0003.0011 - (KV_6631)',
-            'object_id' => '9031'
+        @object_id => {
+            'display_label' => nil,
+            'idno' => @object_label,
+            'object_id' => @object_id
         }
     }
     assert_equal expected, result

@@ -4,8 +4,8 @@ require_relative 'ca_connector'
 
 class CaSearch < CaConnector
 
-  def initialize
-    super 'Search'
+  def initialize(host = nil)
+    super 'Search', host
   end
 
   def query(query, type = nil)

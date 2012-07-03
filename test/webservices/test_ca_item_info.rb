@@ -9,47 +9,54 @@ class TestCaItemInfo < Test::Unit::TestCase
   # Called before every test method runs. Can be used
   # to set up fixture information.
   def setup
+
+    @ca_client = CollectiveAccess.new
+    @ca_client.authenticate
+    @object_label = 'TEST.0001.0001'
+    @object = @ca_client.add_object @object_label
+    @attributes = {
+        digitoolUrl: %w(abcdefgh 172 DigitoolUrl),
+        objectHistoriek: %w(blablabla 84 Text),
+        objectBeschrijving: %w(zxcvbnm 91 Text)
+    }
+    @attributes.each { |k, v|
+      @ca_client.add_attribute @object, k, v[0]
+    }
+
     @client ||= CaItemInfo.new()
+    @client.authenticate
   end
 
   # Called after every test method runs. Can be used to tear
   # down fixture information.
 
   def teardown
+    @ca_client.delete_object @object
   end
 
   def test_01_attributes
-    @client.authenticate
-    result = @client.attributes(9031)
+    result = @client.get_attributes(@object)
 
-    assert 7 < result.size
-    check_attribute result, 0, '63416', 'herkomst: rozenkransbroederschapafkomstig van processievaandelrestauratie: RVW', '84', 'objectHistoriek', 'Text'
-    check_attribute result, 1, '63418', nil, '84', 'objectHistoriek', 'Text'
-    check_attribute result, 2, '63417', 'Portret van de H. Margaretha van Budapest uit reeks van 17 portretten van resp. 6 vrouwelijke en 11 mannelijke heiligen van de Dominicaanse orde.Afkomstig van processievaandels. kunstenaar: St . Lucasschool', '91', 'objectBeschrijving', 'Text'
-    check_attribute result, 3, '181535', '7081', '145', 'trefwoordList', 'List'
-    assert_equal 2, result[4].size
-    check_attribute result, [4, 0], '315652', '1071', '148', 'objectTechniekType', 'List'
-    check_attribute result, [4, 1], '315653', nil, '150', 'objectTechniekOpmerking', 'Text'
-    check_attribute result, 5, '364873', '55509_,_http://libis-t-rosetta-1.libis.kuleuven.be/lias/cgi/get_pid?redirect&usagetype=THUMBNAIL&pid=55509&custom_att_3=stream_,_http://libis-t-rosetta-1.libis.kuleuven.be/lias/cgi/get_pid?redirect&usagetype=VIEW_MAIN,VIEW&pid=55509', '172', 'digitoolUrl', 'DigitoolUrl'
+    assert_equal @attributes.size, result.size
+    @attributes.each_with_index { |(k, v), i|
+      check_attribute result, i, v[0], v[1], k.to_s, v[2]
+    }
   end
 
   def test_02_attribute
-    @client.authenticate
-    result = @client.attribute 9031, 'digitoolUrl'
-
-    assert 0 < result.size
-    check_attribute result, 0, '364873', '55509_,_http://libis-t-rosetta-1.libis.kuleuven.be/lias/cgi/get_pid?redirect&usagetype=THUMBNAIL&pid=55509&custom_att_3=stream_,_http://libis-t-rosetta-1.libis.kuleuven.be/lias/cgi/get_pid?redirect&usagetype=VIEW_MAIN,VIEW&pid=55509', '172'
-
+    @attributes.each { |k, v|
+      result = @client.get_attribute @object, k.to_s
+      check_attribute [result], 0, v[0], v[1]
+    }
   end
 
-  def check_attribute(result, nr, value_id, display_value, element_id, element_code = nil, datatype = nil)
+  def check_attribute(result, nr, display_value, element_id, element_code = nil, datatype = nil)
     r = result
     (nr.is_a?(Array) ? nr : [nr]).each { |i| r = r[i] }
-    assert_equal(value_id, r['value_id'])
-    assert_equal(display_value, r['display_value'])
-    assert_equal(element_code, r['element_code'])
-    assert_equal(element_id, r['element_id'])
-    assert_equal(datatype, r['datatype'])
+    assert_equal display_value, r['display_value']
+    assert_equal element_code, r['element_code']
+    assert_equal element_id, r['element_id']
+    assert_equal datatype, r['datatype']
   end
 
 end

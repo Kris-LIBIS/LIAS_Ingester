@@ -10,13 +10,13 @@ class CaConnector
 
   def initialize(service, host = nil)
     @type_cast = true
-    @host = host || 'crkc.be.halotest.cc.kuleuven.be/ca_crkc'
+    @host = host || 'http://crkc.be.halotest.cc.kuleuven.be/ca_crkc'
     @service = service
     setup @service
   end
 
   def init
-    @wsdl_url = "http://#@host/service.php/#{@service.downcase}/#@service/soapWSDL"
+    @wsdl_url = "#@host/service.php/#{@service.downcase}/#@service/soapWSDL"
 
     Nori.parser = :nokogiri
 
@@ -67,7 +67,7 @@ class CaConnector
         end
 
       when "ns2:Map"
-        r = Hash.new
+        r = {}
         elements = result[:item]
         unless elements.is_a? Array
           elements = Array.new
@@ -86,7 +86,8 @@ class CaConnector
     r
   end
 
-  NS_ATTR = {'xmlns:enc' => 'http://schemas.xmlsoap.org/soap/encoding/',  'xmlns:ns2' => 'http://xml.apache.org/xml-soap'}
+  NS_ATTR_ENC = {'xmlns:enc' => 'http://schemas.xmlsoap.org/soap/encoding/'}
+  NS_ATTR_NS2 = {'xmlns:ns2' => 'http://xml.apache.org/xml-soap'}
 
   def soap_encode(data)
     result = data
@@ -101,7 +102,10 @@ class CaConnector
         else
           attributes['enc:arraySize'] = i
         end
-        attributes.merge! NS_ATTR
+        attributes.merge! NS_ATTR_ENC
+        if t =~ /^ns2:/
+          attributes.merge! NS_ATTR_NS2
+        end
         result = Array.new
         data.each { |x|
           r, a = soap_encode x
@@ -110,7 +114,7 @@ class CaConnector
           result << i
         }
       when Hash
-        attributes = {'xsi:type' => 'ns2:Map'}.merge NS_ATTR
+        attributes = {'xsi:type' => 'ns2:Map'}.merge NS_ATTR_NS2
         result = {item: Array.new}
         data.each { |k, v|
           rk, ak = soap_encode k.to_s
@@ -123,7 +127,11 @@ class CaConnector
         }
       else
         t = type_string data
-        attributes = { 'xsi:type' => t } if t
+        if t
+          attributes = { 'xsi:type' => t }
+          attributes.merge! NS_ATTR_ENC if t =~ /^enc:/
+          attributes.merge! NS_ATTR_NS2 if t =~ /^ns2:/
+        end
     end
     return result, attributes
   end
