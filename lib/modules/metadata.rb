@@ -5,6 +5,7 @@ require 'json'
 require 'ingester_task'
 require 'libis/search_factory'
 require 'tools/xml_document'
+require 'libis/record_factory'
 
 #noinspection RubyResolve
 class Metadata
@@ -73,7 +74,12 @@ class Metadata
     search_term << obj.relative_path.to_s if obj.file_name
     search_term.reverse.each do |term|
       if (dc_file = @metadata_map[term])
-        doc = XmlDocument.open dc_file
+        if @cfg.manifestation_format == :MARC21
+          marc_record = RecordFactory.load dc_file
+          doc = marc_record.to_dc if marc_record
+        else
+          doc = XmlDocument.open dc_file
+        end
         break
       end
     end

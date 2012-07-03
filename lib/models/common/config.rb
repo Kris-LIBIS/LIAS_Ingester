@@ -39,6 +39,7 @@ module CommonConfig
 
       # metadata info
       property :metadata_file1, DataMapper::Property::String
+      property :metadata_format1, DataMapper::Property::Enum[:DC, :MARC21]
       property :search_target, DataMapper::Property::String
       property :search_host, DataMapper::Property::String
       property :search_index, DataMapper::Property::String
@@ -174,6 +175,8 @@ module CommonConfig
                     self.search_term = v
                   when :file
                     self.metadata_file1 = v
+                  when :format
+                    self.metadata_format1 = v.to_sym
                   when :fields
                     self.metadata_fields = v
                   else
@@ -271,6 +274,12 @@ module CommonConfig
       def metadata_file
         return self.metadata_file1 unless self.metadata_file1.nil?
         return self.ingest_run.metadata_file1 if self.respond_to? :ingest_run and self.ingest_run
+        nil
+      end
+
+      def metadata_format
+        return self.metadata_format1 unless self.metadata_format1.nil?
+        return self.ingest_run.metadata_format1 if self.respond_to? :ingest_run and self.ingest_run
         nil
       end
 
