@@ -286,7 +286,7 @@ class Ingester
   def delete_object( obj )
     return unless obj.pid
     result = DigitalEntityManager.instance.delete_object obj.pid
-    if result[:error].nil or result[:error].empty?
+    if result[:error].nil? or result[:error].empty?
       info "Deleted object #{obj.pid}"
       obj.pid = nil
     else
