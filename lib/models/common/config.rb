@@ -70,7 +70,7 @@ module CommonConfig
           self.search_match = nil
           self.search_term = nil
           self.link_type = nil
-          self.link_host = nil
+          self.link_options = nil
         end
 
         self.metadata_fields = {}
