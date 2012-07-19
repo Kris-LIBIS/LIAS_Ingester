@@ -288,11 +288,11 @@ class PostIngester
     obj.manifestations.each { |m| unlink_and_delete_dc m }
     mid = obj.metadata_mid
     result = DigitalEntityManager.instance.unlink_dc obj.pid, mid
-    result[:error].each { |error| error "Error calling web service: #{error}"}
-    if result[:error].empty?
+    result[:error].each { |error| error "Error calling web service: #{error}"} if result[:error]
+    if result[:error].nil? or result[:error].empty?
       info "Removed DC metadata #{mid} from object #{obj.pid}"
       result = MetaDataManager.instance.delete mid
-      if result[:error].empty?
+      if result[:error].nil? or result[:error].empty?
         info "Deleted DC record #{mid}."
         IngestObject.all(:metadata_mid => mid) do |o|
           debug "Clearing metadata_mid field for object ##{o.id}"
@@ -312,12 +312,12 @@ class PostIngester
     ar = obj.get_accessright
     return unless ar && ar.mid
     result = DigitalEntityManager.instance.unlink_acl obj.pid, ar.mid
-    if result[:error].empty?
+    if result[:error].nil? or result[:error].empty?
       info "Unlinked accessright #{ar.mid} from object #{obj.pid}"
       if ar.ptype == :CUSTOM
         # try to delete the ar object
         result = MetaDataManager.instance.delete ar.mid
-        if result[:error].empty?
+        if result[:error].nil? or result[:error].empty?
           info "Deleted accessright metadata record #{ar.mid}."
           ar.mid = nil
         end
