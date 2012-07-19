@@ -28,7 +28,7 @@ class DigitalEntityManager
     de_options = { 'metadata' => 'all', 'relation' => 'all' }
     de_call1 = create_digital_entity_call de_info, 'update', de_options
     result = request :digital_entity_call, :general => general.to_s, :digital_entity_call => de_call1.to_s
-    return result if result[:error].size > 0
+    return result if result[:error] and result[:error].size > 0
     de_call2 = create_digital_entity_call de_info, 'delete'
     request :digital_entity_call, :general => general.to_s, :digital_entity_call => de_call2.to_s
   end
