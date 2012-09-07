@@ -8,51 +8,75 @@ class Hash
 #    return result
 #  end
   def key_strings_to_symbols!(opts = {})
+    self.replace self.key_strings_to_symbols opts
+  end
+
+  NO_DUP_CLASSES = [TrueClass, FalseClass]
+
+  def key_strings_to_symbols(opts = {})
     opts = {resursive: false, upcase: false, downcase: false}.merge opts
+
     r = Hash.new
     self.each_pair do |k,v|
-      if (k.kind_of? String)
-        v.key_strings_to_symbols!(opts) if opts[:recursive] and v.kind_of? Hash and v.respond_to? :key_strings_to_symbols!
-        if opts[:recursive] and v.kind_of? Array
-          v.collect {|a| (a.kind_of? Hash and a.respond_to? :key_strings_to_symbols!) ? a.key_strings_to_symbols!(opts) : a }
-        end
+
+      k = k.to_s if k.kind_of? Symbol
+      if k.kind_of? String
         k = k.downcase if opts[:downcase]
         k = k.upcase if opts[:upcase]
-        r[k.to_sym] = v
-
-      else
-        v.key_strings_to_symbols!(opts) if opts[:recursive] and v.kind_of? Hash and v.respond_to? :key_strings_to_symbols!
-        if opts[:recursive] and v.kind_of? Array
-          v.collect  {|a| (a.kind_of? Hash and a.respond_to? :key_strings_to_symbols!) ? a.key_strings_to_symbols!(opts) : a }
-        end
-        r[k] = v
+        k = k.to_sym
       end
+
+      if opts[:recursive]
+        case v
+          when Hash
+            v = v.key_strings_to_symbols opts
+          when Array
+            v = v.collect { |a| (a.kind_of? Hash) ? a.key_strings_to_symbols(opts) :  Marshal.load(Marshal.dump(a)) }
+          else
+            v = Marshal.load(Marshal.dump(v))
+        end
+      end
+
+      r[k] = v
+
     end
-    self.replace(r)
+
+    r
   end
 
   def key_symbols_to_strings!(opts = {})
+    self.replace self.key_symbols_to_strings opts
+  end
+
+  def key_symbols_to_strings(opts = {})
     opts = {resursive: false, upcase: false, downcase: false}.merge opts
+
     r = Hash.new
     self.each_pair do |k,v|
-      if (k.kind_of? Symbol)
-        v.key_symbols_to_strings!(opts) if opts[:recursive] and v.kind_of? Hash and v.respond_to? :key_symbols_to_strings!
-        if opts[:recursive] and v.kind_of? Array
-          v.collect {|a| (a.kind_of? Hash and a.respond_to? :key_symbols_to_strings!) ? a.key_symbols_to_strings!(opts) : a }
-        end
+
+      k = k.to_sym if k.kind_of? String
+      if k.kind_of? Symbol
         k = k.to_s
         k = k.downcase if opts[:downcase]
         k = k.upcase if opts[:upcase]
-        r[k] = v
-      else
-        v.key_symbols_to_strings!(opts) if opts[:recursive] and v.kind_of? Hash and v.respond_to? :key_symbols_to_strings!
-        if opts[:recursive] and v.kind_of? Array
-          v.collect  {|a| (a.kind_of? Hash and a.respond_to? :key_symbols_to_strings!) ? a.key_symbols_to_strings!(opts) : a }
-        end
-        r[k] = v
       end
+
+      if opts[:recursive]
+        case v
+          when Hash
+            v = v.key_symbols_to_strings(opts)
+          when Array
+            v = v.collect { |a| (a.kind_of? Hash) ? a.key_symbols_to_strings(opts) : Marshal.load(Marshal.dump(a)) }
+          else
+            v = Marshal.load(Marshal.dump(v))
+        end
+      end
+
+      r[k] = v
+
     end
-    self.replace(r)
+
+    r
   end
 
   def recursive_merge(other_hash)
