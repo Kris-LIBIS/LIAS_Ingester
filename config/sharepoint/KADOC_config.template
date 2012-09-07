@@ -19,8 +19,3 @@ common:
   control_fields:
     partition_c:      test sharepoint
     status:           SUPPRESSED
-
-  accessrights:
-    original:         id = 31682
-    view:             id = 31682
-    view_main:        watermark = "KADOC - K.U.Leuven"
