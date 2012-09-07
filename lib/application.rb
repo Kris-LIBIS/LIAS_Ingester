@@ -18,6 +18,9 @@ require 'modules/post_ingester'
 def nil.each #(&block)
 end
 
+#flush stdout output immediately
+$stdout.sync = true
+
 class Application
   include Singleton
 
@@ -247,7 +250,7 @@ class Logger
   attr_accessor :db_log
 
   def db_logger(severity, datetime, progname, msg)
-    # hack required as the logger passes in the message string encoded as US-ASCII
+    # hack required as the logger passes in the message string marked as encoded in US-ASCII, but it really is UTF-8
     msg.encode!('utf-8','utf-8', undef: :replace)
     ::Application.write_log(severity, datetime, progname, msg)
     ::Application.send_log(severity, datetime, progname, msg) if @db_log
