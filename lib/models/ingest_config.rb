@@ -35,7 +35,6 @@ class IngestConfig
   property    :ingest_id,             String
   property    :ingest_dir,            String
   property    :tasker_log,            Text
-  property    :ingest_type,           Enum[:NORMAL, :SHAREPOINT_DATA, :SHAREPOINT_XML], :default => :NORMAL
 
   belongs_to  :ingest_run,            :required => false
 
@@ -77,8 +76,6 @@ class IngestConfig
           self.filename_match = Regexp.new(value)
         when :mime_type
           self.mime_type = Regexp.new(value)
-        when :ingest_type
-          self.ingest_type = value.to_s.upcase.to_sym
         when :ingest_model
           value.key_strings_to_symbols! :downcase => true
           value.each do |k, v|
@@ -123,12 +120,24 @@ class IngestConfig
 
   end
 
-  def media_type
-    self.media_type.to_sym
+  def get_media_type
+    self.media_type.to_s.upcase.to_sym
   end
 
-  def quality
-    self.quality.to_sym
+  def get_quality
+    self.quality.to_s.upcase.to_sym
+  end
+
+  def get_ingest_model_dispatcher
+    @ingest_model_dispatcher ||= IngestModelDispatcher.new("#{self.class.name}_##{self.id}", self.ingest_model_map,
+                                                           self.ingest_model, get_media_type, get_quality,
+                                                           self.manifestations_config)
+  end
+
+  def get_ingest_model(obj = nil)
+    dispatcher = get_ingest_model_dispatcher
+    return nil unless dispatcher
+    dispatcher.get_ingest_model(obj)
   end
 
   def get_or_create_object(label)

@@ -1,7 +1,7 @@
 # coding: utf-8
 
 require 'ingester_module'
-require 'ingest_models/model_factory'
+require 'ingest_models/ingest_model_factory'
 require 'tools/ingester_setup'
 require_relative 'metadata'
 
@@ -172,10 +172,13 @@ class PreIngester
       valid_states << Status::PreIngestFailed
     end
 
-    @model = ModelFactory.instance.get_model_for_config cfg
     @metadata = Metadata.new cfg
 
     cfg.root_objects.each do |obj|
+
+      unless obj.status == Status::PreProcessed
+        info "Skipping object ##{obj.id} - Invalid status"
+      end
 
       process_object obj if valid_states.include?(obj.status)
 
@@ -315,18 +318,22 @@ class PreIngester
 
   #noinspection RubyResolve
   def create_manifestations(object)
-    ModelFactory.manifestations.each do |m|
-      debug "Manifestation: #{m}"
-      file = @model.create_manifestation object, m
-      if file
-        info "Created manifestation file: #{file}"
-        mobj = IngestObject.new file, :MD5
-        mobj.file_stream = file
-        mobj.usage_type = m
-        mobj.label = object.label
-        mobj.status = Status::PreIngested
-        object.add_manifestation mobj
+    if (ingest_model = object.ingest_config.get_ingest_model(object))
+      ingest_model.manifestations.each do |m|
+        debug "Manifestation: #{m}"
+        file = ingest_model.create_manifestation object, m
+        if file
+          info "Created manifestation file: #{file}"
+          mobj = IngestObject.new file, :MD5
+          mobj.file_stream = file
+          mobj.usage_type = m
+          mobj.label = object.label
+          mobj.status = Status::PreIngested
+          object.add_manifestation mobj
+        end
       end
+    else
+      warn "No ingest model found for object ##{object.id}"
     end
     object.children.each { |child| create_manifestations child }
   end
@@ -375,6 +382,7 @@ class PreIngester
   end
 
   def undo_object(obj)
+    return if obj.status < Status::PreIngesting
     ApplicationStatus.instance.obj = obj
     info "Undo object ##{obj.id} PreIngest."
     #noinspection RubyResolve

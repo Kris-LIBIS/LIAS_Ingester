@@ -21,8 +21,12 @@ class IngestModel
   def initialize(config)
     @config = config
     @config.key_strings_to_symbols! :upcase => true, :recursive => true
-    debug "Creating ingest model: #{config}"
+    debug "Creating ingest model: #@config"
     @custom_config = nil
+  end
+
+  def name
+    self.config[:NAME].downcase
   end
 
   def custom_config(config)
@@ -33,14 +37,15 @@ class IngestModel
   end
 
   def get_ingest_model(obj)
+    return self unless @config[:MEDIA] == :ANY
     mime_type = obj.mime_type
-    return nil unless mime_type
+    return self unless mime_type
     get_ingest_model_by_media_type TypeDatabase.instance.mime2media(mime_type)
   end
 
   def get_ingest_model_by_media_type(media_type)
     return (@config[:MEDIA] == media_type ? self : nil) unless @config[:MEDIA] == :ANY
-    ModelFactory.instance.get_model2( media_type, @config[:QUALITY] ).custom_config(@custom_config)
+    IngestModelFactory.instance.get_model2( media_type, @config[:QUALITY] ).custom_config(@custom_config)
   end
 
 
@@ -50,12 +55,18 @@ class IngestModel
   
   def get_manifestation(manifestation, media_type)
     model = get_ingest_model_by_media_type media_type
+    return nil unless model
 
     model.config[:MANIFESTATIONS].each do |m|
       return m if m[:MANIFESTATION] == manifestation
     end
     
     nil
+  end
+
+  def manifestations
+    return Array.new unless config[:MANIFESTATIONS]
+    config[:MANIFESTATIONS].collect { |m| m[:MANIFESTATION] }
   end
 
   def create_manifestation(obj, manifestation)
@@ -103,7 +114,7 @@ class IngestModel
     end
 
     debug "Using ingestmodel: #{self.inspect}"
-    target += ModelFactory.filename_extension(manifestation) + '.' + TypeDatabase.instance.type2ext(m[:FORMAT])
+    target += IngestModelFactory.filename_extension(manifestation) + '.' + TypeDatabase.instance.type2ext(m[:FORMAT])
 
     conversion_operations = m[:OPTIONS] || {}
 

@@ -1,6 +1,6 @@
 # coding: utf-8
 
-require 'ingest_models/model_factory'
+require 'ingest_models/ingest_model_factory'
 require 'converters/type_database'
 
 # This class is able to perform all file checks that we may want to perform during pre-ingest
@@ -85,11 +85,11 @@ class FileChecker
 
     if (mimetype = obj.mime_type)
       unless TypeDatabase.instance.known_mime? mimetype
-        obj.message("File's MIME-Type '#{mimetype}' is not supported.")
+        obj.message = "File's MIME-Type '#{mimetype}' is not supported."
         return false
       end
     else
-      obj.message("File's MIME-Type was not detected.")
+      obj.message = "File's MIME-Type was not detected."
       return false
     end
 
@@ -178,8 +178,7 @@ class FileChecker
 
     if mime_type and mime_type != ''
 
-      ingest_model = ModelFactory.instance.get_model_for_config(@config)
-      ingest_model = ingest_model.get_ingest_model(obj)
+      ingest_model = @config.get_ingest_model(obj)
 
       if ingest_model
         result = ingest_model.valid_media_type(TypeDatabase.instance.mime2media(mime_type))
