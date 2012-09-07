@@ -18,39 +18,15 @@
 				<script src="/view/javascript/jquery.layout.js" type="text/javascript"></script>
 				<script src="/view/javascript/jquery.treeview.js" type="text/javascript"></script>
 
-				<script type="text/javascript" src="https://getfirebug.com/firebug-lite.js"></script>				
-				<script type="text/javascript">
-	
-	function initialize_layout() {
-        	$('body').layout({
-			west__showOverflowOnHover: false,
-			west__minSize: 100,
-			closable: false,
-			resizable: true,
-			slidable: false
-		});
-	};
-
-	function initialize_tree() {
-		$("#tree").treeview({
-			persist: "location",
-			collapsed: false,
-			prerendered: false
-		});
-	};
-
-	$(document).ready(function () {
-		initialize_tree();
-		setTimeout("initialize_layout()", 5);
-	});
-				</script>
+				<script src="https://getfirebug.com/firebug-lite.js" type="text/javascript"></script>
+				<script src="/view/javascript/viewer.js" type="text/javascript"></script>
 			</head>
 			
 			<body class="ui-layout-container mainbody">
 				
 				<div id="TreeDiv" class="ui-layout-west">
 					<ul id="tree" class="treeview filetree">
-						<xsl:call-template name="process_folder"/>
+                      <xsl:apply-templates select="/folder"/>
 					</ul>
 				</div>
 
@@ -87,7 +63,6 @@
 		<xsl:param name="class" select="name()"/>
 		<xsl:param name="name" select="@name"/>
 		<xsl:param name="pid" select="@pid"/>
-		<xsl:param name="path" select="@path"/>
 		<xsl:param name="scope_ref" select="@scope_ref"/>
 		<span class="{string($class)}">
 			<a>
@@ -103,7 +78,8 @@
 				</xsl:if>
 				<xsl:choose>
 					<xsl:when test="$class = 'folder'">
-						<xsl:attribute name="target">_blank</xsl:attribute>
+						<xsl:attribute name="target">_top</xsl:attribute>
+						<xsl:attribute name="on_click()"
 					</xsl:when>
 					<xsl:when test="$class = 'file'">
 						<xsl:attribute name="target">Main</xsl:attribute>
