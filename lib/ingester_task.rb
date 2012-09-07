@@ -69,7 +69,7 @@ module IngesterTask
 
   def handle_exception(e)
     print_exception e
-    raise AbortException.new
+    raise AbortException
   end
 
   def print_exception(e)

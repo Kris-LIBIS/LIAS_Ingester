@@ -16,29 +16,29 @@ class Checksum
   attr :type, :hasher
 
   def initialize(type)
-    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{CHECKSUM_TYPES.inspect}") unless CHECKSUM_TYPES.include? type
+    raise AbortException, "Checksum: bad checksum type: '#{type}' - should be one of #{CHECKSUM_TYPES.inspect}" unless CHECKSUM_TYPES.include? type
     @type   = type
     @hasher = case type
              when :MD5
-               Digest::MD5.new
+               ::Digest::MD5.new()
              when :SHA1
-               Digest::SHA1.new
+               ::Digest::SHA1.new
              when :SHA256
-               Digest::SHA2.new(256)
+               ::Digest::SHA2.new(256)
              when :SHA384
-               Digest::SHA2.new(384)
+               ::Digest::SHA2.new(384)
              when :SHA512
-               Digest::SHA2.new(512)
+               ::Digest::SHA2.new(512)
              end
   end
 
   def self.type_from_string(type_string)
-    throw StandardError.new("Checksum: bad checksum type: '#{type_string}' - should be one of #{CHECKSUM_TYPES_STRING.inspect}") unless CHECKSUM_TYPES_STRING.include? type_string.upcase
+    raise StandardError, "Checksum: bad checksum type: '#{type_string}' - should be one of #{CHECKSUM_TYPES_STRING.inspect}" unless CHECKSUM_TYPES_STRING.include? type_string.upcase
     return CHECKSUM_TYPES[CHECKSUM_TYPES_STRING.index(type_string.upcase)]
   end
 
   def self.type_to_string(type)
-    throw AbortException.new("Checksum: bad checksum type: '#{type}' - should be one of #{CHECKSUM_TYPES.inspect}") unless CHECKSUM_TYPES.include? type
+    raise AbortException, "Checksum: bad checksum type: '#{type}' - should be one of #{CHECKSUM_TYPES.inspect}" unless CHECKSUM_TYPES.include? type
     return CHECKSUM_TYPES_STRING[CHECKSUM_TYPES.index(type)]
   end
 
