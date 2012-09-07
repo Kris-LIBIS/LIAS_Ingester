@@ -1,24 +1,24 @@
 
-:NAME:      flash_mpeg4_tn
-:MEDIA:     :VIDEO
-:QUALITY:   :KADOC
+NAME:      flash_mpeg4_tn
+MEDIA:     :VIDEO
+QUALITY:   :KADOC
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :FLASH
-    :OPTIONS:
-      :RESIZE:        320x240
-      :KBPS:          640
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :FLASH
+    OPTIONS:
+      RESIZE:        320x240
+      KBPS:          640
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          :MPEG4
-    :OPTIONS:
-      :ENCODING:      H264
-      :RESIZE:        720
+  - MANIFESTATION:   VIEW
+    FORMAT:          :MPEG4
+    OPTIONS:
+      ENCODING:      H264
+      RESIZE:        720
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        107x150
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        107x150
+      QUALITY:       50%

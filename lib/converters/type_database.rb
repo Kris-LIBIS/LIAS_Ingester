@@ -3,6 +3,7 @@
 require 'singleton'
 
 require 'application'
+require 'tools/hash'
 
 class TypeDatabase
   include Singleton
@@ -81,11 +82,12 @@ class TypeDatabase
   private
 
   def initialize
-    load_config(Application.dir + '/config/types.yaml')
+    load_config(File.join Application.dir, 'config', 'types.yaml')
   end
 
   def load_config(file)
     config = YAML.load_file file
+    config.key_strings_to_symbols! recursive: true, upcase: true
     @type2media_map = {}
     @type2mime_map = {}
     @type2ext_map = {}

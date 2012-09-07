@@ -1,23 +1,23 @@
 
-:NAME:      jpg-watermark_jp2_tn
-:MEDIA:     :IMAGE
-:QUALITY:   :KADOC
+NAME:      jpg-watermark_jp2_tn
+MEDIA:     :IMAGE
+QUALITY:   :KADOC
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :SCALE:         80%
-      :QUALITY:       70%
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :JPEG
+    OPTIONS:
+      SCALE:         80%
+      QUALITY:       70%
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          :JPEG2000
-    :OPTIONS:
-      :DPI:           75
+  - MANIFESTATION:   VIEW
+    FORMAT:          :JPEG2000
+    OPTIONS:
+      DPI:           75
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        107x150
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        107x150
+      QUALITY:       50%

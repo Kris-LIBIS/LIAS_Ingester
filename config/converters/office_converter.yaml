@@ -1,4 +1,4 @@
-:INPUT_TYPES:
+INPUT_TYPES:
   - :TXT
   - :RTF
   - :HTML
@@ -9,5 +9,5 @@
   - :MSXLSX
   - :MSPPTX
   - :WORDPERFECT
-:OUTPUT_TYPES:
+OUTPUT_TYPES:
   - :PDF

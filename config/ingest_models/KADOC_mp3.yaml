@@ -1,15 +1,15 @@
 
-:NAME:      mp3
-:MEDIA:     :AUDIO
-:QUALITY:   :KADOC
+NAME:      mp3
+MEDIA:     :AUDIO
+QUALITY:   :KADOC
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :MP3
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :MP3
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        107x150
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        107x150
+      QUALITY:       50%

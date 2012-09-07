@@ -6,124 +6,133 @@
 # reverse lookup from extension to type identifier is performed. However, file extensions will typically not be used
 # to determine type identifier or mime types. So you should be fairly safe when the file extensions are not unique.
 
-:TYPES:
+TYPES:
 # Image types
-  - :MEDIA:         :IMAGE
-    :TYPE_INFO:
-      - :TYPE:          :TIFF
-        :MIME:          image/tiff
-        :EXTENSIONS:    tif,tiff
-      - :TYPE:          :JPEG2000
-        :MIME:          image/jp2
-        :EXTENSIONS:    jp2,jpg2
-      - :TYPE:          :JPEG
-        :MIME:          image/jpeg
-        :EXTENSIONS:    jpg,jpe,jpeg
-      - :TYPE:          :PNG
-        :MIME:          image/png
-        :EXTENSIONS:    png
-      - :TYPE:          :BMP
-        :MIME:          image/bmp,image/x-ms-bmp
-        :EXTENSIONS:    bmp
-      - :TYPE:          :GIF
-        :MIME:          image/gif
-        :EXTENSIONS:    gif
+  - MEDIA:            :IMAGE
+    TYPE_INFO:
+      - TYPE:         :TIFF
+        MIME:         image/tiff
+        EXTENSIONS:   tif,tiff
+      - TYPE:         :JPEG2000
+        MIME:         image/jp2
+        EXTENSIONS:   jp2,jpg2
+      - TYPE:         :JPEG
+        MIME:         image/jpeg
+        EXTENSIONS:   jpg,jpe,jpeg
+      - TYPE:         :PNG
+        MIME:         image/png
+        EXTENSIONS:   png
+      - TYPE:         :BMP
+        MIME:         image/bmp,image/x-ms-bmp
+        EXTENSIONS:   bmp
+      - TYPE:         :GIF
+        MIME:         image/gif
+        EXTENSIONS:   gif
 
 # Audio types
-  - :MEDIA:         :AUDIO
-    :TYPE_INFO:
-      - :TYPE:          :WAV
-        :MIME:          audio/x-wav
-        :EXTENSIONS:    wav
-      - :TYPE:          :MP3
-        :MIME:          audio/mpeg
-        :EXTENSIONS:    mp3
-      - :TYPE:          :FLAC
-        :MIME:          audio/flac
-        :EXTENSIONS:    flac
-      - :TYPE:          :OGG
-        :MIME:          audio/ogg
-        :EXTENSIONS:    ogg
+  - MEDIA:            :AUDIO
+    TYPE_INFO:
+      - TYPE:         :WAV
+        MIME:         audio/x-wav
+        EXTENSIONS:   wav
+      - TYPE:         :MP3
+        MIME:         audio/mpeg
+        EXTENSIONS:   mp3
+      - TYPE:         :FLAC
+        MIME:         audio/flac
+        EXTENSIONS:   flac
+      - TYPE:         :OGG
+        MIME:         audio/ogg
+        EXTENSIONS:   ogg
 
 # Video types
-  - :MEDIA:         :VIDEO
-    :TYPE_INFO:
-      - :TYPE:          :MPEG
-        :MIME:          video/mpeg
-        :EXTENSIONS:    mpg,mpeg,mpa,mpe,mpv2
-      - :TYPE:          :MPEG4
-        :MIME:          video/mp4
-        :EXTENSIONS:    mp4,mpeg4
-      - :TYPE:          :MJPEG2000
-        :MIME:          video/jpeg2000
-        :EXTENSIONS:    mjp2
-      - :TYPE:          :QUICKTIME
-        :MIME:          video/quicktime
-        :EXTENSIONS:    qt,mov
-      - :TYPE:          :AVI
-        :MIME:          video/x-msvideo
-        :EXTENSIONS:    avi
-      - :TYPE:          :3GP
-        :MIME:          video/3gp
-        :EXTENSIONS:    3gp
-      - :TYPE:          :OGGV
-        :MIME:          video/ogg
-        :EXTENSIONS:    ogv
-      - :TYPE:          :WMV
-        :MIME:          video/x-ms-wmv
-        :EXTENSIONS:    wmv
-      - :TYPE:          :DV
-        :MIME:          video/dv
-        :EXTENSIONS:    dv
+  - MEDIA:            :VIDEO
+    TYPE_INFO:
+      - TYPE:         :MPEG
+        MIME:         video/mpeg
+        EXTENSIONS:   mpg,mpeg,mpa,mpe,mpv2
+      - TYPE:         :MPEG4
+        MIME:         video/mp4
+        EXTENSIONS:   mp4,mpeg4
+      - TYPE:         :MJPEG2000
+        MIME:         video/jpeg2000
+        EXTENSIONS:   mjp2
+      - TYPE:         :QUICKTIME
+        MIME:         video/quicktime
+        EXTENSIONS:   qt,mov
+      - TYPE:         :AVI
+        MIME:         video/x-msvideo
+        EXTENSIONS:   avi
+      - TYPE:         :3GP
+        MIME:         video/3gp
+        EXTENSIONS:   3gp
+      - TYPE:         :OGGV
+        MIME:         video/ogg
+        EXTENSIONS:   ogv
+      - TYPE:         :WMV
+        MIME:         video/x-ms-wmv
+        EXTENSIONS:   wmv
+      - TYPE:         :DV
+        MIME:         video/dv
+        EXTENSIONS:   dv
+      - TYPE:         :FLASH
+        MIME:         video/x-flv
+        EXTENSIONS:   flv
 
 # Office document types
-  - :MEDIA:         :DOCUMENT
-    :TYPE_INFO:
-      - :TYPE:          :TXT
-        :MIME:          text/plain
-        :EXTENSIONS:    txt
-      - :TYPE:          :RTF
-        :MIME:          text/rtf
-        :EXTENSIONS:    rtf
-      - :TYPE:          :HTML
-        :MIME:          text/html
-        :EXTENSIONS:    html, htm
-      - :TYPE:          :MSDOC
-        :MIME:          application/vnd.ms-word,application/msword
-        :EXTENSIONS:    doc
-      - :TYPE:          :MSDOCX
-        :PUID:          fido-fmt/189.word
-        :MIME:          application/vnd.openxmlformats-officedocument.wordprocessingml.document
-        :EXTENSIONS:    docx
-      - :TYPE:          :MSXLS
-        :MIME:          application/vnd.ms-excel,application/msexcel
-        :EXTENSIONS:    xls
-      - :TYPE:          :MSXLSX
-        :PUID:          fido-fmt/189.xl
-        :MIME:          application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
-        :EXTENSIONS:    xslx
-      - :TYPE:          :MSPPT
-        :MIME:          application/vnd.ms-powerpoint,application/mspowerpoint
-        :EXTENSIONS:    ppt
-      - :TYPE:          :MSPPTX
-        :PUID:          fido-fmt/189.ppt
-        :MIME:          application/vnd.openxmlformats-officedocument.presentationml.presentation
-        :EXTENSIONS:    pptx
-      - :TYPE:          :PDF
-        :MIME:          application/pdf
-        :EXTENSIONS:    pdf
-      - :TYPE:          :PDFA
-        :PUID:          fmt/95
-        :MIME:          application/pdfa # Note the invented mime type here. It requires implementation in theMimeType class.
-        :EXTENSIONS:    pdfa
-      - :TYPE:          :WORDPERFECT
-        :PUID:          x-fmt/44
-        :MIME:          application/vnd.wordperfect
-        :EXTENSIONS:    wpd
+  - MEDIA:            :DOCUMENT
+    TYPE_INFO:
+      - TYPE:         :TXT
+        MIME:         text/plain
+        EXTENSIONS:   txt
+      - TYPE:         :RTF
+        MIME:         text/rtf
+        EXTENSIONS:   rtf
+      - TYPE:         :HTML
+        MIME:         text/html
+        EXTENSIONS:   html, htm
+      - TYPE:         :MSDOC
+        MIME:         application/vnd.ms-word,application/msword
+        EXTENSIONS:   doc
+      - TYPE:         :MSDOCX
+        PUID:         fido-fmt/189.word
+        MIME:         application/vnd.openxmlformats-officedocument.wordprocessingml.document
+        EXTENSIONS:   docx
+      - TYPE:         :MSXLS
+        MIME:         application/vnd.ms-excel,application/msexcel
+        EXTENSIONS:   xls
+      - TYPE:         :MSXLSX
+        PUID:         fido-fmt/189.xl
+        MIME:         application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+        EXTENSIONS:   xslx
+      - TYPE:         :MSPPT
+        MIME:         application/vnd.ms-powerpoint,application/mspowerpoint
+        EXTENSIONS:   ppt
+      - TYPE:         :MSPPTX
+        PUID:         fido-fmt/189.ppt
+        MIME:         application/vnd.openxmlformats-officedocument.presentationml.presentation
+        EXTENSIONS:   pptx
+      - TYPE:         :PDF
+        MIME:         application/pdf
+        EXTENSIONS:   pdf
+      - TYPE:         :PDFA
+        PUID:         fmt/95
+        MIME:         application/pdfa # Note the invented mime type here. It requires implementation in theMimeType class.
+        EXTENSIONS:   pdf
+      - TYPE:         :WORDPERFECT
+        PUID:         x-fmt/44
+        MIME:         application/vnd.wordperfect
+        EXTENSIONS:   wpd
+      - TYPE:         :XML
+        MIME:         text/xml
+        EXTENSIONS:   xml
+      - TYPE:         :SHAREPOINT_MAP
+        MIME:         text/xml/sharepoint_map
+        EXTENSIONS:   xml
 
 # Archive types
   - :MEDIA:         :ARCHIVE
     :TYPE_INFO:
       - :TYPE:        :EAD
-        :MIME:        application/ead   # This is again an invented mime type. It's actually an XML ...
+        :MIME:        archive/ead   # This is again an invented mime type. It's actually an XML ...
         :EXTENSIONS:  ead,xml

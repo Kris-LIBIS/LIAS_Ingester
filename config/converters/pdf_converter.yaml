@@ -1,2 +1,4 @@
-:TYPES:
+TYPES:
   - :PDF
+OUTPUT_TYPES:
+  - :PDFA

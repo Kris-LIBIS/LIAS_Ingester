@@ -1,16 +1,16 @@
 
-:NAME:      Video hoge kwaliteit
-:MEDIA:     :VIDEO
-:QUALITY:   :HIGH
+NAME:      Video hoge kwaliteit
+MEDIA:     :VIDEO
+QUALITY:   :HIGH
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :FLASH
-    :OPTIONS:
-      :SCALE:         50%
-      :QUALITY:       70%
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :FLASH
+    OPTIONS:
+      SCALE:         50%
+      QUALITY:       70%
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          :FLASH
+  - MANIFESTATION:   VIEW
+    FORMAT:          :FLASH
 

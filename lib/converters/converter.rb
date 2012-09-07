@@ -6,6 +6,7 @@ require 'ingester_task'
 require_relative 'type_database'
 
 class Converter
+  include IngesterTask
 
   public
 
@@ -62,6 +63,7 @@ class Converter
 
         file = self.config_file
         config = YAML.load_file file
+        config.key_strings_to_symbols! upcase: true, recursive: true
 
         my_input_types = []
         my_output_types = []
@@ -93,10 +95,12 @@ class Converter
         class_variable_set :@@conversions, my_conversions
       end
 
-      def initialize( source = nil, options = {} )
+      def initialize( source = nil, options = {}, flags = {} )
         init(source) if source
         @options ||= {}
         @options.merge! options if options
+        @flags ||= {}
+        @flags.merge! flags if flags
       end
 
       private

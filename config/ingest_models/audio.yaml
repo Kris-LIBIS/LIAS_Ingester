@@ -1,16 +1,16 @@
 
-:NAME:      Audio archivering
-:MEDIA:     :AUDIO
-:QUALITY:   :ARCHIVE
+NAME:      Audio archivering
+MEDIA:     :AUDIO
+QUALITY:   :ARCHIVE
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   ARCHIVE
-    :FORMAT:          :WAV
+  - MANIFESTATION:   ARCHIVE
+    FORMAT:          :WAV
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :MP3
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :MP3
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          :MP3
+  - MANIFESTATION:   VIEW
+    FORMAT:          :MP3
 

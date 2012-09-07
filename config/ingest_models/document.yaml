@@ -1,19 +1,19 @@
 
-:NAME:      Documenten archivering
-:MEDIA:     :DOCUMENT
-:QUALITY:   :ARCHIVE
+NAME:      Documenten archivering
+MEDIA:     :DOCUMENT
+QUALITY:   :ARCHIVE
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          :PDF
+  - MANIFESTATION:   VIEW
+    FORMAT:          :PDF
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :PDF
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :PDF
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        107x150
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        107x150
+      QUALITY:       50%
 

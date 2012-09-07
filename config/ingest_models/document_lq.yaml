@@ -1,16 +1,16 @@
 
-:NAME:      Documenten lage kwaliteit
-:MEDIA:     :DOCUMENT
-:QUALITY:   :LOW
+NAME:      Documenten lage kwaliteit
+MEDIA:     :DOCUMENT
+QUALITY:   :LOW
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :PDF
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :PDF
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        107x150
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        107x150
+      QUALITY:       50%
 

@@ -1,18 +1,18 @@
 
-:NAME:      xml_ead_pdf_html
-:MEDIA:     :ARCHIVE
-:QUALITY:   :KADOC
+NAME:      xml_ead_pdf_html
+MEDIA:     :ARCHIVE
+QUALITY:   :KADOC
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          EAD
+  - MANIFESTATION:   VIEW
+    FORMAT:          EAD
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :PDFA
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :PDFA
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        107x150
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        107x150
+      QUALITY:       50%

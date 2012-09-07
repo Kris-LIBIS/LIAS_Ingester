@@ -1,19 +1,19 @@
 
-:NAME:      Video archivering
-:MEDIA:     :AUDIO
-:QUALITY:   :ARCHIVE
+NAME:      Video archivering
+MEDIA:     :AUDIO
+QUALITY:   :ARCHIVE
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   ARCHIVE
-    :FORMAT:          :MJPEG2000
+  - MANIFESTATION:   ARCHIVE
+    FORMAT:          :MJPEG2000
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :FLASH
-    :OPTIONS:
-      :SCALE:         50%
-      :QUALITY:       70%
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :FLASH
+    OPTIONS:
+      SCALE:         50%
+      QUALITY:       70%
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          :FLASH
+  - MANIFESTATION:   VIEW
+    FORMAT:          :FLASH
 

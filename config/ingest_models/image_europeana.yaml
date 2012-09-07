@@ -1,25 +1,25 @@
 
-:NAME:      Afbeeldingen archivering europeana
-:MEDIA:     :IMAGE
-:QUALITY:   :EUROPEANA
+NAME:      Afbeeldingen archivering europeana
+MEDIA:     :IMAGE
+QUALITY:   :EUROPEANA
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   ARCHIVE
-    :FORMAT:          :TIFF
+  - MANIFESTATION:   ARCHIVE
+    FORMAT:          :TIFF
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :SCALE:         80%
-      :QUALITY:       70%
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :JPEG
+    OPTIONS:
+      SCALE:         80%
+      QUALITY:       70%
 
-  - :MANIFESTATION:   VIEW
-    :FORMAT:          :JPEG2000
+  - MANIFESTATION:   VIEW
+    FORMAT:          :JPEG2000
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        200
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        200
+      QUALITY:       50%
 

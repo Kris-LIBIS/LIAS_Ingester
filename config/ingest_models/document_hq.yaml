@@ -1,19 +1,19 @@
 
-:NAME:      Documenten hoge kwaliteit
-:MEDIA:     :DOCUMENT
-:QUALITY:   :HIGH
+NAME:      Documenten hoge kwaliteit
+MEDIA:     :DOCUMENT
+QUALITY:   :HIGH
 
-:MANIFESTATIONS:
+MANIFESTATIONS:
 
-  - :MANIFESTATION:   ARCHIVE
-    :FORMAT:          :PDFA
+  - MANIFESTATION:   ARCHIVE
+    FORMAT:          :PDFA
 
-  - :MANIFESTATION:   VIEW_MAIN
-    :FORMAT:          :PDF
+  - MANIFESTATION:   VIEW_MAIN
+    FORMAT:          :PDF
 
-  - :MANIFESTATION:   THUMBNAIL
-    :FORMAT:          :JPEG
-    :OPTIONS:
-      :RESIZE:        107x150
-      :QUALITY:       50%
+  - MANIFESTATION:   THUMBNAIL
+    FORMAT:          :JPEG
+    OPTIONS:
+      RESIZE:        107x150
+      QUALITY:       50%
 
