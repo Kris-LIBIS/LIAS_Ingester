@@ -6,9 +6,10 @@ require 'ingester_module'
 require 'webservices/digital_entity_manager'
 require 'tools/xml_document'
 
+#noinspection RubyResolve
 class Ingester
   include IngesterModule
-  
+
   def start_queue
 
     info 'Starting'
@@ -29,30 +30,32 @@ class Ingester
 
   end
 
-  def start( config_id )
+  def start(config_id)
 
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
-    
+    end unless (cfg = IngestConfig.first(:id => config_id))
+
     begin
 
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
-      when Status::Idle ... Status::PreIngested
-        # Oops! Not yet ready.
-        error "Cannot yet Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-      when Status::PreIngested ... Status::Ingesting
-        # Excellent! Continue ...
-        process_config cfg
-      when Status::Ingesting ... Status::Ingested
-        warn "Restarting Ingest of configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
-        restart config_id
-      when Status::Ingested .. Status::Finished
-        warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        when Status::Idle ... Status::PreIngested
+          # Oops! Not yet ready.
+          error "Cannot yet Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+        when Status::PreIngested ... Status::Ingesting
+          # Excellent! Continue ...
+          process_config cfg
+        when Status::Ingesting ... Status::Ingested
+          warn "Restarting Ingest of configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
+          restart config_id
+        when Status::Ingested .. Status::Finished
+          warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        else
+          # type code here
       end
 
     ensure
@@ -65,7 +68,7 @@ class Ingester
 
   end
 
-  def undo( config_id )
+  def undo(config_id)
 
     cfg = IngestConfig.first(:id => config_id)
 
@@ -86,9 +89,9 @@ class Ingester
 
   end
 
-  def restart( config_id )
+  def restart(config_id)
 
-    if cfg = undo(config_id)
+    if  (cfg = undo(config_id))
       info "Restarting config ##{config_id}"
       process_config cfg
       return config_id
@@ -98,29 +101,31 @@ class Ingester
 
   end
 
-  def continue( config_id )
+  def continue(config_id)
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
-    
+    end unless (cfg = IngestConfig.first(:id => config_id))
+
     begin
 
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
-      when Status::Idle ... Status::Ingesting
-        # Oops! Not yet ready.
-        error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-      when Status::Ingesting
-        error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-      when Status::IngestFailed ... Status::PostIngesting
-        # Excellent! Continue ...
-        warn "Continuing just after Ingest configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
-        process_config cfg, true
-      when Status::PostIngesting .. Status::Finished
-        warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        when Status::Idle ... Status::Ingesting
+          # Oops! Not yet ready.
+          error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+        when Status::Ingesting
+          error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+        when Status::IngestFailed ... Status::PostIngesting
+          # Excellent! Continue ...
+          warn "Continuing just after Ingest configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
+          process_config cfg, true
+        when Status::PostIngesting .. Status::Finished
+          warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        else
+          # type code here
       end
 
     ensure
@@ -135,7 +140,7 @@ class Ingester
 
   private
 
-  def process_config( cfg, continue = false )
+  def process_config(cfg, continue = false)
 
     start_time = Time.now
     ApplicationStatus.instance.run = cfg.ingest_run
@@ -173,17 +178,19 @@ class Ingester
     ApplicationStatus.instance.cfg = nil
     ApplicationStatus.instance.run = nil
 
-    end # process_config
+  end
 
-  def run_ingest cfg
+  # process_config
+
+  def run_ingest(cfg)
     # run ingest task
     Dir.chdir("#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}") do
       info "Running ./tasker_fg.sh #{ConfigFile['user']} staff creator:staff #{cfg.ingest_id}"
       cfg.tasker_log = %x(./tasker_fg.sh #{ConfigFile['user']} staff creator:staff #{cfg.ingest_id})
     end
   end
-  
-  def fix_pidlist( pid_list, cfg )
+
+  def fix_pidlist(pid_list, cfg)
     fixed_pid_list = {}
     pid_list.each do |xmlnr, pid|
       file_name = cfg.ingest_dir + "/ingest/digital_entities/#{xmlnr}.xml"
@@ -198,24 +205,23 @@ class Ingester
     end
     fixed_pid_list
   end
-  
-  def fix_pidlist_for_mets( pid_list, cfg )
+
+  def fix_pidlist_for_mets(pid_list, cfg)
     doc = XmlDocument.open cfg.ingest_dir + '/ingest/digital_entities/0.xml'
     filesec = XmlDocument.parse doc.xpath('//md/value[../type="fileSec"]').first.content.to_s
     fixed_pid_list = {}
     filesec.xpath('//mets:file').each do |f|
-      vpid = f['ID'].gsub('file_','')
-      mets_id = f.xpath('mets:FLocat').first['href'].gsub('METSID-','')
+      vpid = f['ID'].gsub('file_', '')
+      mets_id = f.xpath('mets:FLocat').first['href'].gsub('METSID-', '')
       fixed_pid_list[vpid] = pid_list[mets_id]
     end
     fixed_pid_list[cfg.root_objects.first.vpid] = pid_list['0']
     fixed_pid_list
   end
 
-  def get_pidlist( cfg )
+  def get_pidlist(cfg)
     pid_list = {}
     if cfg.tasker_log
-      #noinspection RubyResolve
       cfg.tasker_log.scan(/Ingesting: (\d+).*?\n?.*?Pid=(\d+) Success/) do
         pid_list[$1]=$2
       end
@@ -227,12 +233,12 @@ class Ingester
     pid_list
   end
 
-  def assign_pids cfg
-    pid_list = get_pidlist cfg
+  def assign_pids(cfg)
+  pid_list = get_pidlist cfg
     # WHY T** F*** does this not work ???
     # cfg.root_objects.all(:status => Status::PreIngested) do |obj|
     cfg.root_objects.each do |obj|
-      next unless obj.status >= Status::PreIngested && obj.status < Status::PostIngesting  
+      next unless obj.status >= Status::PreIngested && obj.status < Status::PostIngesting
       Application.log_to(obj)
       assign_pid pid_list, obj
       obj.save
@@ -240,16 +246,16 @@ class Ingester
     end
   end
 
-  def assign_pid pid_list, obj
-    obj.pid = pid_list[obj.vpid]
+  def assign_pid(pid_list, obj)
+  obj.pid = pid_list[obj.vpid]
     obj.status = Status::IngestFailed
     obj.status = Status::Ingested if obj.pid || obj.branch?
     info "Object id: #{obj.id}, vpid: #{obj.vpid}, pid: #{obj.pid}"
     obj.manifestations.each { |o| assign_pid pid_list, o }
-    obj.children.each       { |o| assign_pid pid_list, o }
+    obj.children.each { |o| assign_pid pid_list, o }
   end
 
-  def undo_config( cfg )
+  def undo_config(cfg)
     start_time = Time.now
     ApplicationStatus.instance.run = cfg.ingest_run
     ApplicationStatus.instance.cfg = cfg
@@ -265,12 +271,12 @@ class Ingester
     ApplicationStatus.instance.run = nil
   end
 
-  def undo_object( obj )
+  def undo_object(obj)
     ApplicationStatus.instance.obj = obj
     info "Undo object ##{obj.id} Ingest."
     obj.status = Status::Ingesting
     obj.manifestations.each { |o| undo_object o }
-    obj.children.each       { |o| undo_object o }
+    obj.children.each { |o| undo_object o }
     delete_object obj
     obj.status = Status::PreIngested if obj.status == Status::Ingesting
     obj.save
@@ -278,16 +284,16 @@ class Ingester
     ApplicationStatus.instance.obj = nil
   end
 
-  def delete_object( obj )
+  def delete_object(obj)
     return unless obj.pid
     result = DigitalEntityManager.instance.delete_object obj.pid
-    unless result[:error].empty?
+    if result[:error].empty?
+      info "Deleted object #{obj.pid}"
+      obj.pid = nil
+    else
       result[:error].each { |e| error "Error calling web service: #{e}" }
       error "Failed to delete object #{obj.pid}"
-    obj.status = Status::IngestFailed
-    else
-      info "Deleted object #{obj.pid}"
-    obj.pid = nil
+      obj.status = Status::IngestFailed
     end
   end
 

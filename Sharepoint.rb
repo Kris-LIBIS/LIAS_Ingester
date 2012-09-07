@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 # coding: utf-8
-
 require_relative 'lib/application'
 
 require 'modules/sharepoint_collector'

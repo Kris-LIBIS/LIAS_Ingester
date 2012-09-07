@@ -4,6 +4,7 @@ require 'ingester_module'
 require 'webservices/digital_entity_manager'
 require 'webservices/meta_data_manager'
 
+#noinspection RubyResolve
 class PostIngester
   include IngesterModule
   
@@ -32,7 +33,7 @@ class PostIngester
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
+    end unless (cfg = IngestConfig.first(:id => config_id))
     
     begin
       
@@ -93,7 +94,7 @@ class PostIngester
 
   def restart( config_id )
     
-    if cfg = undo(config_id)
+    if (cfg = undo(config_id))
       info "Restarting config ##{config_id}"
       process_config cfg
       return config_id
@@ -197,14 +198,14 @@ class PostIngester
       if ar.get_id.nil?
         acl_record = MetaDataManager.instance.create_acl_record(ar.pinfo)
         result = MetaDataManager.instance.create_acl acl_record
-        result[:error].each { |error| @@app.logger.error "Error calling web service: #{error}" } if result[:error]
-        unless result[:mids] and result[:mids].size == 1
-          error "Failed to create accessrights metadata for #{ar.inspect}"
-          obj.status = Status::PostIngestFailed
-        else
+        result[:error].each { |error| Application.logger.error "Error calling web service: #{error}" } if result[:error]
+        if result[:mids] and result[:mids].size == 1
           ar.set_id result[:mids][0]
           ar.save
           info "Created accessrights metadata record #{ar.get_id} for accessright ##{ar.id}"
+        else
+          error "Failed to create accessrights metadata for #{ar.inspect}"
+          obj.status = Status::PostIngestFailed
         end
       end
     end
@@ -225,11 +226,9 @@ class PostIngester
 
   def create_and_link_dc( obj, mid = nil )
     if obj.metadata
-      unless obj.pid
-        warn "Ignoring metadata on virtual object ##{obj.id}: '#{obj.label_path}'"
-      else
+      if obj.pid
         result = MetaDataManager.instance.create_dc_from_xml(obj.metadata)
-        result[:error].each { |e| error "Error calling web service: #{e}"} if result[:error]
+        result[:error].each { |e| error "Error calling web service: #{e}" } if result[:error]
         unless result[:mids] and !result[:mids].empty?
           error "Failed to create DC metadata for object #{obj.pid}"
           obj.status = Status::PostIngestFailed
@@ -237,6 +236,8 @@ class PostIngester
         end
         mid = result[:mids].first
         info "Created DC metadata record nr #{mid}"
+      else
+        warn "Ignoring metadata on virtual object ##{obj.id}: '#{obj.label_path}'"
       end
     end
     if mid and obj.pid
@@ -288,10 +289,7 @@ class PostIngester
     mid = obj.metadata_mid
     result = DigitalEntityManager.instance.unlink_dc obj.pid, mid
     result[:error].each { |error| error "Error calling web service: #{error}"}
-    unless result[:error].empty?
-      error "Failed to unlink metadata record #{mid} to object #{obj.pid}"
-      obj.status = Status::PostIngestFailed
-    else
+    if result[:error].empty?
       info "Removed DC metadata #{mid} from object #{obj.pid}"
       result = MetaDataManager.instance.delete mid
       if result[:error].empty?
@@ -301,6 +299,9 @@ class PostIngester
           o.metadata_mid = nil
         end
       end
+    else
+      error "Failed to unlink metadata record #{mid} to object #{obj.pid}"
+      obj.status = Status::PostIngestFailed
     end
   end
   
@@ -311,11 +312,7 @@ class PostIngester
     ar = obj.get_accessright
     return unless ar && ar.mid
     result = DigitalEntityManager.instance.unlink_acl obj.pid, ar.mid
-    unless result[:error].empty?
-      result[:error].each { |e| error "Error calling web service: #{e}" }
-      error "Failed to unlink accessright #{ar.mid} from object #{obj.pid}"
-      obj.status = Status::PostIngestFailed
-    else
+    if result[:error].empty?
       info "Unlinked accessright #{ar.mid} from object #{obj.pid}"
       if ar.ptype == :CUSTOM
         # try to delete the ar object
@@ -326,6 +323,10 @@ class PostIngester
         end
         # We ignore errors, AR record may very well still be in use
       end
+    else
+      result[:error].each { |e| error "Error calling web service: #{e}" }
+      error "Failed to unlink accessright #{ar.mid} from object #{obj.pid}"
+      obj.status = Status::PostIngestFailed
     end
   end
   

@@ -27,17 +27,17 @@ class ConverterChain
     operations.each do |k,v|
       method = k.to_s.downcase.to_sym
       chain_element = @converter_chain.reverse.detect { |c| c[:converter].new.respond_to? method }
-      unless chain_element
-        error "No converter in the converter chain supports '#{method.to_s}'. Continuing conversion without this operation."
-      else
+      if chain_element
         my_operations[chain_element[:converter]] ||= {}
         my_operations[chain_element[:converter]][method] = v
+      else
+        error "No converter in the converter chain supports '#{method.to_s}'. Continuing conversion without this operation."
       end
     end
 
     temp_files = []
 
-    while chain_element = chain.shift
+    while (chain_element = chain.shift)
 
       target_type = chain_element[:target]
       converter_class = chain_element[:converter]

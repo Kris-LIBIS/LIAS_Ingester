@@ -29,7 +29,7 @@ class OpacSearch < GenericSearch
     @session_id = 0
     @set_number = 0
 
-    response = execute_http_query("op=find&code=#{@index}&request=#{@term}&base=#{@base}")
+    response = execute_http_query("op=find&code=#@index&request=#@term&base=#@base")
     if response
       #noinspection RubyResolve
       @set_number = xml_get_text(response.xpath('//find/set_number'))
@@ -52,7 +52,7 @@ class OpacSearch < GenericSearch
     while @record_pointer <= @num_records
 
       if @record_pointer <= @num_records
-        response = execute_http_query("op=present&set_entry=#{@record_pointer}&set_number=#{@set_number}&base=#{@base}")
+        response = execute_http_query("op=present&set_entry=#@record_pointer&set_number=#@set_number&base=#@base")
 
         if response
           #noinspection RubyResolve
@@ -99,7 +99,7 @@ class OpacSearch < GenericSearch
   def add_item_data(xml_document)
 
     doc_number = xml_get_text(xml_document.root.xpath('//doc_number'))
-    response = execute_http_query("op=item-data&base=#{@base}&doc-number=#{doc_number}")
+    response = execute_http_query("op=item-data&base=#@base&doc-number=#{doc_number}")
 
     if response
       oai_marc = xml_document.root.xpath('//oai_marc').first
@@ -145,12 +145,16 @@ class OpacSearch < GenericSearch
     redo_count = 10
     xml_document = nil
 
-    begin
+    redo_search = true
+
+    while redo_search == true and redo_count > 0
+
+      sleep_time = 0.1 # in minutes
+
       redo_search = false
+      redo_count = redo_count - 1
 
       begin
-        redo_count = redo_count - 1
-        sleep_time = 0.1 # in minutes
 
         response = Net::HTTP.fetch(@host, :data => data, :action => :post)
 
@@ -162,7 +166,7 @@ class OpacSearch < GenericSearch
           else
             unless error == 'empty set'
               puts
-              puts "----------> Error searching for #{@term} --> '#{error}'"
+              puts "----------> Error searching for #@term --> '#{error}'"
               puts
             end
             if error =~ /license/
@@ -186,7 +190,7 @@ class OpacSearch < GenericSearch
 
       sleep sleep_time * 60 if redo_search
 
-    end until redo_search == false or redo_count < 0
+    end
 
     xml_document
 

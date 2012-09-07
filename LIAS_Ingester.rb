@@ -76,6 +76,8 @@ if @@app.options[:action]
       #noinspection RubyUnusedLocalVariable
       cfg_id = post_ingester.send(@@app.options[:action], arg)
 
+      else
+        # type code here
     end
 
   end

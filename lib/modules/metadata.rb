@@ -7,6 +7,7 @@ require 'libis/record'
 require 'libis/search'
 require 'tools/xml_document'
 
+#noinspection RubyResolve
 class Metadata
   include IngesterTask
   
@@ -17,7 +18,7 @@ class Metadata
     @cfg = cfg
     
     @metadata_map = {}
-    if mf = @cfg.metadata_file
+    if (mf = @cfg.metadata_file)
       @metadata_map = JSON.parse File.open(mf, 'r:utf-8').readlines.join
     end
   end
@@ -37,16 +38,16 @@ class Metadata
     options = MY_SEARCH_OPTIONS.merge @cfg.get_search_options
     search_term = obj.label
     if options[:term]
-      if (options[:match])
+      if options[:match]
         search_term = obj.file_name if obj.file_name
-        if (search_term =~ options[:match])
+        if search_term =~ options[:match]
           search_term = eval options[:term]
         end
       end
     end
     record = load_record search_term, options
     if record.nil?
-      Application.warn('Metadata') { "Could not find metadata for '#{search_term}'" } if obj.root?
+      Application.info('Metadata') { "Could not find metadata for '#{search_term}'" } if obj.root?
     else
       copy_metadata_from_aleph obj, record
     end
@@ -55,7 +56,7 @@ class Metadata
   def get_from_disk(obj)
     record = read_record obj
     if record.invalid?
-      Application.warn('Metadata') { "Could not find metadata in '#{@cfg.metadata_file}'" } if obj.root?
+      Application.info('Metadata') { "Could not find metadata in '#{@cfg.metadata_file}'" } if obj.root?
     else
       copy_metadata_as_is obj, record
     end
@@ -81,7 +82,7 @@ class Metadata
     search_term = [obj.label]
     search_term << obj.relative_path.to_s if obj.file_name
     search_term.reverse.each do |term|
-      if dc_file = @metadata_map[term]
+      if (dc_file = @metadata_map[term])
         doc = XmlDocument.open dc_file
         break
       end

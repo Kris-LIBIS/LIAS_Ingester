@@ -1,5 +1,6 @@
 require "ingester_module"
 
+#noinspection RubyResolve
 class PostProcessor
   include IngesterModule
 
@@ -8,7 +9,7 @@ class PostProcessor
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
+    end unless (cfg = IngestConfig.first(:id => config_id))
 
     begin
 
@@ -34,6 +35,8 @@ class PostProcessor
         end
       when Status::Finished
         warn "Skipping PostProcess of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+        else
+          # type code here
       end
 
     ensure
@@ -72,7 +75,7 @@ class PostProcessor
 
   def restart( config_id )
 
-    if cfg = undo(config_id)
+    if (cfg = undo(config_id))
       info "Restarting config ##{config_id}"
       process_config cfg
       return config_id
@@ -87,7 +90,7 @@ class PostProcessor
     begin
       error "Configuration ##{config_id} not found"
       return nil
-    end unless cfg = IngestConfig.first(:id => config_id)
+    end unless (cfg = IngestConfig.first(:id => config_id))
 
     process_config cfg
 
