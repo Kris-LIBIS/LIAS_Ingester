@@ -2,6 +2,7 @@
 
 require 'savon'
 require 'nori'
+require 'gyoku'
 require 'net/https'
 
 require 'tools/xml_document'
@@ -31,17 +32,19 @@ module SoapClient
   def setup(service, options = {})
     init unless @base_url
     Savon.configure do |cfg|
-      cfg.logger = Application.instance.logger
-      cfg.log_level = ConfigFile['SOAP_logging_level'] || :info
-      cfg.log = ConfigFile['SOAP_logging']
+      cfg.logger = ::Application.instance.logger
+      cfg.log_level = ::ConfigFile['SOAP_logging_level'] || :info
+      cfg.log = ::ConfigFile['SOAP_logging']
+      #noinspection RubyResolve
       cfg.soap_version = 2
+      #noinspection RubyResolve
       cfg.raise_errors = false
-      HTTPI.logger = Application.instance.logger
-      HTTPI.log_level = ConfigFile['SOAP_logging_level'] || :info
-      HTTPI.log = ConfigFile['SOAP_logging']
+      HTTPI.logger = ::Application.instance.logger
+      HTTPI.log_level = ::ConfigFile['SOAP_logging_level'] || :info
+      HTTPI.log = ::ConfigFile['SOAP_logging']
     end
 
-    url = options[:wsdl_url] || @base_url + service + @wsdl_extension
+    url = options[:wsdl_url] || @wsdl_url || (@base_url + service + @wsdl_extension)
     proxy = options[:proxy]
 
     #noinspection RubyArgCount

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008388680</dc:identifier>
+  <dc:title>Oeuvres morales de Plvtarqve : réunies et annotées. /</dc:title>
+  <dc:title>Morele werken van Plutargus : verzameld en geannoteerd</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dcterms:isPartOf>Facsimiles : de l'ancien Grecque , 5</dcterms:isPartOf>
+  <dcterms:alternative>Oeuvres morales, 1643, France, </dcterms:alternative>
+  <dcterms:alternative>Πλούταρχος</dcterms:alternative>
+  <dcterms:alternative>&amp;lt;&amp;lt;Les &amp;gt;&amp;gt;oeuvres morales de Plutarque</dcterms:alternative>
+  <dc:creator>Plutarchus Chaeronensis, ca. 46-120AC, (author)</dc:creator>
+  <dc:subject xsi:type="http://purl.org/dc/terms/LCSH" class="text">Rome Antiquities.</dc:subject>
+  <dc:subject xsi:type="http://purl.org/dc/terms/UDC" xml:lang="nl" class="text">Historische chronologie</dc:subject>
+  <dc:subject>Academic collection</dc:subject>
+  <dc:temporal>1601-1650</dc:temporal>
+  <dc:description>Index
+Oeuvres de Plutargue
+Bruxelles : Mezier, 1610(oorspronkelijke uitgever)</dc:description>
+  <dcterms:isVersionOf>2e éd. (par M. Deleuze)</dcterms:isVersionOf>
+  <dcterms:tableOfContents>1. Plutarque en Chéronée / Klauber, C.</dcterms:tableOfContents>
+  <dcterms:tableOfContents>2. Ancien Grecque / Amyo, J.</dcterms:tableOfContents>
+  <dc:contributor>Amyot, Jacques, II, Sir, 1513-1593, Jaq ( translator)</dc:contributor>
+  <dc:contributor>Musée chrétien d'Esztergom (MCDE), org. institute (rare books/mss only) (et sponsor)</dc:contributor>
+  <dcterms:provenance>BRES KULeuven Centrale Bibliotheek</dcterms:provenance>
+  <dc:publisher>et Luzerne (druk: ) 1614</dc:publisher>
+  <dc:publisher>Crespin, Samuel (Genève)(drukker)</dc:publisher>
+  <dc:date>1614 -     </dc:date>
+  <dc:date>Datering origineel werk: 1643</dc:date>
+  <dc:type>Books before 1840</dc:type>
+  <dc:type>Books</dc:type>
+  <dc:type xml:lang="en" class="text">Microfilm</dc:type>
+  <dc:type xml:lang="en" class="text">Books before 1840</dc:type>
+  <dc:type xml:lang="nl" class="text">Microfilm</dc:type>
+  <dc:type xml:lang="nl" class="text">Boeken vóór 1840</dc:type>
+  <dc:type xml:lang="fr" class="text">Microfilm</dc:type>
+  <dc:type xml:lang="fr" class="text">Livres avant 1840</dc:type>
+  <dcterms:spatial xsi:type="http://purl.org/dc/terms/LCSH" class="text">Rome Antiquities</dcterms:spatial>
+  <dcterms:extent>¶8, a-z6, A-2O6, 2P4, 2*4, 2Q-4V6, 4X4, A-F6, G8 ; [8], 363, [5] f., f. 365-674, [44] f. : ill. script (2°)</dcterms:extent>
+  <dcterms:medium>57 engraving(s) (C.P.S.C.M. / Klauber Cath. Sc. et Exc. A.V.)</dcterms:medium>
+  <dcterms:hasVersion>Version Français</dcterms:hasVersion>
+  <dc:source>BRES KULeuven Centrale Bibliotheek testrecord</dc:source>
+  <dc:source xsi:type="dcterms:URI" class="text">http://books.google.be/books?id=inZoup9VrjEC&amp;amp;pg=PA64&amp;amp;lpg=PA64&amp;amp;dq=Oeuvres+morales+et+melde+Plutarque&amp;amp;source=bl&amp;amp;ots=uCoZl5ohAc&amp;amp;sig=EJPiUc1TZQwUO3Z9x7OV9KPcMJI&amp;amp;hl=nl&amp;amp;sa=X&amp;amp;ei=yOYTT-avKMbi8AOQ2fDLAw&amp;amp;sqi=2&amp;amp;ved=0CCoQ6AEwAQ#v=onepage&amp;amp;q&amp;amp;f=false#Oeuvvres+morales+de+Plvtarqve</dc:source>
+  <dc:language>fr</dc:language>
+  <dc:language>la</dc:language>
+  <dc:language>grc</dc:language>
+  <dc:language>Français, Grecque, Latin</dc:language>
+  <dcterms:references>Copac online</dcterms:references>
+  <dcterms:isReferencedBy>de le Court, 1182</dcterms:isReferencedBy>
+</record>

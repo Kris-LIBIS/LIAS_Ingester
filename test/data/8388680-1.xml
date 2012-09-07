@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008388680</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">BK</fixfield>
+<fixfield id="LDR">00000nam^a22^^^^^^u^4500</fixfield>
+<fixfield id="001">008388680</fixfield>
+<fixfield id="005">20120116150152.0</fixfield>
+<fixfield id="008">100122s1614^^^^sz^^^^^^|^^^^^000^0^lat^c</fixfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Plutarchus Chaeronensis</subfield>
+<subfield label="d">ca. 46-120AC</subfield>
+<subfield label="4">aut</subfield>
+</varfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Amyot, Jacques</subfield>
+<subfield label="b">II</subfield>
+<subfield label="c">Sir</subfield>
+<subfield label="d">1513-1593</subfield>
+<subfield label="g">Jaq</subfield>
+<subfield label="9">avec titre 2</subfield>
+<subfield label="4">trl</subfield>
+</varfield>
+<varfield id="710" i1="2" i2=" ">
+<subfield label="a">Musée chrétien d'Esztergom</subfield>
+<subfield label="g">MCDE</subfield>
+<subfield label="9">et sponsor</subfield>
+<subfield label="4">ori</subfield>
+</varfield>
+<varfield id="710" i1="2" i2="9">
+<subfield label="a">Crespin, Samuel</subfield>
+<subfield label="c">Genève</subfield>
+<subfield label="d">1599-1648</subfield>
+<subfield label="4">prt</subfield>
+</varfield>
+<varfield id="752" i1="9" i2=" ">
+<subfield label="9">1601-1650</subfield>
+</varfield>
+<varfield id="130" i1="0" i2=" ">
+<subfield label="a">Oeuvres morales</subfield>
+<subfield label="f">1643</subfield>
+<subfield label="g">France</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="245" i1="1" i2="0">
+<subfield label="a">Oeuvres morales de Plvtarqve :</subfield>
+<subfield label="b">réunies et annotées. /</subfield>
+<subfield label="c">Trad. par Jacques Amyot e.a.</subfield>
+</varfield>
+<varfield id="246" i1="1" i2="1">
+<subfield label="a">Morele werken van Plutargus</subfield>
+<subfield label="b">verzameld en geannoteerd</subfield>
+</varfield>
+<varfield id="246" i1="1" i2="3">
+<subfield label="a">Πλούταρχος</subfield>
+</varfield>
+<varfield id="246" i1="1" i2="9">
+<subfield label="a">&lt;&lt;Les &gt;&gt;oeuvres morales de Plutarque</subfield>
+</varfield>
+<varfield id="250" i1=" " i2=" ">
+<subfield label="a">2e éd.</subfield>
+<subfield label="b">par M. Deleuze</subfield>
+</varfield>
+<varfield id="260" i1=" " i2="9">
+<subfield label="e">A Geneve</subfield>
+<subfield label="f">pour Samuel Crespin</subfield>
+<subfield label="g">1614</subfield>
+<subfield label="9">et Luzerne</subfield>
+</varfield>
+<varfield id="300" i1=" " i2=" ">
+<subfield label="a">¶8, a-z6, A-2O6, 2P4, 2*4, 2Q-4V6, 4X4, A-F6, G8 ; [8], 363, [5] f., f. 365-674, [44] f. :</subfield>
+<subfield label="b">ill.</subfield>
+<subfield label="e">script</subfield>
+<subfield label="9">2°</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="a">57</subfield>
+<subfield label="b">engraving(s)</subfield>
+<subfield label="9">C.P.S.C.M. / Klauber Cath. Sc. et Exc. A.V.</subfield>
+</varfield>
+<varfield id="440" i1=" " i2="0">
+<subfield label="a">Facsimiles</subfield>
+<subfield label="b">de l'ancien Grecque</subfield>
+<subfield label="v">5</subfield>
+</varfield>
+<varfield id="500" i1=" " i2=" ">
+<subfield label="a">Index</subfield>
+</varfield>
+<varfield id="505" i1="0" i2=" ">
+<subfield label="a">1.</subfield>
+<subfield label="t">Plutarque en Chéronée</subfield>
+<subfield label="r">Klauber, C.</subfield>
+</varfield>
+<varfield id="505" i1="2" i2=" ">
+<subfield label="a">2.</subfield>
+<subfield label="t">Ancien Grecque</subfield>
+<subfield label="r">Amyo, J.</subfield>
+</varfield>
+<varfield id="510" i1="4" i2=" ">
+<subfield label="a">de le Court</subfield>
+<subfield label="c">1182</subfield>
+</varfield>
+<varfield id="534" i1="9" i2=" ">
+<subfield label="a">Oeuvres de Plutargue</subfield>
+</varfield>
+<varfield id="534" i1=" " i2="9">
+<subfield label="a">Bruxelles : Mezier, 1610</subfield>
+</varfield>
+<varfield id="534" i1=" " i2=" ">
+<subfield label="a">Version Français</subfield>
+</varfield>
+<varfield id="546" i1=" " i2=" ">
+<subfield label="a">Français, Grecque, Latin</subfield>
+</varfield>
+<varfield id="581" i1=" " i2=" ">
+<subfield label="a">Copac online</subfield>
+</varfield>
+<varfield id="650" i1="1" i2="0">
+<subfield label="a">Rome</subfield>
+<subfield label="x">Antiquities.</subfield>
+</varfield>
+<varfield id="651" i1=" " i2="0">
+<subfield label="a">Rome</subfield>
+<subfield label="x">Antiquities</subfield>
+<subfield label="v">Early works to 1800.</subfield>
+</varfield>
+<varfield id="655" i1="9" i2="4">
+<subfield label="a">Books before 1840</subfield>
+<subfield label="x">Boeken vóór 1840</subfield>
+<subfield label="y">Livres avant 1840</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="1">
+<subfield label="a">Academic collection</subfield>
+</varfield>
+<varfield id="691" i1="E" i2="1">
+<subfield label="8">930.24</subfield>
+<subfield label="a">Historische chronologie</subfield>
+<subfield label="9">dut</subfield>
+</varfield>
+<varfield id="041" i1="9" i2=" ">
+<subfield label="a">fre</subfield>
+<subfield label="9">grc</subfield>
+<subfield label="h">lat</subfield>
+</varfield>
+<varfield id="088" i1=" " i2=" ">
+<subfield label="9">1</subfield>
+<subfield label="a">Microfilm</subfield>
+<subfield label="x">Microfilm</subfield>
+<subfield label="y">Microfilm</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1000</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1001</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1002</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1002</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1010</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1012</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1028</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1033</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1042</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1114</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1114</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1127</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1142</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1143</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1154</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1440</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1501</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1504</subfield>
+</varfield>
+<varfield id="856" i1=" " i2="1">
+<subfield label="u">http://books.google.be/books?id=inZoup9VrjEC&amp;pg=PA64&amp;lpg=PA64&amp;dq=Oeuvres+morales+et+melde+Plutarque&amp;source=bl&amp;ots=uCoZl5ohAc&amp;sig=EJPiUc1TZQwUO3Z9x7OV9KPcMJI&amp;hl=nl&amp;sa=X&amp;ei=yOYTT-avKMbi8AOQ2fDLAw&amp;sqi=2&amp;ved=0CCoQ6AEwAQ#v=onepage&amp;q&amp;f=false</subfield>
+<subfield label="y">Oeuvvres morales de Plvtarqve</subfield>
+</varfield>
+<varfield id="852" i1=" " i2=" "><subfield label="b">BRES</subfield><subfield label="c">KULeuven Centrale Bibliotheek</subfield><subfield label="h">testrecord</subfield></varfield></oai_marc>
+</metadata>
+</record>
+<session-id>N8QQL84M54A7FE8SYNA72LJ1SAB46US27TTDXHU7I8BKTX4T3A</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>

@@ -4,25 +4,26 @@ require 'csv'
 
 require_relative 'xml_document'
 
+#noinspection RubyStringKeysInHashInspection
 class IngesterSetup
-  
+
   LABELMAPPING = {
-    :vpid               => 'vpid',
-    :file_name          => 'stream_ref/file_name',
-    :relation_type      => 'relations/relation/type',
-    :related_to         => 'relations/relation/vpid',
-    :usage_type         => 'control/usage_type',
-    :preservation_level => 'control/preservation_level',
-    :entity_type        => 'control/entity_type',
-    :label              => 'control/label'
-    }
+      :vpid => 'vpid',
+      :file_name => 'stream_ref/file_name',
+      :relation_type => 'relations/relation/type',
+      :related_to => 'relations/relation/vpid',
+      :usage_type => 'control/usage_type',
+      :preservation_level => 'control/preservation_level',
+      :entity_type => 'control/entity_type',
+      :label => 'control/label'
+  }
 
   attr_reader :tasks
 
   TASK_PARAMETER_ORDER = {
-    'MetadataInserter' =>     [ :Link, :Mddesc, :Mdfilename, :Mid, :ComplexOnly, :Extension, :Size ],
-    'AttributeAssignment' =>  [ :Name1, :Value1, :Name2, :Value2, :Name3, :Value3, :apply_to_parent_only, :extension],
-    'FullText' =>             [ :Encoding, :Extension ]
+      'MetadataInserter' => [:Link, :Mddesc, :Mdfilename, :Mid, :ComplexOnly, :Extension, :Size],
+      'AttributeAssignment' => [:Name1, :Value1, :Name2, :Value2, :Name3, :Value3, :apply_to_parent_only, :extension],
+      'FullText' => [:Encoding, :Extension]
   }
 
   def initialize
@@ -31,71 +32,70 @@ class IngesterSetup
     @is_complex = false
     @requires_mets = false
     @tasks = Array.new
-    super
   end
 
   def requires_mets?
     @requires_mets
   end
 
-  def add_metadata( options = {} )
-    task              = Hash.new
-    task[:task_name]  = 'MetadataInserter'
-    task[:name]       = 'Add Metadata'
-    params            = Hash.new
-    task[:params]     = params
-    params[:Link]         = ''
-    params[:Mddesc]       = ''
-    params[:Mdfilename]   = ''
-    params[:Mid]          = ''
-    params[:ComplexOnly]  = 'false'
-    params[:Extension]    = ''
-    params[:Size]         = ''
-    options.each do |k,v|
+  def add_metadata(options = {})
+    task = Hash.new
+    task[:task_name] = 'MetadataInserter'
+    task[:name] = 'Add Metadata'
+    params = Hash.new
+    task[:params] = params
+    params[:Link] = ''
+    params[:Mddesc] = ''
+    params[:Mdfilename] = ''
+    params[:Mid] = ''
+    params[:ComplexOnly] = 'false'
+    params[:Extension] = ''
+    params[:Size] = ''
+    options.each do |k, v|
       params[k] = v if [:Link, :Mddesc, :Mdfilename, :Mid, :ComplexOnly, :Extension, :Size].include? k
     end
     @tasks << task
   end
 
-  def add_acl( id, options = {} )
-    add_metadata( {:Mddesc => 'accessrights rights_md',
-                   :Link => 'true',
-                   :Mid => id.to_s
-                   }.merge!(options) )
+  def add_acl(id, options = {})
+    add_metadata({:Mddesc => 'accessrights rights_md',
+                  :Link => 'true',
+                  :Mid => id.to_s
+                 }.merge!(options))
   end
 
-  def add_dc( file_name, options = {} )
-    add_metadata( {:Mddesc => 'descriptive dc',
-                   :Link => 'true',
-                   :Mdfilename => file_name
-                   }.merge!(options) )
+  def add_dc(file_name, options = {})
+    add_metadata({:Mddesc => 'descriptive dc',
+                  :Link => 'true',
+                  :Mdfilename => file_name
+                 }.merge!(options))
   end
 
-  def add_control_fields( name_values, extension, options = {} )
+  def add_control_fields(name_values, extension, options = {})
 
     return unless name_values
 
     keys = name_values.keys
     until keys.empty?
-      task              = Hash.new
-      task[:task_name]  = 'AttributeAssignment'
-      task[:name]       = 'Control section Attribute Assignment'
-      params            = Hash.new
-      task[:params]     = params
-      params[:Name1]    = ''
-      params[:Value1]   = ''
-      params[:Name2]    = ''
-      params[:Value2]   = ''
-      params[:Name3]    = ''
-      params[:Value3]   = ''
+      task = Hash.new
+      task[:task_name] = 'AttributeAssignment'
+      task[:name] = 'Control section Attribute Assignment'
+      params = Hash.new
+      task[:params] = params
+      params[:Name1] = ''
+      params[:Value1] = ''
+      params[:Name2] = ''
+      params[:Value2] = ''
+      params[:Name3] = ''
+      params[:Value3] = ''
       1.upto(3) do |n|
         key = keys.shift
         params["Name#{n}".to_sym] = key
         params["Value#{n}".to_sym] = name_values[key]
       end
       params[:apply_to_parent_only] = 'false'
-      params[:extension]  = extension
-      options.each do |k,v|
+      params[:extension] = extension
+      options.each do |k, v|
         params[k] = v if [:apply_to_parent_only, :extension].include? k
       end
       @tasks << task
@@ -103,28 +103,28 @@ class IngesterSetup
 
   end
 
-  def full_text_extraction( options = {} )
-    task              = Hash.new
-    task[:task_name]  = 'FullText'
-    task[:name]       = 'Full Text Extraction'
-    params            = Hash.new
-    task[:params]     = params
-    params[:Encoding]   = 'UTF-8'
-    params[:Extension]  = 'ftx'
-    options.each { |k,v| params[k] = v if [:Encoding, :Extension].include? k }
+  def full_text_extraction(options = {})
+    task = Hash.new
+    task[:task_name] = 'FullText'
+    task[:name] = 'Full Text Extraction'
+    params = Hash.new
+    task[:params] = params
+    params[:Encoding] = 'UTF-8'
+    params[:Extension] = 'ftx'
+    options.each { |k, v| params[k] = v if [:Encoding, :Extension].include? k }
     @tasks << task
   end
 
-  def add_complex_object( name, usage_type )
+  def add_complex_object(name, usage_type)
     @is_complex ||= true
     add_file name, usage_type, 'COMPLEX'
   end
 
-  def add_dir( name )
+  def add_dir(name)
     add_file name, 'VIEW', 'directory'
   end
 
-  def add_file( label, usage_type, entity_type = nil, obj = nil )
+  def add_file(label, usage_type, entity_type = nil, obj = nil)
     file_info = Hash.new
     @last_id += 1
     file_info[:vpid] = @last_id
@@ -132,23 +132,23 @@ class IngesterSetup
     file_info[:file_name] = obj.relative_stream.to_s if obj and obj.file_stream
     file_info[:label] = label
     case usage_type.upcase
-    when /^(COMPLEX_)?ORIGINAL$/
-      file_info[:usage_type] = 'ARCHIVE'
-      file_info[:preservation_level] = 'critical'
-    when /^((\d+|COMPLEX)_)?ARCHIVE$/
-      file_info[:usage_type] = 'ARCHIVE'
-      file_info[:preservation_level] = 'high'
-    when /^((\d+|COMPLEX)_)?VIEW_MAIN$/
-      file_info[:usage_type] = 'VIEW_MAIN'
-      file_info[:preservation_level] = 'any'
-    when /^((\d+|COMPLEX)_)?VIEW$/
-      file_info[:usage_type] = 'VIEW'
-      file_info[:preservation_level] = 'any'
-    when /^((\d+|COMPLEX)_)?THUMBNAIL$/
-      file_info[:usage_type] = 'THUMBNAIL'
-      file_info[:preservation_level] = 'any'
-    else
-      file_info[:preservation_level] = 'any'
+      when /^(COMPLEX_)?ORIGINAL$/
+        file_info[:usage_type] = 'ARCHIVE'
+        file_info[:preservation_level] = 'critical'
+      when /^((\d+|COMPLEX)_)?ARCHIVE$/
+        file_info[:usage_type] = 'ARCHIVE'
+        file_info[:preservation_level] = 'high'
+      when /^((\d+|COMPLEX)_)?VIEW_MAIN$/
+        file_info[:usage_type] = 'VIEW_MAIN'
+        file_info[:preservation_level] = 'any'
+      when /^((\d+|COMPLEX)_)?VIEW$/
+        file_info[:usage_type] = 'VIEW'
+        file_info[:preservation_level] = 'any'
+      when /^((\d+|COMPLEX)_)?THUMBNAIL$/
+        file_info[:usage_type] = 'THUMBNAIL'
+        file_info[:preservation_level] = 'any'
+      else
+        file_info[:preservation_level] = 'any'
     end
     file_info[:entity_type] = entity_type
     file_info[:object] = obj
@@ -156,19 +156,19 @@ class IngesterSetup
     @last_id
   end
 
-  def set_relation( vpid, relation_type, to_vpid )
+  def set_relation(vpid, relation_type, to_vpid)
     vpid = vpid.to_i
     relation_type = relation_type.to_sym
     to_vpid = to_vpid.to_i
-    return false if ( vpid < 1 or vpid > @last_id )
-    return false if ( to_vpid < 1 or to_vpid >= vpid )
+    return false if (vpid < 1 or vpid > @last_id)
+    return false if (to_vpid < 1 or to_vpid >= vpid)
     @files[vpid][:relation_type] = relation_type
     @files[vpid][:related_to] = to_vpid
-    @requires_mets ||= ( relation_type == :part_of and @files[to_vpid][:relation_type] == :part_of )
+    @requires_mets ||= (relation_type == :part_of and @files[to_vpid][:relation_type] == :part_of)
     true
   end
 
-  def finalize_setup( setup_dir )
+  def finalize_setup(setup_dir)
     # write ingest_settings
     write_settings setup_dir + '/ingest_settings.xml'
 
@@ -181,81 +181,80 @@ class IngesterSetup
     end
   end
 
-  def get_related( relation, to_vpid, usage_type = nil )
+  def get_related(relation, to_vpid, usage_type = nil)
     relation = relation.to_sym
     to_vpid = to_vpid.to_i
-    result = @files.find_all do |_, f|
+    @files.find_all do |_, f|
       f[:relation_type] == relation and f[:related_to] == to_vpid and
-      ( usage_type ? f[:usage_type] == usage_type : true )
+          (usage_type ? f[:usage_type] == usage_type : true)
     end
-    result
   end
 
-  def write_settings( file )
+  def write_settings(file)
     doc = XmlDocument.new
 
     root = doc.create_node 'ingest_settings', :namespaces => {
-      :node_ns => 'xb',
-      'xb' => 'http://com/exlibris/digitool/common/jobs/xmlbeans' }
+        :node_ns => 'xb',
+        'xb' => 'http://com/exlibris/digitool/common/jobs/xmlbeans'}
     doc.root = root
 
     if @requires_mets
       node = doc.create_node 'transformer_task', :attributes => {
-        'name'        => 'METS xml file and associated file stream(s)',
-        'class_name'  => 'com.exlibris.digitool.ingest.transformer.metsbased.MetsBasedTransformer' }
-      node << ( doc.create_node 'param', :attributes => { 'name'   =>  'mets_file', 'value'  =>  'mets.xml' } )
-      node << ( doc.create_node 'param', :attributes => { 'name'   =>  'downloadFiles', 'value'  =>  'false' } )
+          'name' => 'METS xml file and associated file stream(s)',
+          'class_name' => 'com.exlibris.digitool.ingest.transformer.metsbased.MetsBasedTransformer'}
+      node << (doc.create_node 'param', :attributes => {'name' => 'mets_file', 'value' => 'mets.xml'})
+      node << (doc.create_node 'param', :attributes => {'name' => 'downloadFiles', 'value' => 'false'})
       root << node
     else
       node = doc.create_node 'transformer_task', :attributes => {
-        'name'        => 'Comma separated value (.csv) file',
-        'class_name'  => 'com.exlibris.digitool.ingest.transformer.valuebased.CsvTransformer' }
-      node << ( doc.create_node 'param', :attributes => { 'name'   => 'template_file', 'value'  => 'values.csv' } )
-      node << ( doc.create_node 'param', :attributes => { 'name'   => 'mapping_file', 'value'  => 'mapping.xml' } )
+          'name' => 'Comma separated value (.csv) file',
+          'class_name' => 'com.exlibris.digitool.ingest.transformer.valuebased.CsvTransformer'}
+      node << (doc.create_node 'param', :attributes => {'name' => 'template_file', 'value' => 'values.csv'})
+      node << (doc.create_node 'param', :attributes => {'name' => 'mapping_file', 'value' => 'mapping.xml'})
       root << node
     end
 
     i = 0
-    chain = doc.create_node 'tasks_chain', :attributes => { 'name' => 'Task Chain' }
+    chain = doc.create_node 'tasks_chain', :attributes => {'name' => 'Task Chain'}
 
     @tasks.each do |task|
-      chain << ( write_task doc, task, i )
+      chain << (write_task doc, task, i)
       i += 1
     end
 
-    ( root << chain ) if i > 0
+    (root << chain) if i > 0
 
-    root << ( doc.create_node 'ingest_task', :attributes => { 'name' => 'LIAS_ingester' } )
+    root << (doc.create_node 'ingest_task', :attributes => {'name' => 'LIAS_ingester'})
 
     doc.save file
 
   end
 
-  def write_task( doc, task, nr )
+  def write_task(doc, task, nr)
 
     node = doc.create_node 'task_settings', :attributes => {
-      'id'        => nr.to_s,
-      'task_name' => task[:task_name],
-      'name'      => task[:name] }
+        'id' => nr.to_s,
+        'task_name' => task[:task_name],
+        'name' => task[:name]}
 
     TASK_PARAMETER_ORDER[task[:task_name]].each do |p|
       param = task[:params][p]
-      node << ( doc.create_node 'param', :attributes => { 'name' => p.to_s, 'value' => param.to_s } )
+      node << (doc.create_node 'param', :attributes => {'name' => p.to_s, 'value' => param.to_s})
     end
 
     node
 
   end
 
-  def write_csv( file )
+  def write_csv(file)
     ### NOTE: This is a workaround for what is probably a bug in DigiTool: in complex object ingests,
     ######### the VIEW_MAIN manifestations are not displayed by the viewer (could this be an issue in
     ######### the on-the-fly METS creator in the delevery module?)
     @files.each { |_, f| f[:usage_type] = 'VIEW' if f[:usage_type] == 'VIEW_MAIN' } if @is_complex
 
-    CSV.open( file, 'w:utf-8') do |csv|
+    CSV.open(file, 'w:utf-8') do |csv|
       csv << LABELMAPPING.keys
-      @files.each do |_,file_info|
+      @files.each do |_, file_info|
         row = Array.new
         LABELMAPPING.keys.each do |tag|
           element = file_info[tag] ? file_info[tag].to_s : ''
@@ -266,74 +265,75 @@ class IngesterSetup
     end
   end
 
-  def create_mapping( doc, position, target )
+  def create_mapping(doc, position, target)
     x_map = doc.create_node 'x_map'
-    x_map << doc.create_node('x_source', :attributes => { 'position' => position } )
-    x_map << doc.create_text_node( 'x_target', target)
+    x_map << doc.create_node('x_source', :attributes => {'position' => position})
+    x_map << doc.create_text_node('x_target', target)
     x_map
   end
 
-  def write_mapping( file )
+  def write_mapping(file)
     doc = XmlDocument.new
 
-    root = doc.create_node('x_mapping', :attributes => { 'start_from_line' => '2' }, :namespaces => {
-      :node_ns  =>  'tm',
-      'tm'      =>  'http://com/exlibris/digitool/repository/transMap/xmlbeans' } )
+    root = doc.create_node('x_mapping', :attributes => {'start_from_line' => '2'}, :namespaces => {
+        :node_ns => 'tm',
+        'tm' => 'http://com/exlibris/digitool/repository/transMap/xmlbeans'})
 
     doc.root = root
 
     stream_map = doc.create_node 'x_map'
-    stream_map << ( doc.create_text_node 'x_target', 'stream_ref' )
-    stream_map << ( doc.create_text_node 'x_attr',   'store_command' )
-    stream_map << ( doc.create_text_node 'x_default','copy' )
+    stream_map << (doc.create_text_node 'x_target', 'stream_ref')
+    stream_map << (doc.create_text_node 'x_attr', 'store_command')
+    stream_map << (doc.create_text_node 'x_default', 'copy')
 
     root << stream_map
 
     stream_map = doc.create_node 'x_map'
-    stream_map << ( doc.create_text_node 'x_target', 'stream_ref/directory_path' )
-    stream_map << ( doc.create_text_node 'x_default','default' )
+    stream_map << (doc.create_text_node 'x_target', 'stream_ref/directory_path')
+    stream_map << (doc.create_text_node 'x_default', 'default')
 
     root << stream_map
 
-    LABELMAPPING.each_with_index do |mapping,i|
-      root << ( create_mapping(doc, (i+1).to_s, mapping[1]) )
+    LABELMAPPING.each_with_index do |mapping, i|
+      root << (create_mapping(doc, (i+1).to_s, mapping[1]))
     end
 
-    root << ( create_mapping doc, '1','stream_ref/file_id' )
+    root << (create_mapping doc, '1', 'stream_ref/file_id')
 
     doc.save file
 
   end
 
-  def write_mets( target_file )
+  def write_mets(target_file)
 
     @ns = 'mets:'
-    doc       = XmlDocument.new
-    doc.root  = doc.create_node @ns + 'mets'
-    add_namespaces doc.root, 'mods'   => 'http://www.loc.gov/mods/v3'
-    add_namespaces doc.root, 'mets'   => 'http://www.loc.gov/METS/'
-    add_namespaces doc.root, 'xsi'    => 'http://www.w3.org/2001/XMLSchema-instance'
-    add_namespaces doc.root, 'xlink'  => 'http://www.w3.org/1999/xlink'
-    add_namespaces doc.root, 'rts'    => 'http://cosimo.stanford.edu/sdr/metsrights/'
-    add_namespaces doc.root, 'mix'    => 'http://www.loc.gov/mix/'
+    doc = XmlDocument.new
+    doc.root = doc.create_node @ns + 'mets'
+    add_namespaces doc.root, 'mods' => 'http://www.loc.gov/mods/v3'
+    add_namespaces doc.root, 'mets' => 'http://www.loc.gov/METS/'
+    add_namespaces doc.root, 'xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
+    add_namespaces doc.root, 'xlink' => 'http://www.w3.org/1999/xlink'
+    add_namespaces doc.root, 'rts' => 'http://cosimo.stanford.edu/sdr/metsrights/'
+    add_namespaces doc.root, 'mix' => 'http://www.loc.gov/mix/'
     add_attributes doc.root, 'xsi:schemaLocation' => 'http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd http://www.loc.gov/mods/v3 .http://www.loc.gov/mods/v3/mods-3-1.xsd http://www.loc.gov/mix/ http://www.loc.gov/mix/mix.xsd http://cosimo.stanford.edu/sdr/metsrights/ http://cosimo.stanford.edu/sdr/metsrights.xsd'
     add_attributes doc.root, 'xmlns' => 'http://www.loc.gov/METS/' if @ns == ''
 
     #noinspection RubyUnusedLocalVariable
-    doc.root  << ( header       = doc.create_node @ns + 'metsHdr',      :attributes => { 'ID' => 'hdr' } )
-    doc.root  << ( filesec      = doc.create_node @ns + 'fileSec',      :attributes => { 'ID' => 'fsec' } )
-    filesec   << ( archives     = doc.create_node @ns + 'fileGrp',      :attributes => { 'ID' => 'fgrp_1', 'USE' => 'archive' } )
-    filesec   << ( thumbnails   = doc.create_node @ns + 'fileGrp',      :attributes => { 'ID' => 'fgrp_2', 'USE' => 'thumbnail' } )
-    filesec   << ( views        = doc.create_node @ns + 'fileGrp',      :attributes => { 'ID' => 'fgrp_3', 'USE' => 'reference' } )
-    filesec   << ( view_mains   = doc.create_node @ns + 'fileGrp',      :attributes => { 'ID' => 'fgrp_4', 'USE' => 'reference' } )
-    doc.root  << ( logical_map  = doc.create_node @ns + 'structMap',    :attributes => { 'ID' => 'smap_1', 'TYPE' => 'LOGICAL',  'LABEL' => 'Inhoud' } )
+    doc.root << (header = doc.create_node @ns + 'metsHdr', :attributes => {'ID' => 'hdr'})
+    doc.root << (filesec = doc.create_node @ns + 'fileSec', :attributes => {'ID' => 'fsec'})
+    filesec << (archives = doc.create_node @ns + 'fileGrp', :attributes => {'ID' => 'fgrp_1', 'USE' => 'archive'})
+    filesec << (thumbnails = doc.create_node @ns + 'fileGrp', :attributes => {'ID' => 'fgrp_2', 'USE' => 'thumbnail'})
+    filesec << (views = doc.create_node @ns + 'fileGrp', :attributes => {'ID' => 'fgrp_3', 'USE' => 'reference'})
+    filesec << (view_mains = doc.create_node @ns + 'fileGrp', :attributes => {'ID' => 'fgrp_4', 'USE' => 'reference'})
 
-    root_objects = @files.find_all do |_,file_info|
+    doc.root << (logical_map = doc.create_node @ns + 'structMap', :attributes => {'ID' => 'smap_1', 'TYPE' => 'LOGICAL', 'LABEL' => 'Inhoud'})
+
+    root_objects = @files.find_all do |_, file_info|
       file_info[:relation_type].nil?
     end
 
     if root_objects.size != 1
-      @@logger.error(self.class) { "METS ingest can only process with exaclty one root object" }
+      Application.instance.logger.error(self.class) { "METS ingest can only process with exaclty one root object" }
       return
     end
 
@@ -341,12 +341,12 @@ class IngesterSetup
     root_label = root_object[1][:label]
     add_attributes doc.root, 'LABEL' => root_label
 
-    add_node_recursive doc, root_object[1], logical_map
+    logical_map << (add_node_recursive doc, root_object[1])
 
-    @files.each do |vpid,file_info|
-      next unless obj = file_info[:object]
+    @files.each do |vpid, file_info|
+      next unless (obj = file_info[:object])
       next unless file_info[:file_name]
-      file = doc.create_node @ns + 'file', :attributes => { 'ID' => "file_#{vpid.to_s}" }
+      file = doc.create_node @ns + 'file', :attributes => {'ID' => "file_#{vpid.to_s}"}
       if obj.file_info
         add_attributes(file,
                        'MIMETYPE' => obj.mime_type,
@@ -355,18 +355,20 @@ class IngesterSetup
       end
       group_id = file_info[:relation_type] == :manifestation ? file_info[:related_to] : file_info[:vpid]
       add_attributes file, 'GROUPID' => "group_#{group_id}"
-      file << ( file_location = create_node @ns + 'FLocat' )
+      file << (file_location = create_node @ns + 'FLocat')
       add_attributes file_location, 'LOCTYPE' => 'URL'
       add_attributes file_location, 'xlink:href' => "file://streams/#{obj.relative_stream.to_s}"
       case file_info[:usage_type]
-      when 'ARCHIVE'
-        archives << file
-      when 'VIEW'
-        views << file
-      when 'VIEW_MAIN'
-        view_mains << file
-      when 'THUMBNAIL'
-        thumbnails << file
+        when 'ARCHIVE'
+          archives << file
+        when 'VIEW'
+          views << file
+        when 'VIEW_MAIN'
+          view_mains << file
+        when 'THUMBNAIL'
+          thumbnails << file
+        else
+          # do nothing
       end
     end
 
@@ -376,19 +378,19 @@ class IngesterSetup
 
   private
 
-  def add_node( file, parent_node )
+  def add_node(file, parent_node)
 
     # First create the div node
     div_node = add_div_node file, parent_node
 
-    f = get_related( :manifestation, file[:vpid], 'VIEW_MAIN' ).first
+    f = get_related(:manifestation, file[:vpid], 'VIEW_MAIN').first
     add_fptr_node f[1], div_node if f
 
     div_node
 
   end
 
-  def add_div_node( file, parent_node )
+  def add_div_node(file, parent_node)
     # create ID for the node
     ## Actually, the IDs on all structMap elements are reset to random numbers by the DTL ingester
     parent_id = parent_node['ID']
@@ -396,31 +398,33 @@ class IngesterSetup
     this_id = "div_#{parent_id}_#{file[:vpid].to_s}"
 
     # create the div node
-    this_node = parent_node. create_node @ns + 'div', :attributes => { 'ID' => this_id, 'LABEL' => File.basename(file[:label]) }
+    this_node = parent_node.create_node @ns + 'div', :attributes => {'ID' => this_id, 'LABEL' => File.basename(file[:label])}
 
     parent_node << this_node
 
     this_node
   end
 
-  def add_fptr_node( file, parent_node )
+  def add_fptr_node(file, parent_node)
 
     # add a fptr node if there is a physical file
     if file[:file_name]
-      parent_node << ( create_node @ns + 'fptr', :attributes => {
-        'FILEID' => "file_#{file[:vpid].to_s}", 'ID' => "fptr_#{parent_node['ID']}_#{file[:vpid].to_s}" } )
+      parent_node << (create_node @ns + 'fptr', :attributes => {
+          'FILEID' => "file_#{file[:vpid].to_s}", 'ID' => "fptr_#{parent_node['ID']}_#{file[:vpid].to_s}"})
     end
 
   end
 
-  def add_node_recursive( file, parent_node )
+  def add_node_recursive(file, parent_node)
 
     this_node = add_node file, parent_node
 
-    get_related( :part_of, file[:vpid] ).each { |_, f| add_node_recursive f, this_node unless f[:object] and f[:object].leaf? }
+    get_related(:part_of, file[:vpid]).each { |_, f| add_node_recursive f, this_node unless f[:object] and f[:object].leaf? }
 
-    get_related( :part_of, file[:vpid] ).each { |_, f| add_node_recursive f, this_node if f[:object] and f[:object].leaf? }
+    get_related(:part_of, file[:vpid]).each { |_, f| add_node_recursive f, this_node if f[:object] and f[:object].leaf? }
+
+    this_node
 
   end
-  
+
 end

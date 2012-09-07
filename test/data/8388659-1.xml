@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008388659</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">VM</fixfield>
+<fixfield id="LDR">00000nkm^a22^^^^^^a^4500</fixfield>
+<fixfield id="001">008388659</fixfield>
+<fixfield id="005">20120116150534.0</fixfield>
+<fixfield id="008">110204q17uu^^^^xx^nnn^^^^^^^^^^^^||lat^d</fixfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Harrewijn, François</subfield>
+<subfield label="d">1700-1764</subfield>
+<subfield label="g">Flemish etcher, bookseller</subfield>
+<subfield label="4">art</subfield>
+<subfield label="9">graphic artist</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Leuven. Panorama's</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Leuven. Religieuze gebouwen</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Leuven. Sint-Geertruiabdij</subfield>
+<subfield label="h">Static image</subfield>
+</varfield>
+<varfield id="260" i1=" " i2=" ">
+<subfield label="c">s.d.</subfield>
+<subfield label="9">1720-1800</subfield>
+</varfield>
+<varfield id="300" i1="9" i2=" ">
+<subfield label="b">Black-and-white ;</subfield>
+<subfield label="c">voorstelling: 340 x 455 mm</subfield>
+<subfield label="c">voorstelling met opschrift: 345 x 455 mm.</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="b">engraving(s)</subfield>
+</varfield>
+<varfield id="529" i1=" " i2=" ">
+<subfield label="a">Nobilissima D. Gertrudis Abbatia Lovanii, Ordinis Canonicorum Regularium S. Augustini</subfield>
+<subfield label="b">buiten de voorstelling: onderaan, centraal</subfield>
+</varfield>
+<varfield id="529" i1=" " i2=" ">
+<subfield label="a">F. Harrewijn sc.</subfield>
+<subfield label="b">buiten de voorstelling: onderaan, links</subfield>
+</varfield>
+<varfield id="545" i1=" " i2=" ">
+<subfield label="a">Panoramisch gezicht op de Sint-Geertruiabdij en de Sint-Gertrudiskerk. Links een cartouche met inscriptie bekroond door twee putti met een wapen en de wapenspreuk van de abt Guillaume-Philippe de Herzelles. Boven rechts nog twee aanzichten van de abdij.</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="1">
+<subfield label="a">VoL Gebouw</subfield>
+<subfield label="x">Leuven, Sint-Geertruiabdij (Sint-Gertruidis-abdij)</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="1">
+<subfield label="a">VoL Gebtype</subfield>
+<subfield label="x">abdijen</subfield>
+</varfield>
+<varfield id="690" i1="0" i2="1">
+<subfield label="a">VoL Straat</subfield>
+<subfield label="x">Leuven, Halfmaartstraat</subfield>
+</varfield>
+<varfield id="655" i1="9" i2="4">
+<subfield label="a">Topographical pictures</subfield>
+<subfield label="x">Topografische prenten</subfield>
+<subfield label="y">Gravures topographiques</subfield>
+</varfield>
+<varfield id="088" i1=" " i2=" ">
+<subfield label="a">Graphic</subfield>
+<subfield label="x">Grafische voorstelling (niet gespecificeerd)</subfield>
+<subfield label="y">Graphique (non précisé)</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">MM04</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">0950</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL01</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1500</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1502</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1504</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1505</subfield>
+</varfield>
+<varfield id="852" i1=" " i2=" "><subfield label="b">BRES</subfield><subfield label="c">KULeuven Centrale Bibliotheek</subfield><subfield label="h"></subfield></varfield></oai_marc>
+</metadata>
+</record>
+<session-id>AXL4E3LRA5N89HDJXLA1LICSHGY3V7K4BAADDI31MX97BET4EP</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>

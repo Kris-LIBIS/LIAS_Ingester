@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008388823</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">SE</fixfield>
+<fixfield id="LDR">00000nas^a22^^^^^^u^4500</fixfield>
+<fixfield id="001">008388823</fixfield>
+<fixfield id="005">20120116150206.0</fixfield>
+<fixfield id="008">100122d16241630ne^^^^^^|^^^^^000^0^lat^c</fixfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Callimaci Cyrenaei Hymni, epigrammata et fragmenta, qvæ exstant.</subfield>
+<subfield label="Z">954843</subfield>
+</varfield>
+<varfield id="246" i1="1" i2="4">
+<subfield label="a">Konjunkturanalyse</subfield>
+<subfield label="b">Einleitung</subfield>
+</varfield>
+<varfield id="246" i1="1" i2="5">
+<subfield label="a">Eurostatistik</subfield>
+<subfield label="b">Einleitung</subfield>
+</varfield>
+<varfield id="246" i1="9" i2="3">
+<subfield label="a">Titels SFX</subfield>
+<subfield label="b">inleiding</subfield>
+</varfield>
+<varfield id="247" i1="1" i2="0">
+<subfield label="a">Callimaci Cyrenaei Hymni</subfield>
+<subfield label="b">fragmenta</subfield>
+<subfield label="9">1(1624)-3(1626)</subfield>
+<subfield label="x">0003-9578</subfield>
+<subfield label="Z">704982</subfield>
+</varfield>
+<varfield id="254" i1=" " i2=" ">
+<subfield label="a">Musical presentation</subfield>
+</varfield>
+<varfield id="260" i1=" " i2=" ">
+<subfield label="c">1624-1630.</subfield>
+</varfield>
+<varfield id="260" i1=" " i2="9">
+<subfield label="e">Antverpiae</subfield>
+<subfield label="f">apud Christophorum Plantinum</subfield>
+</varfield>
+<varfield id="306" i1=" " i2=" ">
+<subfield label="a">015536</subfield>
+</varfield>
+<varfield id="310" i1=" " i2=" ">
+<subfield label="a">Unknown</subfield>
+</varfield>
+<varfield id="655" i1="9" i2="4">
+<subfield label="a">Books before 1840</subfield>
+<subfield label="x">Boeken vóór 1840</subfield>
+<subfield label="y">Livres avant 1840</subfield>
+</varfield>
+<varfield id="655" i1=" " i2="4">
+<subfield label="a">Periodicals</subfield>
+<subfield label="x">Tijdschriften - Periodieken</subfield>
+<subfield label="y">Périodiques</subfield>
+<subfield label="z">(Magazines)</subfield>
+</varfield>
+<varfield id="692" i1=" " i2=" ">
+<subfield label="a">E01.01</subfield>
+<subfield label="x">Architectuur. Algemeen</subfield>
+<subfield label="y">Architecture. General</subfield>
+</varfield>
+<varfield id="024" i1="8" i2=" ">
+<subfield label="a">UE 33373</subfield>
+<subfield label="9">part 1</subfield>
+</varfield>
+<varfield id="028" i1="3" i2="0">
+<subfield label="a">561677-2</subfield>
+<subfield label="b">UNS</subfield>
+<subfield label="9">Global</subfield>
+</varfield>
+<varfield id="028" i1="4" i2="0">
+<subfield label="a">456-89</subfield>
+</varfield>
+<varfield id="028" i1="5" i2="0">
+<subfield label="a">E.08.XIII.8</subfield>
+<subfield label="b">UNs</subfield>
+</varfield>
+<varfield id="033" i1=" " i2="0">
+<subfield label="a">Opname : 02 februari 1999</subfield>
+<subfield label="b">Leuven</subfield>
+</varfield>
+<varfield id="033" i1="9" i2=" ">
+<subfield label="a">20090511</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="1">
+<subfield label="a">alto_flute_fl_ww</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">2</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="2">
+<subfield label="a">cornet_br</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">2</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="3">
+<subfield label="a">bass_drum_perc</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">1</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="4">
+<subfield label="a">accordion_kbd</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">1</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="5">
+<subfield label="a">balalaika_pl_str</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">1</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="6">
+<subfield label="a">alto_voice</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">3</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="7">
+<subfield label="a">child_chorus</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">8</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="8">
+<subfield label="a">violin_bwdstr</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">4</subfield>
+</varfield>
+<varfield id="048" i1="0" i2="9">
+<subfield label="a">brass_band_ens</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">1</subfield>
+</varfield>
+<varfield id="048" i1="1" i2="0">
+<subfield label="a">bass_guitar_elec</subfield>
+<subfield label="c">spec</subfield>
+<subfield label="9">1</subfield>
+</varfield>
+<varfield id="048" i1="1" i2="1">
+<subfield label="a">unknown</subfield>
+</varfield>
+<varfield id="086" i1="0" i2="0">
+<subfield label="a">NBN EN 378-1</subfield>
+<subfield label="9">2008</subfield>
+</varfield>
+<varfield id="086" i1="1" i2="0">
+<subfield label="a">01.040.27</subfield>
+</varfield>
+<varfield id="086" i1="2" i2="0">
+<subfield label="a">NBN EN 378-1</subfield>
+<subfield label="9">2000</subfield>
+</varfield>
+<varfield id="097" i1=" " i2=" ">
+<subfield label="a">03</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1127</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1132</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1134</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1134</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1135</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1139</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1140</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1140</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1141</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1144</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1144</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1146</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1148</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1440</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1502</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1504</subfield>
+</varfield>
+<varfield id="035" i1=" " i2=" ">
+<subfield label="a">007147082</subfield>
+</varfield>
+<varfield id="309" i1=" " i2=" ">
+<subfield label="a">2-4 minutes</subfield>
+</varfield>
+<varfield id="852" i1=" " i2=" "><subfield label="b"></subfield><subfield label="c">KULeuven Centrale Bibliotheek</subfield><subfield label="h">testrecord</subfield></varfield></oai_marc>
+</metadata>
+</record>
+<session-id>A1FKBN6IMCBMKCCHSM8GBKGFYX5DPF7D295CF38XF2C9M9881N</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>

@@ -5,6 +5,7 @@ require 'ingester_task'
 
 require_relative 'type_database'
 
+#noinspection RubyClassVariableUsageInspection
 class Converter
   include IngesterTask
 
@@ -69,16 +70,16 @@ class Converter
         my_output_types = []
 
         config[:TYPES].each do |t|
-          my_input_types.add t
-          my_output_types.add t
+          my_input_types << t
+          my_output_types << t
         end if config[:TYPES]
 
         config[:INPUT_TYPES].each do |t|
-          my_input_types.add t
+          my_input_types << t
         end if config[:INPUT_TYPES]
 
         config[:OUTPUT_TYPES].each do |t|
-          my_output_types.add t
+          my_output_types << t
         end if config[:OUTPUT_TYPES]
 
         class_variable_set :@@input_types, my_input_types

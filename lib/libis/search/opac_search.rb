@@ -5,7 +5,7 @@ require 'tools/xml_document'
 require 'pp'
 
 require 'tools/hash'
-
+require 'libis/record_factory'
 require_relative 'generic_search'
 
 class OpacSearch < GenericSearch
@@ -51,27 +51,47 @@ class OpacSearch < GenericSearch
 
     while @record_pointer <= @num_records
 
-      if @record_pointer <= @num_records
-        response = execute_http_query("op=present&set_entry=#@record_pointer&set_number=#@set_number&base=#@base")
-
-        if response
-          #noinspection RubyResolve
-          response.root << element = response.create_node('search')
-          element['type'] = 'opac'
-          element['host'] = @host
-          element['base'] = @base
-          set_entry = xml_get_text(response.root.xpath('//set_entry')).to_i
-          if set_entry == @record_pointer
-            add_item_data(response)
-            yield response
-          end
-        end
-      else
-        puts 'no record found'
+      next_record do |r|
+        yield r
       end
 
-      @record_pointer += 1
     end
+  end
+
+  def next_record(set_number = nil, &block)
+
+    if !set_number.nil? && @set_number != set_number
+      @record_pointer = 1
+      @set_number = set_number
+    elsif @set_number.nil?
+      return
+    end
+
+    if @record_pointer <= @num_records
+      response = execute_http_query("op=present&set_entry=#@record_pointer&set_number=#@set_number&base=#@base")
+
+
+      if response
+        #noinspection RubyResolve
+        response.root << element = response.create_node('search')
+        element['type'] = 'opac'
+        element['host'] = @host
+        element['base'] = @base
+        set_entry = xml_get_text(response.root.xpath('//set_entry')).to_i
+        if set_entry == @record_pointer
+          add_item_data(response)
+          return RecordFactory.parse(response.to_xml).first if block.nil?
+          yield response
+        end
+      end
+    else
+      puts 'no record found'
+    end
+
+    @record_pointer += 1
+
+    nil
+
   end
 
 
@@ -145,16 +165,14 @@ class OpacSearch < GenericSearch
     redo_count = 10
     xml_document = nil
 
-    redo_search = true
+    redo_search = false
 
-    while redo_search == true and redo_count > 0
-
-      sleep_time = 0.1 # in minutes
-
+    begin
       redo_search = false
-      redo_count = redo_count - 1
 
       begin
+        redo_count = redo_count - 1
+        sleep_time = 0.1 # in minutes
 
         response = Net::HTTP.fetch(@host, :data => data, :action => :post)
 
@@ -162,7 +180,6 @@ class OpacSearch < GenericSearch
           xml_document, error = str_to_xml(response.body)
           if xml_document && error.size == 0
             #puts " Found #{xml_get_text(xml_document.xpath('//find/no_records'))} records"
-            nil
           else
             unless error == 'empty set'
               puts
@@ -190,7 +207,7 @@ class OpacSearch < GenericSearch
 
       sleep sleep_time * 60 if redo_search
 
-    end
+    end until redo_search == false or redo_count < 0
 
     xml_document
 

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008388659</dc:identifier>
+  <dc:title>Leuven. Sint-Geertruiabdij [Static image]</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dcterms:isPartOf>Leuven. Panorama's</dcterms:isPartOf>
+  <dcterms:isPartOf>Leuven. Religieuze gebouwen</dcterms:isPartOf>
+  <dc:creator>Harrewijn, François, 1700-1764, Flemish etcher, bookseller (artist)</dc:creator>
+  <dc:subject>VoL Gebouw</dc:subject>
+  <dc:subject>VoL Gebtype</dc:subject>
+  <dc:subject>VoL Straat</dc:subject>
+  <dc:description>Nobilissima D. Gertrudis Abbatia Lovanii, Ordinis Canonicorum Regularium S. Augustini, buiten de voorstelling: onderaan, centraal
+F. Harrewijn sc., buiten de voorstelling: onderaan, links
+Panoramisch gezicht op de Sint-Geertruiabdij en de Sint-Gertrudiskerk. Links een cartouche met inscriptie bekroond door twee putti met een wapen en de wapenspreuk van de abt Guillaume-Philippe de Herzelles. Boven rechts nog twee aanzichten van de abdij.</dc:description>
+  <dcterms:provenance>BRES KULeuven Centrale Bibliotheek</dcterms:provenance>
+  <dc:publisher>s.d. 1720-1800</dc:publisher>
+  <dc:date>17uu -     </dc:date>
+  <dc:type>Topographical pictures</dc:type>
+  <dc:type>Visual Materials</dc:type>
+  <dc:type xml:lang="en" class="text">Graphic</dc:type>
+  <dc:type xml:lang="en" class="text">Topographical pictures</dc:type>
+  <dc:type xml:lang="nl" class="text">Grafische voorstelling (niet gespecificeerd)</dc:type>
+  <dc:type xml:lang="nl" class="text">Topografische prenten</dc:type>
+  <dc:type xml:lang="fr" class="text">Graphique (non précisé)</dc:type>
+  <dc:type xml:lang="fr" class="text">Gravures topographiques</dc:type>
+  <dcterms:extent>Black-and-white ; voorstelling: 340 x 455 mm;voorstelling met opschrift: 345 x 455 mm.</dcterms:extent>
+  <dcterms:medium>engraving(s)</dcterms:medium>
+  <dc:source>BRES KULeuven Centrale Bibliotheek</dc:source>
+  <dc:language>la</dc:language>
+</record>

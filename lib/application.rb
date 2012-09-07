@@ -27,7 +27,7 @@ class Application
   #noinspection RubyResolve
   attr_reader   :logger
   #noinspection RubyResolve
-  attr_reader   :db_log_level
+  attr_accessor :db_log_level
   #noinspection RubyResolve
   attr_accessor :log_objects
   #noinspection RubyResolve

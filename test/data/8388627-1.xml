@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<present>
+<record>
+<record_header>
+<set_entry>000000001</set_entry>
+</record_header>
+<doc_number>008388627</doc_number>
+<metadata>
+<oai_marc>
+<varfield id="STA" i1=" " i2=" ">
+<subfield label="a">SUPPRESSED</subfield>
+</varfield>
+<fixfield id="FMT">VM</fixfield>
+<fixfield id="LDR">00000nkm^a22^^^^^^a^4500</fixfield>
+<fixfield id="001">008388627</fixfield>
+<fixfield id="005">20120116150609.0</fixfield>
+<fixfield id="008">110204q17uu^^^^xx^nnn^^^^^^^^^^^^||fre^d</fixfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Lipsius, Justus</subfield>
+<subfield label="d">1547-1606</subfield>
+<subfield label="4">dpc</subfield>
+</varfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Rubens, Peter Paul</subfield>
+<subfield label="d">1577-1640</subfield>
+<subfield label="g">Flemish painter and draughtsman</subfield>
+<subfield label="4">art</subfield>
+<subfield label="9">designer</subfield>
+</varfield>
+<varfield id="700" i1="1" i2=" ">
+<subfield label="a">Harrewijn, François</subfield>
+<subfield label="d">1700-1764</subfield>
+<subfield label="g">Flemish etcher, bookseller</subfield>
+<subfield label="4">art</subfield>
+<subfield label="9">graphic artist</subfield>
+</varfield>
+<varfield id="243" i1="1" i2="0">
+<subfield label="a">Testrecord mapping M21 naar DC</subfield>
+</varfield>
+<varfield id="245" i1="0" i2="0">
+<subfield label="a">Justus Lipsius</subfield>
+<subfield label="h">Static image</subfield>
+</varfield>
+<varfield id="260" i1=" " i2=" ">
+<subfield label="c">s.d.</subfield>
+<subfield label="9">1700-1800</subfield>
+</varfield>
+<varfield id="300" i1="9" i2=" ">
+<subfield label="b">Black-and-white ;</subfield>
+<subfield label="c">voorstelling: 150 x 120 mm</subfield>
+<subfield label="c">voorstelling met opschrift: 155 x 125 mm</subfield>
+<subfield label="c">plaatrand: 170 x 130 mm.</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="b">etching(s)</subfield>
+</varfield>
+<varfield id="399" i1=" " i2=" ">
+<subfield label="b">engraving(s)</subfield>
+</varfield>
+<varfield id="529" i1=" " i2=" ">
+<subfield label="a">P. Rubens pinxit, F. Harrewyn sculpsit</subfield>
+<subfield label="b">in de voorstelling: onderaan, links</subfield>
+</varfield>
+<varfield id="529" i1=" " i2=" ">
+<subfield label="a">[...] excudit</subfield>
+<subfield label="b">in de voorstelling: onderaan, rechts</subfield>
+</varfield>
+<varfield id="529" i1=" " i2=" ">
+<subfield label="a">Justus Lipsius</subfield>
+<subfield label="b">buiten de voorstelling: onderaan, centraal</subfield>
+</varfield>
+<varfield id="500" i1=" " i2=" ">
+<subfield label="a">Naam uitgever niet goed leesbaar</subfield>
+</varfield>
+<varfield id="655" i1="9" i2="4">
+<subfield label="a">Portraits</subfield>
+<subfield label="x">Portretten</subfield>
+<subfield label="y">Portraits</subfield>
+</varfield>
+<varfield id="088" i1=" " i2=" ">
+<subfield label="a">Graphic</subfield>
+<subfield label="x">Grafische voorstelling (niet gespecificeerd)</subfield>
+<subfield label="y">Graphique (non précisé)</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">MM04</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">0929</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">MM04</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">0934</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL01</subfield>
+<subfield label="b">00</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1500</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1502</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1504</subfield>
+</varfield>
+<varfield id="CAT" i1=" " i2=" ">
+<subfield label="a">LL04</subfield>
+<subfield label="b">01</subfield>
+<subfield label="c">20120116</subfield>
+<subfield label="l">LBS01</subfield>
+<subfield label="h">1506</subfield>
+</varfield>
+<varfield id="852" i1=" " i2=" "><subfield label="b">BRES</subfield><subfield label="c">KULeuven Centrale Bibliotheek</subfield><subfield label="h"></subfield></varfield></oai_marc>
+</metadata>
+</record>
+<session-id>STL8VTMRPS1NIQSIGD33Y2BMHYQGIR4A584BLJUUUK6BBYP243</session-id>
+<search type="opac" host="http://opac.libis.be/X" base="LBS01"/></present>

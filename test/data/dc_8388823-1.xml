@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<record xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dc:identifier>urn:ControlNumber:008388823</dc:identifier>
+  <dc:identifier>007147082</dc:identifier>
+  <dc:identifier>UE 33373</dc:identifier>
+  <dc:identifier>456-89</dc:identifier>
+  <dc:identifier>UNs: E.08.XIII.8</dc:identifier>
+  <dc:title>Callimaci Cyrenaei Hymni, epigrammata et fragmenta, qvæ exstant.</dc:title>
+  <dcterms:isPartOf>Testrecord mapping M21 naar DC</dcterms:isPartOf>
+  <dcterms:provenance>KULeuven Centrale Bibliotheek</dcterms:provenance>
+  <dc:publisher>1624-1630.</dc:publisher>
+  <dc:date>1624 - 1630</dc:date>
+  <dc:type>Books before 1840</dc:type>
+  <dc:type>(Magazines)</dc:type>
+  <dc:type>Continuing Resources</dc:type>
+  <dc:type xml:lang="en" class="text">Periodicals</dc:type>
+  <dc:type xml:lang="en" class="text">Books before 1840</dc:type>
+  <dc:type xml:lang="nl" class="text">Tijdschriften - Periodieken</dc:type>
+  <dc:type xml:lang="nl" class="text">Boeken vóór 1840</dc:type>
+  <dc:type xml:lang="fr" class="text">Périodiques</dc:type>
+  <dc:type xml:lang="fr" class="text">Livres avant 1840</dc:type>
+  <dcterms:extent>01:55:36</dcterms:extent>
+  <dcterms:extent>2-4 minutes</dcterms:extent>
+  <dcterms:accrualPeriodicity>Unknown</dcterms:accrualPeriodicity>
+  <dcterms:replaces>Callimaci Cyrenaei Hymni : fragmenta (1(1624)-3(1626))</dcterms:replaces>
+  <dc:source>KULeuven Centrale Bibliotheek testrecord</dc:source>
+  <dc:language>la</dc:language>
+</record>

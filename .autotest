@@ -1,0 +1,12 @@
+require 'autotest/timestamp'
+require 'autotest/fsevent'
+require 'autotest/restart'
+PLATFORM = RUBY_PLATFORM
+#require 'redgreen/autotest'
+require 'test_notifier/runner/autotest'
+TestNotifier.default_notifier = :notify_send
+Autotest.add_hook :initialize do |autotest|
+  %w{.git ._* tmp log doc .idea _* data helpers}.each do |exception|
+    autotest.add_exception(exception)
+  end
+end

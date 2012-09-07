@@ -28,12 +28,12 @@ class ImageConverter < Converter
     @options[:density] = value
   end
 
-  def colorspace(value)
-    @options[:colorspace] = value
-  end
-
   def flatten(value)
     @flags[:flatten] = value
+  end
+
+  def colorspace(value)
+    @options[:colorspace] = value
   end
 
   def watermark(options = {})

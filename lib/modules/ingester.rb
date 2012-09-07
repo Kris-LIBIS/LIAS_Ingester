@@ -9,7 +9,7 @@ require 'tools/xml_document'
 #noinspection RubyResolve
 class Ingester
   include IngesterModule
-
+  
   def start_queue
 
     info 'Starting'
@@ -36,24 +36,24 @@ class Ingester
       error "Configuration ##{config_id} not found"
       return nil
     end unless (cfg = IngestConfig.first(:id => config_id))
-
+    
     begin
 
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
-        when Status::Idle ... Status::PreIngested
-          # Oops! Not yet ready.
-          error "Cannot yet Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-        when Status::PreIngested ... Status::Ingesting
-          # Excellent! Continue ...
-          process_config cfg
-        when Status::Ingesting ... Status::Ingested
-          warn "Restarting Ingest of configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
-          restart config_id
-        when Status::Ingested .. Status::Finished
-          warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+      when Status::Idle ... Status::PreIngested
+        # Oops! Not yet ready.
+        error "Cannot yet Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+      when Status::PreIngested ... Status::Ingesting
+        # Excellent! Continue ...
+        process_config cfg
+      when Status::Ingesting ... Status::Ingested
+        warn "Restarting Ingest of configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
+        restart config_id
+      when Status::Ingested .. Status::Finished
+        warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
         else
           # type code here
       end
@@ -91,7 +91,7 @@ class Ingester
 
   def restart(config_id)
 
-    if  (cfg = undo(config_id))
+    if (cfg = undo(config_id))
       info "Restarting config ##{config_id}"
       process_config cfg
       return config_id
@@ -106,24 +106,24 @@ class Ingester
       error "Configuration ##{config_id} not found"
       return nil
     end unless (cfg = IngestConfig.first(:id => config_id))
-
+    
     begin
 
       ApplicationStatus.instance.run = cfg.ingest_run
       ApplicationStatus.instance.cfg = cfg
 
       case cfg.status
-        when Status::Idle ... Status::Ingesting
-          # Oops! Not yet ready.
-          error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-        when Status::Ingesting
-          error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
-        when Status::IngestFailed ... Status::PostIngesting
-          # Excellent! Continue ...
-          warn "Continuing just after Ingest configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
-          process_config cfg, true
-        when Status::PostIngesting .. Status::Finished
-          warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
+      when Status::Idle ... Status::Ingesting
+        # Oops! Not yet ready.
+        error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+      when Status::Ingesting
+        error "Cannot continue Ingest configuration ##{config_id}. Status is '#{Status.to_string(cfg.status)}'."
+      when Status::IngestFailed ... Status::PostIngesting
+        # Excellent! Continue ...
+        warn "Continuing just after Ingest configuration #{config_id} with status '#{Status.to_string(cfg.status)}'."
+        process_config cfg, true
+      when Status::PostIngesting .. Status::Finished
+        warn "Skipping Ingest of configuration ##{config_id} because status is '#{Status.to_string(cfg.status)}'."
         else
           # type code here
       end
@@ -180,8 +180,6 @@ class Ingester
 
   end
 
-  # process_config
-
   def run_ingest(cfg)
     # run ingest task
     Dir.chdir("#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}") do
@@ -211,17 +209,18 @@ class Ingester
     filesec = XmlDocument.parse doc.xpath('//md/value[../type="fileSec"]').first.content.to_s
     fixed_pid_list = {}
     filesec.xpath('//mets:file').each do |f|
-      vpid = f['ID'].gsub('file_', '')
-      mets_id = f.xpath('mets:FLocat').first['href'].gsub('METSID-', '')
+      vpid = f['ID'].gsub('file_','')
+      mets_id = f.xpath('mets:FLocat').first['href'].gsub('METSID-','')
       fixed_pid_list[vpid] = pid_list[mets_id]
     end
     fixed_pid_list[cfg.root_objects.first.vpid] = pid_list['0']
     fixed_pid_list
   end
 
-  def get_pidlist(cfg)
+  def get_pidlist( cfg )
     pid_list = {}
     if cfg.tasker_log
+      #noinspection RubyResolve
       cfg.tasker_log.scan(/Ingesting: (\d+).*?\n?.*?Pid=(\d+) Success/) do
         pid_list[$1]=$2
       end
@@ -287,7 +286,7 @@ class Ingester
   def delete_object(obj)
     return unless obj.pid
     result = DigitalEntityManager.instance.delete_object obj.pid
-    if result[:error].empty?
+    if result[:error].nil? or result[:error].empty?
       info "Deleted object #{obj.pid}"
       obj.pid = nil
     else
