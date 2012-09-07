@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+
+  <xs:complexType name="folderType">
+    <xs:complexContent>
+      <xs:restriction base="xs:anyType">
+        <xs:attributeGroup ref="itemAttributes"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="fileType">
+    <xs:complexContent>
+      <xs:restriction base="xs:anyType">
+        <xs:attributeGroup ref="itemAttributes"/>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:attributeGroup name="itemAttributes">
+    <xs:attribute name="name" type="xs:string"/>
+    <xs:attribute name="id" type="xs:positiveInteger"/>
+    <xs:attribute name="oid" type="xs:positiveInteger"/>
+    <xs:attribute name="pid" type="xs:positiveInteger"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="rootAttributes">
+    <xs:attributeGroup ref="itemAttributes"/>
+    <xs:attribute name="parent_dir" type="xs:string"/>
+    <xs:attribute name="parent_pid" type="xs:positiveInteger"/>
+    <xs:attribute name="scope_id" type="xs:positiveInteger"/>
+  </xs:attributeGroup>
+
+  <xs:complexType name="rootFolderType">
+    <xs:sequence>
+      <xs:element name="folder" type="folderType" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="file" type="fileType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="rootAttributes"/>
+  </xs:complexType>
+
+  <xs:element name="folder" type="rootFolderType"/>
+
+</xs:schema>

@@ -15,7 +15,7 @@ class IngestObject
   property    :updated_at,      DataMapper::Property::Date
   property    :status,          DataMapper::Property::Integer, :default => Status::New
   property    :status_name,     DataMapper::Property::String
-  property    :label,           DataMapper::Property::String #, :index => :label_idx
+  property    :label_name,      DataMapper::Property::String #, :index => :label_idx
   property    :usage_type,      DataMapper::Property::String #, :index => :usage_type_idx
   property    :metadata,        DataMapper::Property::FilePath
   property    :metadata_mid,    DataMapper::Property::Integer
@@ -89,12 +89,16 @@ class IngestObject
   def initialize(file_path = nil, checksum_type = nil)
     if file_path
       self.file_info      = FileInfo.new(file_path, checksum_type)
-      self.label          = self.file_info.base_name
+      self.label_name     = self.file_info.base_name
       self.usage_type     = 'ORIGINAL'
     end
     self.message        = ''
     self.status         = Status::New
     self.accessright    = nil
+  end
+
+  def recalculate_checksums
+    self.file_info.recalculate_checksums
   end
 
   def get_accessright_model
@@ -185,7 +189,7 @@ class IngestObject
 
   def stream_name
     #flattened_relative
-    id.to_s + File.extname(file_name)
+    id.to_s + '_' + file_name.remove_whitespace.encode_visual(/[^\w.]/)
   end
   
   def relative_stream
@@ -199,9 +203,13 @@ class IngestObject
     return self.file_info.mime_type if self.file_info
     nil
   end
+
+  def label=(value)
+    self.label_name = value
+  end
   
   def label
-    return super if super
+    return self.label_name if self.label_name
     return self.master.label if self.master
     nil
   end

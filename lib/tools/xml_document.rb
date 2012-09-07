@@ -37,14 +37,25 @@ class XmlDocument
     fd.close
   end
 
+  def validates_against?(schema)
+    schema_doc = Nokogiri::XML::Schema.new(File.open(schema))
+    schema_doc.valid?(@document)
+  end
+
   def add_processing_instruction( name, content )
     processing_instruction = Nokogiri::XML::ProcessingInstruction.new( @document, name, content )
     @document.root.add_previous_sibling processing_instruction
     processing_instruction
   end
 
-  def build( at_node = @document.root, &block )
-    Nokogiri::XML::Builder.with(at_node, &block)
+  def build( at_node = nil, &block )
+    xml = Nokogiri::XML::Builder.with(at_node, &block)
+    if at_node
+      at_node << xml.doc.root
+    else
+      @document = xml.doc
+    end
+
   end
 
   def create_text_node( name, text, options = {} )

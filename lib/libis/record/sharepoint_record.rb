@@ -9,17 +9,28 @@ require 'tools/xml_document'
 class SharepointRecord < Hash
   include IngesterTask
 
-  attr_accessor :label_prefix
   attr_accessor :node
   
   def initialize
     @node = nil
-    @label_prefix = ''
+    self[:label_prefix] = ''
     super nil
   end
 
+  def label_prefix
+    self[:label_prefix]
+  end
+
+  def label_prefix=(value)
+    self[:label_prefix] = value
+  end
+
   def label
-    (@label_prefix.to_s + ' ' + (self[:ows_Title1] || self[:ows_BaseName]).to_s).strip
+    (self[:ows_Title1] || self[:ows_BaseName] || file_name).to_s
+  end
+
+  def title
+    self[:label_prefix] + ' ' + self.label
   end
 
   def content_type
@@ -63,11 +74,14 @@ class SharepointRecord < Hash
   end
 
   def is_described?
+=begin
     self[:ows_Title1] and
         (   self[:ows_Creation_x0020_date_x0028_s_x0029_] or
             self[:ows_Startdate] or
             self[:ows_Enddate]
         )
+=end
+    self[:ows_Unit_of_description]
   end
 
   def simple_content_type
@@ -79,12 +93,8 @@ class SharepointRecord < Hash
       when /^Bestanddeel of stuk \(document\)/i
         return :file
       when /^Meervoudige beschrijving \(folder\)/i
-        warn "Meervoudige beschrijving (folder) gevonden: '#{relative_path}'"
-        #noinspection RubyDeadCode
         return :mmap
       when /^Meervoudige beschrijving \(document\)/i
-        warn "Meervoudige beschrijving (document) gevonden: '#{relative_path}'"
-        #noinspection RubyDeadCode
         return :mfile
       when /^Tussenniveau/i
         return :map
@@ -120,11 +130,15 @@ class SharepointRecord < Hash
   end
 
   def ingest_model
-    self[:ows_Ingestmodel]
+    return self[:ows_Ingestmodel] if self[:ows_Ingestmodel]
+    return self.node.parent.content.ingest_model if node and node.parent and node.parent.content
+    nil
   end
 
   def accessright_model
-    self[:ows_Access_x0020_rights_x0020_model]
+    return self[:ows_Access_x0020_rights_x0020_model] if self[:ows_Access_x0020_rights_x0020_model]
+    return self.node.parent.content.accessright_model if node and node.parent and node.parent.content
+    nil
   end
 
   def to_raw
@@ -138,7 +152,7 @@ class SharepointRecord < Hash
     xml_doc.root = xml_doc.create_node('record')
     
     self.each do |label, value|
-      
+
       unless label == :node
         #noinspection RubyResolve
         xml_doc.root << xml_doc.create_text_node(label.to_s, value.to_s)
@@ -179,7 +193,7 @@ class SharepointRecord < Hash
     self.each do |label, value|
       dc_tag = mapping.dc_tag(label)
       next unless dc_tag
-      dc_value = (mapping.dc_prefix( label ) || '') + value + (mapping.dc_postfix( label ) || '')
+      dc_value = (mapping.dc_prefix( label ) || '') + value.to_s + (mapping.dc_postfix( label ) || '')
       #noinspection RubyResolve
       xml_doc.root << xml_doc.create_text_node(dc_tag, dc_value)
     end

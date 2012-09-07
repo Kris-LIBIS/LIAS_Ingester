@@ -5,6 +5,7 @@ require 'highline'
 require 'webservices/soap_client'
 require 'tools/string'
 require 'libis/record/sharepoint_record'
+require 'tools/exceptions'
 
 require_relative 'generic_search'
 
@@ -48,6 +49,8 @@ class SharepointSearch < GenericSearch
       'is null' => 'IsNull'
   }
 
+  MAX_QUERY_RETRY = 10
+
   public
 
   def initialize
@@ -69,7 +72,7 @@ class SharepointSearch < GenericSearch
   def password
     return @password if @password
     highline = HighLine.new($stdin, $stderr)
-    @password = highline.ask("Password for #{self.username}: ") { |q| q.echo = '*'}.chomp
+    @password = highline.ask("Password for #{self.username}: ") { |q| q.echo = '*' }.chomp
   end
 
   def query(term, index, base, options = {})
@@ -121,6 +124,7 @@ class SharepointSearch < GenericSearch
   protected
 
   def restart_query
+    @start_id = 0
     @result = nil
     @current = 0
     @set_count = 0
@@ -138,14 +142,19 @@ class SharepointSearch < GenericSearch
   def get_next_set
 
     @current = 0
+    @set_count = 0
 
-    begin
+    retry_count = MAX_QUERY_RETRY
+
+    while retry_count > 0
+
+      Application.instance.logger.warn(self.class) { "Retrying (#{retry_count}) ..." } if retry_count < MAX_QUERY_RETRY
 
       #noinspection RubyStringKeysInHashInspection
       query = {
           'Query' => {
               'Where' => {
-                  @query_operator  => {
+                  @query_operator => {
                       'FieldRef' => '',
                       'Value' => @term,
                       :attributes! => {
@@ -162,7 +171,7 @@ class SharepointSearch < GenericSearch
       }
 
       #noinspection RubyStringKeysInHashInspection
-      query_options =  {
+      query_options = {
           'QueryOptions' => {
               'ViewAttributes' => '',
               :attributes! => {
@@ -172,6 +181,13 @@ class SharepointSearch < GenericSearch
               }
           }
       }
+
+      now = Time.now
+      window_start = Time.new(now.year, now.month, now.day, 12, 15)
+      window_end = Time.new(now.year, now.month, now.day, 13, 15)
+      if @selection and now > window_start and now < window_end
+        query_options['QueryOptions']['Folder'] = @server_url + 'Gedeelde%20documenten/' + @selection + '/.'
+      end
 
       if @next_set
         query_options['QueryOptions']['Paging'] = ''
@@ -188,21 +204,33 @@ class SharepointSearch < GenericSearch
           listName: @base,
           viewName: '',
           query: query,
-          viewFields: { 'ViewFields' => '' },
+          viewFields: {'ViewFields' => ''},
           rowLimit: @limit.to_s,
           query_options: query_options,
           webID: ''
       }
 
-      @result = result
-      @set_count = result[:count]
-      @next_set = result[:next_set]
+      if result[:error]
+        Application.instance.logger.warn(self.class) { "SOAP error: '#{result[:error]}'" }
+        raise AbortException, "Too many SOAP errors, giving up." unless retry_count > 0
+      elsif result[:exception]
+        Application.instance.logger.warn(self.class) { "SOAP exception: '#{result[:exception].message}'" }
+        raise result[:exception] unless retry_count > 0
+      else
+        @result = result
+        @set_count = result[:count]
+        @next_set = result[:next_set]
+        retry_count = 0
+        retry_count = MAX_QUERY_RETRY + 1 if @set_count == 0 and @next_set
+      end
 
-    end while @set_count == 0 and @next_set
+      retry_count -= 1
+
+    end
 
   end
 
-  def result_parser( result )
+  def result_parser(result)
 
     records = []
     result = result[:get_list_items_response][:get_list_items_result]
@@ -213,21 +241,22 @@ class SharepointSearch < GenericSearch
     rows = [rows] unless rows.is_a? Array
 
     #noinspection RubyResolve
-    rows.each do | row |
+    rows.each do |row|
       if @selection.nil? or row[:ows_FileRef] =~ /^\d+;#sites\/lias\/Gedeelde documenten\/#{@selection}($|\/)/
-        records << clean_row( row )
+        records << clean_row(row)
       end
     end
 
     next_set = data[:@list_item_collection_position_next]
 
+    # the itemcount in the response is not interesting. We count only the records that match our selection criteria.
     count = records.size
 
-    { next_set: next_set, records: records, count: count }
+    {next_set: next_set, records: records, count: count}
 
   end
 
-  def clean_row( row )
+  def clean_row(row)
 
     @fields_found ||= Set.new
     row.keys.each { |k| @fields_found << k }
@@ -237,7 +266,7 @@ class SharepointSearch < GenericSearch
 
     record = SharepointRecord.new
 
-    row.each do | k, v |
+    row.each do |k, v|
       key = k.to_s.gsub(/^@/, '').to_sym
       next if fields_to_be_removed.include? key
       record[key] = v.dot_net_clean

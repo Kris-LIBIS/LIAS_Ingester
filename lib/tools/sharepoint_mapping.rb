@@ -2,15 +2,21 @@
 
 require 'awesome_print'
 require 'csv'
+require 'yaml'
+
 require 'tools/hash'
 
 class SharepointMapping < Hash
 
   def initialize( mapping_file )
 
+
     CSV.foreach(mapping_file, headers: true, skip_blanks: true) do |row|
       next unless row[1]
-      next unless (row[2] || row[3])
+      # next unless (row[2] || row[3])
+
+      # compensation for bug in library that reads the Excel data
+      0.upto(5) { |i| row[i] = row[i].gsub(/_x005F(_x[0-9a-fA-F]{4}_)/, '\1') if row[i] }
 
       name = row[0] ? row[0].strip : nil
       label = row[1].strip.to_sym
@@ -20,6 +26,7 @@ class SharepointMapping < Hash
       db_valuemask = row[5] ? row[5] : nil
 #      scope_tag = row[6] ? row[6].strip : nil
 #      scope_id = (row[7] and row[7] =~ /[0-9]+/ ? Integer(row[7].strip) : nil)
+
 
       mapping = {}
       mapping[:fancy_name] = name if name
@@ -53,6 +60,9 @@ class SharepointMapping < Hash
 
     end
 
+    File.open('mapping.yml','wt') { |fp|
+      fp.puts self.to_yaml
+    }
     super nil
 
   end
@@ -84,12 +94,6 @@ class SharepointMapping < Hash
   def dc_postfix( label )
     mapping = self[label]
     mapping = mapping[:dc_postfix] if mapping
-    mapping
-  end
-
-  def name( label )
-    mapping = self[label]
-    mapping = mapping[:fancy_name] if mapping
     mapping
   end
 

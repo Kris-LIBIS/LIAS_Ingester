@@ -5,6 +5,7 @@ require 'tools/sharepoint_mapping'
 require "tools/oracle_client"
 require "tools/xml_document"
 
+#noinspection RubyResolve
 class SharepointPostProcessor < PostProcessor
 
   def initialize( metadata_tree_file, metadata_sql_file, mapping_file )
@@ -17,15 +18,7 @@ class SharepointPostProcessor < PostProcessor
 
   def process_config( cfg )
 
-    #noinspection RubyResolve
-    unless cfg.ingest_type == :SHAREPOINT_XML
-      cfg.status = Status::PostProcessed
-      cfg.save
-      return
-    end
-
     start_time = Time.now
-    #noinspection RubyResolve
     ApplicationStatus.instance.run = cfg.ingest_run
     ApplicationStatus.instance.cfg = cfg
     info "Processing config ##{cfg.id}"
@@ -52,31 +45,30 @@ class SharepointPostProcessor < PostProcessor
 
     # load metadata tree
     info "Reading metadata tree"
-    tree = SharepointMetadataTree.open @metadata_tree_file
+    @tree = SharepointMetadataTree.open @metadata_tree_file
 
     # enrich the data with the pids
     info "Enriching metadata with PIDs"
     dirty = false
-    tree.visit do | phase, node, _ |
+    @tree.visit do | phase, node, _ |
       if phase == :before and (metadata = node.content)
         if metadata[:pid].nil? and (obj = IngestObject.first(:id => metadata[:ingest_object_id]))
           metadata[:pid] = obj.pid
           metadata[:ingest_status] = 'ingested'
-          #noinspection RubyResolve
           metadata[:ingest_id] = obj.ingest_config.ingest_id
           dirty = true
         end
       end
     end
     info "Saving metadata tree"
-    tree.save @metadata_tree_file if dirty
+    @tree.save @metadata_tree_file if dirty
 
     # export metadata to sql script
     info "Creating Scope SQL script"
     mapping = SharepointMapping.new @mapping_file
     File.open(@metadata_sql_file, 'w') do |f|
       f.puts "set define off"
-      tree.visit do |phase, node, _|
+      @tree.visit do |phase, node, _|
         if phase == :before and (metadata = node.content)
           f.puts metadata.to_sql(mapping).gsub('@TABLE_NAME@','KUL_SCP_DGTL_SHP')
         end
@@ -85,7 +77,7 @@ class SharepointPostProcessor < PostProcessor
     end
 
     info "Executing Scope SQL script"
-    OracleClient.scope_client.run @metadata_sql_file
+    #OracleClient.scope_client.run @metadata_sql_file
 
   rescue => e
     cfg.status = Status::PostProcessFailed
@@ -107,7 +99,7 @@ class SharepointPostProcessor < PostProcessor
     obj.set_status_recursive Status::PostProcessing, Status::PostIngested
     obj.save
 
-    update_pid_links(obj)
+    update_pid_links(obj) if obj.mime_type == 'text/xml/sharepoint_map'
 
     obj.set_status_recursive Status::PostProcessed, Status::PostProcessing
 
@@ -126,13 +118,30 @@ class SharepointPostProcessor < PostProcessor
     child_pids = []
     doc = XmlDocument.open filename
     doc.xpath('//*').each do |element|
+      # add pid attribute to the xml node
       attr = element.attribute('oid')
       next unless attr
       pid = IngestObject.first(:id => attr.content).pid
+      element.remove_attribute 'oid'
       child_pids << pid
       element.set_attribute 'pid', pid
+      # add the parent pid and name to the xml node
+      attr = element.attribute('id')
+      next unless attr
+      node = @tree.at_index attr.content
+      element.remove_attribute 'id'
+      next unless node
+      parent_node = node.parent
+      next unless parent_node
+      element.set_attribute 'parent_dir', parent_node.name
+      parent_pid = nil
+      parent_pid = parent_node.content[:pid] if parent_node.content
+      next unless parent_pid
+      element.set_attribute 'parent_pid', parent_pid
     end
     doc.save filename
+    obj.recalculate_checksums
+
     result = DigitalEntityManager.instance.update_stream(obj.pid, filename)
     if result[:error]
       result[:error].each { |e| error "Error calling web service: #{e}"}
@@ -141,7 +150,10 @@ class SharepointPostProcessor < PostProcessor
     else
       info "Updated object links for object #{obj.pid}"
     end
-    result = DigitalEntityManager.instance.add_relations(obj.pid, 'include', child_pids)
+
+    # Not required, but we create relations between the objects in DigiTool to keep track of things
+    # note that we drop the first child pid as it is this object's own pid
+    result = DigitalEntityManager.instance.add_relations(obj.pid, 'include', child_pids[1..-1])
     if result[:error]
       result[:error].each { |e| error "Error calling web service: #{e}"}
       error "Failed to link child objects for object ##{obj.pid}"
