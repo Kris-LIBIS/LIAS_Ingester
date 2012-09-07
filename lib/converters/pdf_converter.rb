@@ -22,6 +22,7 @@ class PdfConverter < Converter
     elsif File.exist? watermark_info
       @wm_image = watermark_info
     else
+      #noinspection RubyResolve
       @wm_text = watermark_info.spit('\n')
     end
 
@@ -34,28 +35,56 @@ class PdfConverter < Converter
     @source = source
 
     unless PdfConverter.input_mimetype?(MimeType.get(@source))
-      Application.instance().logger.error(self.class) { "Supplied file '#{@source}' is not a PDF file." }
+      Application.instance().logger.error(self.class) { "Supplied file '#@source' is not a PDF file." }
     end
 
   end
 
-  def do_convert(target, _)
+  def do_convert(target, format)
 
-    cmd = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/pdf_copy.sh --file_input \"#{@source}\" --file_output \"#{target}\""
+    result = ''
 
-    @options.each do |k,v|
-      cmd += " --#{k.to_s} #{v}"
+    unless @options.empty?
+
+      tmp_target = target
+      tmp_target += '.pdf' if format == :PDFA
+
+      cmd = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/pdf_copy.sh --file_input \"#@source\" --file_output \"#{tmp_target}\""
+
+      @options.each do |k,v|
+        cmd += " --#{k.to_s} #{v}"
+      end
+
+      cmd += " --wm_image \"#@wm_image\"" if @wm_image
+
+      if @wm_text
+        cmd += " --wm_text"
+        @wm_text.each { |t| cmd += " \"#{t}\"" }
+      end
+
+      debug "Converting PDF using: '#{cmd}'"
+      result += %x[#{cmd}]
+      debug "Conversion result: #{result}"
+
+      @source = tmp_target if format == :PDFA
+
     end
 
-    cmd += " --wm_image \"#{@wm_image}\"" if @wm_image
+    if format == :PDFA
+      cmd = 'gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite'
+      cmd += ' -dPDFACompatibilityPolicy=1'
+      cmd += " -sOutputFile=#{target}"
+#      cmd += " #{File.join(Application.dir,'config','PDFA_def.ps')}"
+      cmd += " #@source"
 
-    if @wm_text
-      cmd += " --wm_text"
-      @wm_text.each { |t| cmd += " \"#{t}\"" }
+      debug "Converting PDF to PDFA using: '#{cmd}'"
+      result += %x[#{cmd}]
+      debug "Conversion result: #{result}"
     end
 
-    `#{cmd}`
 
+
+    result
   end
 
 end

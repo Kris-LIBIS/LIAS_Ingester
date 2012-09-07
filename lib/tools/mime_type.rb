@@ -23,7 +23,8 @@ class MimeType
       'application/x-zip',
       'image/x-3ds',
       'text/plain',
-      'video/x-ms-asf'
+      'video/x-ms-asf',
+      'application/pdf'
   ] + BAD_MIMETYPES
 
   #noinspection RubyLiteralArrayInspection
@@ -76,12 +77,24 @@ class MimeType
               mimetype = 'application/vnd.wordperfect'
             when 'x-fmt/394'
               mimetype = 'application/vnd.wordperfect'
+            when 'fmt/95'
+              mimetype = 'application/pdfa'
             else
               # nothing
           end
         end
         debug "Fido MIME-type: #{mimetype} (PRONOM UID: #{format})"
         result = mimetype unless mimetype == "None"
+      end
+    end
+
+    # determine XML type
+    if result == 'text/xml'
+      doc = XmlDocument.open file_path
+      if doc.validates_against?(File.join(Application.dir,'config','sharepoint','map_xml.xsd').to_s)
+        result = 'text/xml/sharepoint_map'
+      elsif doc.validates_against?(File.join(Application.dir,'config','ead.xsd').to_s)
+        result = 'archive/ead'
       end
     end
 

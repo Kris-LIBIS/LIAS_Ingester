@@ -21,11 +21,19 @@ class ImageConverter < Converter
   end
 
   def dpi(value)
-    @options[:resample] = value
+    @options[:density] = value
   end
 
   def resample(value)
-    @options[:resample] = value
+    @options[:density] = value
+  end
+
+  def colorspace(value)
+    @options[:colorspace] = value
+  end
+
+  def flatten(value)
+    @flags[:flatten] = value
   end
 
   def watermark(options = {})
@@ -58,26 +66,37 @@ class ImageConverter < Converter
       target_file += '.tmp.bmp'
     end
 
-
     command = "convert"
     command = "#{ConfigFile['dtl_base']}/#{ConfigFile['dtl_bin_dir']}/watermarker.sh" if @wm_image
+
+    if format == :JPEG
+      command += ' -flatten'
+    end
 
     @options.each do |o,v|
       command += " -#{o.to_s} '#{v}'"
     end
 
+    @flags.each do |f,v|
+      if v
+        command += " -#{f.to_s}"
+      else
+        command.gsub!(/ -#{f.to_s}/,'')
+      end
+    end
+
     command += " '#{@source + ([:PDF, :TIFF].include?(TypeDatabase.instance.mime2type(MimeType.get(@source))) ? '[0]' : '')}' '#{target_file}'"
 
-    command += " '#{@wm_image}'" if @wm_image
+    command += " '#@wm_image'" if @wm_image
 
     Application.debug('ImageConverter') { "command: #{command}" }
 
-    result = `#{command}`
+    result = %x[#{command}]
 
     Application.debug('ImageConverter') { "result: #{result}" }
 
     if format == :JP2
-      result = `j2kdriver -i #{target_file} -t jp2 -R 0 -w R53 -o #{target} 2>&1`
+      result = %x[j2kdriver -i #{target_file} -t jp2 -R 0 -w R53 -o #{target} 2>&1]
       if result.match(/error/i)
         Application.error('ImageConverter') { "JPEG2000 conversion failed: #{result}" }
       elsif result.match(/warning/i)
