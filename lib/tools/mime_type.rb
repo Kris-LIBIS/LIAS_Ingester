@@ -10,28 +10,19 @@ require 'ingester_task'
 class MimeType
   include IngesterTask
 
-  BAD_MIMETYPES = [
-      'application/octet-stream',
-      'application/x-empty',
-      'CDF V2 Document'
-  ]
+  BAD_MIMETYPES = %w(None)
 
   #noinspection RubyLiteralArrayInspection
   RETRY_MIMETYPES = [
-      'application/vnd.ms-office',
-      'application/zip',
-      'application/x-zip',
-      'image/x-3ds',
-      'text/plain',
-      'video/x-ms-asf',
-      'application/pdf'
+      'application/rtf',
+      'text/rtf'
   ] + BAD_MIMETYPES
 
   #noinspection RubyLiteralArrayInspection
   FIDO_FORMATS = [
-      '/nas/vol03/app/depot/fido/fido/conf/formats.xml',
-      '/nas/vol03/app/depot/fido/fido/conf/format_extensions.xml'
+      "#{$application_dir}/config/lias_formats.xml"
   ]
+
   def capture_stderr
     # The output stream must be an IO-like object. In this case we capture it in
     # an in-memory IO object so we can return the string value. You can assign any
@@ -45,55 +36,69 @@ class MimeType
   end
 
 
-  def self.get( file_path )
+  def self.get(file_path)
 
     fp = file_path.to_s.escape_for_string
-    debug "Determining MIME type of '#{fp}' ..."
+    info "Determining MIME type of '#{fp}' ..."
 
-    result = nil
-
-    # use FILE
-    mimetype = %x(/usr/bin/file -ib "#{fp}").strip.split(';')[0].split(',')[0]
-    debug "File result: '#{mimetype}'"
-    result = mimetype unless BAD_MIMETYPES.include? mimetype
+    mimetype = result = nil
 
     # use FIDO
-    if result.nil? or RETRY_MIMETYPES.include? mimetype
-      fido = %x(/nas/vol03/app/bin/fido -loadformats #{FIDO_FORMATS.join(',')} "#{fp}" 2>/dev/null)
-      debug "Fido result: '#{fido.to_s}'"
-      r = CSV.parse(fido)[0]
-      if r && r[0] == "OK"
-        format = r[2]
-        mimetype = r[7]
-        if mimetype == "None"
-          case format
-            when 'fido-fmt/189.word'
-              mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-            when 'fido-fmt/189.xl'
-              mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            when 'fido-fmt/189.ppt'
-              mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
-            when 'x-fmt/44'
-              mimetype = 'application/vnd.wordperfect'
-            when 'x-fmt/394'
-              mimetype = 'application/vnd.wordperfect'
-            when 'fmt/95'
-              mimetype = 'application/pdfa'
-            else
-              # nothing
-          end
+    cmd = "/nas/vol03/app/bin/fido -loadformats #{FIDO_FORMATS.join(',')} \"#{fp}\" 2> /dev/null "
+    fido = %x(#{cmd})
+    info "Fido result: '#{fido.to_s}'"
+    fido_results = CSV.parse fido
+    r = fido_results[0]
+    if fido_results.size > 1
+      while (x = fido_results.pop)
+        if x[0] == "OK" && x[8] == "signature"
+          r = x
+          break
         end
-        debug "Fido MIME-type: #{mimetype} (PRONOM UID: #{format})"
-        result = mimetype unless mimetype == "None"
       end
+    end
+    if r && r[0] == "OK"
+      format = r[2]
+      mimetype = r[7]
+      if mimetype == "None"
+        case format
+          when 'fido-fmt/189.word'
+            mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          when 'lias-fmt/189.word'
+            mimetype = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          when 'fido-fmt/189.xl'
+            mimetype = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+          when 'fido-fmt/189.ppt'
+            mimetype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+          when 'x-fmt/44'
+            mimetype = 'application/vnd.wordperfect'
+          when 'x-fmt/394'
+            mimetype = 'application/vnd.wordperfect'
+          when 'fmt/95'
+            mimetype = 'application/pdfa'
+          when 'fmt/354'
+            mimetype = 'application/pdfa'
+          else
+            # nothing
+        end
+      end
+      info "Fido MIME-type: #{mimetype} (PRONOM UID: #{format})"
+      result = mimetype unless BAD_MIMETYPES.include? mimetype
+    end
+
+    # use FILE
+    if result.nil? or RETRY_MIMETYPES.include? mimetype
+      mimetype = %x(/usr/bin/file -ib "#{fp}").strip.split(';')[0].split(',')[0]
+      info "File result: '#{mimetype}'"
+      result = mimetype unless BAD_MIMETYPES.include? mimetype
     end
 
     # determine XML type
     if result == 'text/xml'
       doc = XmlDocument.open file_path
-      if doc.validates_against?(File.join(Application.dir,'config','sharepoint','map_xml.xsd').to_s)
+      if doc.validates_against?(File.join(Application.dir, 'config', 'sharepoint', 'map_xml.xsd').to_s)
         result = 'text/xml/sharepoint_map'
-      elsif doc.validates_against?(File.join(Application.dir,'config','ead.xsd').to_s)
+      elsif doc.validates_against?(File.join(Application.dir, 'config', 'ead.xsd').to_s)
         result = 'archive/ead'
       end
     end
@@ -102,7 +107,7 @@ class MimeType
     if result.nil?
       begin
         x = %x(identify -format "%m" "#{fp}")
-        debug "Identify result: '#{x.to_s}'"
+        info "Identify result: '#{x.to_s}'"
         x = x.split[0].strip if x
         result = 'image/jp2' if x == 'JP2'
       rescue Exception
@@ -110,7 +115,7 @@ class MimeType
       end
     end
 
-    result ? debug("Final MIME-type: '#{result}'") : warn("Could not identify MIME type of '#{fp}'")
+    result ? info("Final MIME-type: '#{result}'") : warn("Could not identify MIME type of '#{fp}'")
 
     result
   end
