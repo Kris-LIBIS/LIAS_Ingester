@@ -381,7 +381,7 @@ class MarcRecord
             tag('094__', 'a').collect { |t| element(t.a_a, prefix: 'Equidistance ', join: ';') },
             # [MARC 502 __ $a] ([MARC 502 __ $9])
             tag('502__', 'a 9').collect { |t|
-              list(t._a, opt(t._9))
+              list(t._a, opt_r(t._9))
             },
             # [MARC 529 __ $a] ", " [MARC 529 __ $b] " (" [MARC 529 __ $c] ")"
             tag('529__', 'a b 9').collect { |t|
@@ -755,7 +755,7 @@ class MarcRecord
         }
 
         # [MARC 306 __  $a*]
-        tag('306__', 'a').each { |t| xml['dcterms'].extent repeat(t.a_a.collect { |x| x.scan(/(\d\d)(\d\d)(\d\d)/).join(':') }) }
+        tag('306__', 'a').each { |t| xml['dcterms'].extent repeat(t.a_a.collect { |y| y.scan(/(\d\d)(\d\d)(\d\d)/).join(':') }) }
 
         # [MARC 309 __ $a]
         each_field('309__', 'a').each { |f| xml['dcterms'].extent f }
@@ -845,47 +845,47 @@ class MarcRecord
 
         # [MARC 041 9_ $a*]
         tag('0419_', 'a').each { |t|
-          xml['dc'].language repeat(t.a_a.collect { |x| taalcode(x) })
+          xml['dc'].language repeat(t.a_a.collect { |y| taalcode(y) })
         }
 
         # [MARC 041 9_ $d*]
         tag('0419_', 'd').each { |t|
-          xml['dc'].language repeat(t.a_d.collect { |x| taalcode(x) })
+          xml['dc'].language repeat(t.a_d.collect { |y| taalcode(y) })
         }
 
         # [MARC 041 9_ $e*]
         tag('0419_', 'e').each { |t|
-          xml['dc'].language repeat(t.a_e.collect { |x| taalcode(x) })
+          xml['dc'].language repeat(t.a_e.collect { |y| taalcode(y) })
         }
 
         # [MARC 041 9_ $f*]
         tag('0419_', 'f').each { |t|
-          xml['dc'].language repeat(t.a_f.collect { |x| taalcode(x) })
+          xml['dc'].language repeat(t.a_f.collect { |y| taalcode(y) })
         }
 
         # [MARC 041 9_ $h*]
         tag('0419_', 'h').each { |t|
-          xml['dc'].language repeat(t.a_h.collect { |x| taalcode(x) })
+          xml['dc'].language repeat(t.a_h.collect { |y| taalcode(y) })
         }
 
         # [MARC 041 9_ $9*]
         tag('0419_', '9').each { |t|
-          xml['dc'].language repeat(t.a_9.collect { |x| taalcode(x) })
+          xml['dc'].language repeat(t.a_9.collect { |y| taalcode(y) })
         }
 
         # "Gedubde taal: " [MARC 041 _9 $a*]
         tag('041_9', 'a').each { |t|
-          xml['dc'].language repeat(t.a_a.collect { |x| taalcode(x) }, prefix: 'Gedubde taal:')
+          xml['dc'].language repeat(t.a_a.collect { |y| taalcode(y) }, prefix: 'Gedubde taal:')
         }
 
         # [MARC 041 _9 $h*]
         tag('041_9', 'h').each { |t|
-          xml['dc'].language repeat(t.a_h.collect { |x| taalcode(x) })
+          xml['dc'].language repeat(t.a_h.collect { |y| taalcode(y) })
         }
 
         # "Ondertitels: " [MARC 041 _9 $9*]
         tag('041_9', '9').each { |t|
-          xml['dc'].language element(t.a_9.collect { |x| taalcode(x) }, prefix: 'Ondertitels:')
+          xml['dc'].language element(t.a_9.collect { |y| taalcode(y) }, prefix: 'Ondertitels:')
         }
 
         # [MARC 008 (35-37)]

@@ -202,7 +202,7 @@ class SharepointCollector
     cfg_hash[:common][:packaging][:location] = "#@data_dir"
     cfg_hash[:common][:packaging][:selection] = "#@selection"
 
-    cfg_hash[:metadata] = {file: @metadata_map}
+    cfg_hash[:metadata] = {file: @metadata_map, format: :DC}
 
     run.init_config cfg_hash
     run.status = Status::New

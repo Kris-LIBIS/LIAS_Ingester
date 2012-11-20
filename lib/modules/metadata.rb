@@ -74,11 +74,11 @@ class Metadata
     search_term << obj.relative_path.to_s if obj.file_name
     search_term.reverse.each do |term|
       if (dc_file = @metadata_map[term])
-        if @cfg.manifestation_format != :DC
+        if @cfg.metadata_format != :DC
           record = RecordFactory.load dc_file
           if record
             record = record.first if record.is_a?(Array) and record.size >= 1
-            doc = record.first.to_dc
+            doc = record.to_dc
           end
         else
           doc = XmlDocument.open dc_file
@@ -119,10 +119,11 @@ class Metadata
       obj.metadata = "#{@cfg.ingest_dir}/transform/dc_#{obj.id}.xml"
       doc = XmlDocument.new
       records = doc.create_node('records')
-      records << record.root
+      new_record = record.root.dup
       obj.get_run.get_metadata_fields.each do |tag,value|
-        records << doc.create_text_node(tag,value)
+        new_record << doc.create_text_node(tag,value)
       end
+      records << new_record
       doc.root = records
       doc.save(obj.metadata)
     rescue Exception => e

@@ -279,8 +279,8 @@ module CommonConfig
 
       def metadata_format
         return self.metadata_format1 unless self.metadata_format1.nil?
-        return self.ingest_run.metadata_format1 if self.respond_to? :ingest_run and self.ingest_run
-        nil
+        return self.ingest_run.metadata_format1 if self.respond_to? :ingest_run and self.ingest_run unless self.ingest_run.metadata_format1.nil?
+        :DC
       end
 
       def get_search_options
