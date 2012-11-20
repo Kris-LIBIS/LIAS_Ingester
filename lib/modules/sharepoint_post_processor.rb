@@ -26,6 +26,10 @@ class SharepointPostProcessor < PostProcessor
     cfg.status = Status::PostProcessing
     cfg.save
 
+    # load metadata tree
+    info "Reading metadata tree"
+    @tree = SharepointMetadataTree.open @metadata_tree_file
+
     failed_objects = []
 
     cfg.root_objects.each do |obj|
@@ -41,11 +45,7 @@ class SharepointPostProcessor < PostProcessor
     cfg.status = Status::PostProcessed
 
     cfg.save
-    warn "#{failed_objects.size} objects failed during Post-Process" unless failed_objects.empty?
 
-    # load metadata tree
-    info "Reading metadata tree"
-    @tree = SharepointMetadataTree.open @metadata_tree_file
 
     # enrich the data with the pids
     info "Enriching metadata with PIDs"
@@ -77,7 +77,12 @@ class SharepointPostProcessor < PostProcessor
     end
 
     info "Executing Scope SQL script"
-    #OracleClient.scope_client.run @metadata_sql_file
+    result = OracleClient.scope_client.run @metadata_sql_file
+    info "#{result[:created]} Oracle rows created." if result[:created] > 0
+    info "#{result[:updated]} Oracle rows updated." if result[:updated] > 0
+    info "#{result[:deleted]} Oracle rows deleted." if result[:deleted] > 0
+    info "#{result[:errors]} Oracle errors:"
+    result[:error_detail].each {|k,v| info "  #{v} time(s) '#{k}'"}
 
   rescue => e
     cfg.status = Status::PostProcessFailed
@@ -148,7 +153,7 @@ class SharepointPostProcessor < PostProcessor
       error "Failed to update record file stream for object ##{obj.pid}"
       obj.status = Status::PostProcessFailed
     else
-      info "Updated object links for object #{obj.pid}"
+      info "Updated object links for object ##{obj.pid}"
     end
 
     # Not required, but we create relations between the objects in DigiTool to keep track of things
@@ -159,7 +164,7 @@ class SharepointPostProcessor < PostProcessor
       error "Failed to link child objects for object ##{obj.pid}"
       obj.status = Status::PostProcessFailed
     else
-      info "Linked child objects for object #{obj.pid}"
+      info "Linked child objects for object ##{obj.pid}"
     end
   end
 
