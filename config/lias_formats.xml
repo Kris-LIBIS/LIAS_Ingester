@@ -1,12 +1,75 @@
 <?xml version="1.0"?>
 <formats xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="0.2" xsi:noNamespaceSchemaLocation="fido-formats.xsd">
   <format>
-    <puid>fido-fmt/189.word</puid>
+    <puid>lias-fmt/001</puid>
+    <name>Textura TS print file</name>
+    <mime>text/plain</mime>
+    <signature>
+      <name>Textura TS print file</name>
+      <pattern>
+        <position>BOF</position>
+        <regex>(?s)\A(\f#%\*P66610\r\nBACKUP-NAME : \(PR\)[A-Z/\d]*/TS\d* ON USER\r\nCREATION-DATE : \d{6}\r\n\*%#\f )?\f {6}(\r\n){2}={75}   (\r\n){2}L I J S T   V A N   D E   U I T K E R I N G E N   S Y N D\.   P R E M I E S {21}EUR {4}(\r\n){2}={75}   (\r\n){2}CENTR[\S ]*\d\d/\d\d/\d\d   (\r\n){2}={75}   \r\n</regex>
+      </pattern>
+      <pattern>
+        <position>VAR</position>
+        <regex>(?s)(\r\n){2}NUMMER DRAGER   TYPE DRAGER   SCHRIJFCODE   DICHTHEID   BLOCKINGSFACTOR \r\n</regex>
+      </pattern>
+      <pattern>
+        <position>VAR</position>
+        <regex>(?s)\r\n {41}AANTAL {17}BEDRAG  \r\n</regex>
+      </pattern>
+      <pattern>
+        <position>VAR</position>
+        <regex>(?s)\r\n {5}POSTASSIGNATIES :  </regex>
+      </pattern>
+      <pattern>
+        <position>VAR</position>
+        <regex>(?s)\r\n {5}CIRCULAIRE CHEQUES :  </regex>
+      </pattern>
+      <pattern>
+        <position>VAR</position>
+        <regex>(?s)\r\n {5}CIRC\.CHEQUES \(TERUG ORGAN\.\) :  </regex>
+      </pattern>
+      <pattern>
+        <position>VAR</position>
+        <regex>(?s)\r\n {5}OVERSCHRIJVINGEN : </regex>
+      </pattern>
+      <!--
+      -->
+      <pattern>
+        <position>VAR</position>
+        <regex>(?s)\r\n {5}ALGEMEEN TOTAAL :  </regex>
+      </pattern>
+      <pattern>
+        <position>EOF</position>
+        <regex>(?s)\r\nHANDTEKENING\(EN\) AFGEVER: {9}( .){10}(\r\n){3}HANDTEKENING VOOR ONTVANGST: {6}( .){10}\r\n( \f|\f\x1a)\x00+\Z</regex>
+      </pattern>
+    </signature>
+  </format>
+  <format>
+    <puid>lias-fmt/002</puid>
+    <name>Textura VP/S print file</name>
+    <mime>text/plain</mime>
+    <has_priority_over>lias-fmt/001</has_priority_over>
+    <signature>
+      <name>Textura VP/S print file</name>
+      <pattern>
+        <position>BOF</position>
+        <regex>(?s)\A(\f#%\*P66610\r\nBACKUP-NAME : \(PR\)[A-Z/\d]*V[PS]\d* ON USER\r\nCREATION-DATE : \d{6}\r\n\*%#\f )?\f {49}(LIJST|LISTE) AVP .{55}(REEKS|SERIE) :[ \d]*\r\n {48}-{57} {3}\r\n\r\n</regex>
+      </pattern>
+      <pattern>
+        <position>EOF</position>
+        <regex>(?s)\r\n( \f|\f\x1a)\x00+\Z</regex>
+      </pattern>
+    </signature>
+  </format>
+  <format>
+    <puid>lias-fmt/189.word</puid>
     <name>Microsoft Office Open XML - Word</name>
-    <mime>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime>
     <extension>docx</extension>
     <has_priority_over>x-fmt/263</has_priority_over>
     <has_priority_over>fmt/189</has_priority_over>
+    <has_priority_over>fido-fmt/189.word</has_priority_over>
     <signature>
       <name>Microsoft Office Open XML - Word</name>
       <pattern>
@@ -19,55 +82,31 @@
       </pattern>
       <pattern>
         <position>EOF</position>
-        <regex>(?s)\x00\x00word/.{1,20}\.xmlPK\x01\x02\x2d.{0,2000}\Z</regex>
-      </pattern>
-    </signature>
-  </format>
-  <format>
-    <puid>fido-fmt/189.xl</puid>
-    <name>Microsoft Office Open XML - Excel</name>
-    <mime>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mime>
-    <extension>xlsx</extension>
-    <has_priority_over>x-fmt/263</has_priority_over>
-    <has_priority_over>fmt/189</has_priority_over>
-    <signature>
-      <name>Microsoft Office Open XML - Excel</name>
-      <pattern>
-        <position>BOF</position>
-        <regex>(?s)\APK\x03\x04</regex>
-      </pattern>
-      <pattern>
-        <position>BOF</position>
-        <regex>(?s)\A.{30}\[Content_Types\]\.xml \xa2</regex>
-      </pattern>
-      <pattern>
-        <position>EOF</position>
-        <regex>(?s)\x00xl/.{1,20}\.xmlPK\x01\x02\x2d.{0,2000}\Z</regex>
-      </pattern>
-    </signature>
-  </format>
-  <format>
-    <puid>fido-fmt/189.ppt</puid>
-    <name>Microsoft Office Open XML - Powerpoint</name>
-    <mime>application/vnd.openxmlformats-officedocument.presentationml.presentation</mime>
-    <extension>pptx</extension>
-    <has_priority_over>x-fmt/263</has_priority_over>
-    <has_priority_over>fmt/189</has_priority_over>
-    <signature>
-      <name>Microsoft Office Open XML - Powerpoint</name>
-      <pattern>
-        <position>BOF</position>
-        <regex>(?s)\APK\x03\x04</regex>
-      </pattern>
-      <pattern>
-        <position>BOF</position>
-        <regex>(?s)\A.{30}\[Content_Types\]\.xml \xa2</regex>
-      </pattern>
-      <pattern>
-        <position>EOF</position>
-        <!-- ppt/presentation.xml might be better, but it can be far from the end. -->
-        <regex>(?s)\x00ppt/.{1,20}\.xmlPK\x01\x02\x2d.{0,2000}\Z</regex>
+        <regex>(?s)\x00\x00word/.{1,20}\.xmlPK\x01\x02\x2d.{0,4000}\Z</regex>
       </pattern>
     </signature>
   </format>
 </formats>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
