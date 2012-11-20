@@ -5,8 +5,8 @@ require "webservices/collective_access"
 class PostProcessor
   include IngesterModule
 
-  THUMBNAIL_URL = 'http://libis-t-rosetta-1.libis.kuleuven.be/lias/cgi/get_pid?redirect&usagetype=THUMBNAIL&custom_att_3=stream&pid='
-  VIEW_URL = 'http://libis-t-rosetta-1.libis.kuleuven.be/lias/cgi/get_pid?redirect&usagetype=VIEW_MAIN,VIEW&pid='
+  THUMBNAIL_URL = 'http://resolver.lias.be/get_pid?redirect&usagetype=THUMBNAIL&custom_att_3=stream&pid='
+  VIEW_URL = 'http://resolver.lias.be/get_pid?redirect&usagetype=VIEW_MAIN,VIEW&pid='
 
   def start(config_id)
 
