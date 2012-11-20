@@ -113,7 +113,10 @@ class IngestObject
   def get_accessright()
     unless self.accessright
       ar_model = get_accessright_model
-      self.accessright = ar_model.get_accessright(self.usage_type)
+      usagetype = self.usage_type
+      usagetype = usagetype.to_s.downcase
+      usagetype = 'archive' if usagetype == 'original'
+      self.accessright = ar_model.get_accessright(usagetype)
     end
     self.accessright
   end

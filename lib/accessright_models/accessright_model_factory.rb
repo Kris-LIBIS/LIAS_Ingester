@@ -20,6 +20,10 @@ class AccessrightModelFactory
     load_models("#{Application.dir}/config/accessright_models")
   end
 
+  def reload
+    load_models("#{Application.dir}/config/accessright_models")
+  end
+
   def get_model(name)
     @models[name.downcase]
   end
@@ -27,6 +31,7 @@ class AccessrightModelFactory
   protected
 
   def load_models(path)
+    debug "Loading accessright models from: #{path}"
     @models = {}
     Dir.glob("#{path}/*.yaml").each do |m|
       debug "Loading accessright model: #{m}"
@@ -37,6 +42,7 @@ class AccessrightModelFactory
         name = model[:name]
         ar_model = AccessrightModel.first(:name => name)
         ar_model ||= AccessrightModel.new(model)
+        ar_model.save
         @models[name.downcase] = ar_model
         model[:aliases] ||= []
         model[:aliases].each { name | @models[name.downcase] = ar_model }

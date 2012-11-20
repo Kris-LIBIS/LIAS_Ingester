@@ -26,7 +26,7 @@ class PostIngester
   ensure
     info 'Done'
     
-  end # start
+  end # start_queue
   
   def start( config_id )
     
@@ -69,7 +69,7 @@ class PostIngester
     
     config_id
     
-  end
+  end # start
   
   def undo( config_id )
     
@@ -196,7 +196,7 @@ class PostIngester
     return if ar.is_watermark?
     if ar.is_custom?
       if ar.get_id.nil?
-        acl_record = MetaDataManager.instance.create_acl_record(ar.pinfo)
+        acl_record = MetaDataManager.instance.create_acl_record(ar.get_custom)
         result = MetaDataManager.instance.create_acl acl_record
         result[:error].each { |error| Application.instance.logger.error "Error calling web service: #{error}" } if result[:error]
         if result[:mids] and result[:mids].size == 1
@@ -217,10 +217,10 @@ class PostIngester
     result = DigitalEntityManager.instance.link_acl obj.pid, ar.get_id
     if result[:error]
       result[:error].each { |e| error "Error calling web service: #{e}" }
-      error "Failed to link accessright #{ar.mid} to object #{obj.pid}"
+      error "Failed to link accessright #{ar.get_id} to object #{obj.pid}"
       obj.status = Status::PostIngestFailed
     else
-      info "Linked accessright #{ar.mid} to object #{obj.pid}"
+      info "Linked accessright #{ar.get_id} to object #{obj.pid}"
     end
   end
 
@@ -310,22 +310,22 @@ class PostIngester
     return unless obj.pid
     obj.manifestations.each { |m| unlink_ar cfg, m }
     ar = obj.get_accessright
-    return unless ar && ar.mid
-    result = DigitalEntityManager.instance.unlink_acl obj.pid, ar.mid
+    return unless ar && ar.get_id
+    result = DigitalEntityManager.instance.unlink_acl obj.pid, ar.get_id
     if result[:error].nil? or result[:error].empty?
-      info "Unlinked accessright #{ar.mid} from object #{obj.pid}"
-      if ar.ptype == :CUSTOM
+      info "Unlinked accessright #{ar.get_id} from object #{obj.pid}"
+      if ar.is_custom?
         # try to delete the ar object
-        result = MetaDataManager.instance.delete ar.mid
+        result = MetaDataManager.instance.delete ar.get_id
         if result[:error].nil? or result[:error].empty?
-          info "Deleted accessright metadata record #{ar.mid}."
-          ar.mid = nil
+          info "Deleted accessright metadata record #{ar.get_id}."
+          ar.set_id nil
         end
         # We ignore errors, AR record may very well still be in use
       end
     else
       result[:error].each { |e| error "Error calling web service: #{e}" }
-      error "Failed to unlink accessright #{ar.mid} from object #{obj.pid}"
+      error "Failed to unlink accessright #{ar.get_id} from object #{obj.pid}"
       obj.status = Status::PostIngestFailed
     end
   end

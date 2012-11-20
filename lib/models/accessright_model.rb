@@ -19,12 +19,24 @@ class AccessrightModel
 
   has n,      :ingest_object
 
+  before :save, :before_save
+  after :save, :after_save
+
+  def before_save
+  end
+
+  def after_save
+    self.accessrights.save
+    self.ar_model_links.save
+  end
+
   def initialize(data)
     debug "Creating new AccessrightModel with data: #{data}"
     data.key_strings_to_symbols! :downcase => true, :recursive => true
     self.name = data[:name]
     data[:manifestations].each do |usage_type, accessright_data|
       accessright = Accessright.from_value accessright_data
+      accessright.save
       set_accessright(usage_type, accessright)
     end if data[:manifestations]
   end
@@ -50,6 +62,13 @@ class AccessrightModel
     result = {}
     self.ar_model_links.each { |link| result[link.usage_type] = link.accessright }
     result
+  end
+
+  def debug_print(indent = 0)
+    indent += 1
+    get_accessrights.each do |k,v|
+      p ' ' * indent + k.to_s + ':' + v.inspect
+    end
   end
 
 end
