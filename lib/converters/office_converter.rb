@@ -14,7 +14,7 @@ class OfficeConverter < Converter
     @source = source
     @options = { orig_fname: File.basename(source)}
 
-    puts "Initializing #{self.class} with '#{source}'"
+    Application.debug(self.class.name) { "Initializing #{self.class} with '#{source}'" }
   end
 
   def do_convert(target, format)
@@ -25,9 +25,13 @@ class OfficeConverter < Converter
     cmd = 'office_convert'
     cmd += %{ "#{File.absolute_path(@source).to_s.escape_for_cmd}"}
     cmd += %{ "#{File.absolute_path(target).to_s.escape_for_cmd}"}
-    cmd += %{ "#{@options[:orig_fname].to_s.escape_for_cmd}"}
+    cmd += %{ "#{@options[:orig_fname].to_s.decode_visual.gsub(/^\d+_/, '').escape_for_cmd}"}
 
-    `#{cmd}`
+    Application.debug(self.class.name) { "Running converter command: '#{cmd}'"}
+
+    result = `#{cmd}`
+
+    Application.debug(self.class.name) { "Result: '#{result}'"}
 
     target
 

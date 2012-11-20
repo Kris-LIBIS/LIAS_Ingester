@@ -86,7 +86,7 @@ TYPES:
         MIME:         text/plain
         EXTENSIONS:   txt
       - TYPE:         :RTF
-        MIME:         text/rtf
+        MIME:         text/rtf,application/msword
         EXTENSIONS:   rtf
       - TYPE:         :HTML
         MIME:         text/html
@@ -117,7 +117,7 @@ TYPES:
         EXTENSIONS:   pdf
       - TYPE:         :PDFA
         PUID:         fmt/95
-        MIME:         application/pdfa # Note the invented mime type here. It requires implementation in theMimeType class.
+        MIME:         application/pdfa # Note the invented mime type here. It requires implementation in the MimeType class.
         EXTENSIONS:   pdf
       - TYPE:         :WORDPERFECT
         PUID:         x-fmt/44

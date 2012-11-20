@@ -289,6 +289,7 @@ class PreIngester
     dirs.each do |d|
       dir = "#{cfg.ingest_dir}/#{d}"
       FileUtils.mkdir dir unless Dir.exist?(dir)
+      FileUtils.chmod 0777, dir
     end
 
   end
@@ -312,6 +313,7 @@ class PreIngester
       object.file_stream = "#{object.get_config.ingest_dir}/transform/streams/#{object.stream_name}"
 #      FileUtils.mkdir_p File.dirname(object.file_stream)
       FileUtils.cp_r object.file_path, object.file_stream
+      `touch --reference="#{object.file_path}" "#{object.file_stream}"`
     end
     object.children.each { |child| copy_stream child }
   end
@@ -323,6 +325,7 @@ class PreIngester
         debug "Manifestation: #{m}"
         file = ingest_model.create_manifestation object, m
         if file
+          `touch --reference="#{object.file_path}" "#{file}"`
           info "Created manifestation file: #{file}"
           mobj = IngestObject.new file, :MD5
           mobj.file_stream = file
