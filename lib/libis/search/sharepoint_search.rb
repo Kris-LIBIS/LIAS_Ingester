@@ -242,7 +242,7 @@ class SharepointSearch < GenericSearch
 
     #noinspection RubyResolve
     rows.each do |row|
-      if @selection.nil? or row[:ows_FileRef] =~ /^\d+;#sites\/lias\/Gedeelde documenten\/#{@selection}($|\/)/
+      if @selection.nil? or row[:ows_FileRef] =~ /^\d+;#sites\/lias\/Gedeelde documenten\/#@selection(|\/.*)$/
         records << clean_row(row)
       end
     end
