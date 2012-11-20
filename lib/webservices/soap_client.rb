@@ -93,7 +93,7 @@ module SoapClient
       result = parse_result response
       return result
     rescue Exception => ex
-      return {exception: ex}
+      return {error: ex}
     end
   end
 
