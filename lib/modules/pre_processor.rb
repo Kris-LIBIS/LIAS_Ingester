@@ -205,7 +205,7 @@ class PreProcessor
 
     #noinspection RubyControlFlowConversionInspection
     if not @checker.match object
-      debug "Object ##{object.id} did not match: #{object.message}"
+      info "Object ##{object.id} did not match: #{object.message}"
       object.status = Status::Initialized
       #noinspection RubyResolve
       object.message = nil

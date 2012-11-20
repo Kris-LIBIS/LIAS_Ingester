@@ -102,7 +102,7 @@ class DigitalEntityManager
                     ]
     }
     de_info['metadata'][0]['name'] = md_name if md_name
-    de_info['metadata'][0]['type'] = md_name if md_type
+    de_info['metadata'][0]['type'] = md_type if md_type
     update_object( de_info, { 'metadata' => 'all' } )
   end
 

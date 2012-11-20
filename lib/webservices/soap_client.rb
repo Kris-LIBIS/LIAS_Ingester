@@ -72,8 +72,8 @@ module SoapClient
       http_options = body.delete(:http_options) || {}
       wsse_options = body.delete(:wsse_options) || {}
       method_options = body.delete(:method_options) || {}
-      safe_body = body.reject { |k, _| k == :general }
-      Application.instance.logger.debug(self.class) { "Request '#{method.inspect}' '#{safe_body.inspect}'" }
+#      safe_body = body.reject { |k, _| k == :general }
+#      Application.instance.logger.debug(self.class) { "Request '#{method.inspect}' '#{safe_body.inspect}'" }
       response = @client.request method, method_options do |soap, wsdl, http, _|
         soap.body = body
         soap.used_namespaces
@@ -102,7 +102,7 @@ module SoapClient
       error = []
       error << "SOAP Error: " + response.soap_fault.to_s if response.soap_fault?
       error << "HTTP Error: " + response.http_error.to_s if response.http_error?
-      Application.instance.logger.debug(self.class) { "Result: error='#{error.inspect}'" }
+#      Application.instance.logger.debug(self.class) { "Result: error='#{error.inspect}'" }
       return {error: error}
     end
 
