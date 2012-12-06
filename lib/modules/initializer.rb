@@ -88,7 +88,7 @@ class Initializer
   
   def restart( run_id )
     
-    if run = undo(run_id)
+    if (run = undo(run_id))
       ApplicationStatus.instance.run = run
       info "Restarting run ##{run_id}"
       process_run run

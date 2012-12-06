@@ -54,7 +54,7 @@ class Application
   end
   
   def set_action(action, module_id)
-    if @options[:action] then
+    if @options[:action]
       puts "ERROR: options --start, --continue, --restart and --undo are mutually exclusive."
       exit
     end
@@ -140,6 +140,7 @@ class Application
       end
 
       opts.on('--test', 'test mode - clears the database!') do
+        #noinspection RubyClassVariableUsageInspection
         @@test_mode = true
       end
       
@@ -238,7 +239,6 @@ class Application
   def config_value( key, default, key2 = nil )
     result = ConfigFile[key.to_s] || default
     key = key2 if key2
-    #noinspection RubyResolve
     result = @options[key.to_sym] if @options[key.to_sym]
     result
   end
@@ -246,7 +246,6 @@ class Application
 end
 
 class Logger
-  #noinspection RubyResolve
   attr_accessor :db_log
 
   def db_logger(severity, datetime, progname, msg)
@@ -259,7 +258,10 @@ class Logger
 end
 
 # to force initialization of the database
-@@test_mode = false
-@@app = Application.instance
-@@app.init
-@@logger = @@app.logger
+#noinspection RubyClassVariableUsageInspection
+begin
+  @@test_mode = false
+  @@app = Application.instance
+  @@app.init
+  @@logger = @@app.logger
+end
