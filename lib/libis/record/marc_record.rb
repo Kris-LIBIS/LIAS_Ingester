@@ -1065,12 +1065,14 @@ class MarcRecord
   def name_type(data)
     #noinspection RubyResolve
     code = data._4.to_sym
+    return :unknown unless DOLLAR4TABLE[data.tag].has_key? code
     DOLLAR4TABLE[data.tag][code][1]
   end
 
   def full_name(data)
     #noinspection RubyResolve
     code = data._4.to_sym
+    return '' unless DOLLAR4TABLE[data.tag].has_key? code
     DOLLAR4TABLE[data.tag][code][0]
   end
 
