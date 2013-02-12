@@ -149,7 +149,7 @@ class IngestConfig
 
   def get_or_create_child_object(parent, label)
     lookup_pool = (parent ? parent.children : root_objects)
-    found = lookup_pool.first :label => label
+    found = lookup_pool.first :label_name => label
     unless found
       found = IngestObject.new
       found.usage_type = self.complex_utype
