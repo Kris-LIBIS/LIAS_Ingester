@@ -213,8 +213,9 @@ class SharepointMetadataTree
       type_indicator = [0]
       type_indicator = [1] if (node.content and node.content.is_file?)
       type_indicator << ((node.content and node.content.label and !node.content.label.empty?) ? node.content.label : node.name).sort_form
-    }.each do |child|
+    }.each_with_index do |child, i|
       my_options = options.dup
+      my_options[:index] = i
       yield :before, child, my_options
       visit_children child, my_options, &block
       yield :after, child, my_options
