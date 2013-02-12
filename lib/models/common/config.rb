@@ -71,6 +71,7 @@ module CommonConfig
           self.search_term = nil
           self.link_type = nil
           self.link_options = nil
+          self.metadata_format1 = :DC
         end
 
         self.metadata_fields = {}
