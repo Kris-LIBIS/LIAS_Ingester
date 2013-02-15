@@ -23,6 +23,13 @@ class VarField
     output
   end
 
+  # @return [String] debug output to inspect the contents of the VarField - Single line version
+  def dump_line
+    output = "#@tag:#@ind1:#@ind2:"
+    @subfield.each { |s, t| output += "$#{s}#{t}" }
+    output
+  end
+
   # @return [Array] a list of all subfield cides
   def keys
     @subfield.keys
