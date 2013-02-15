@@ -36,7 +36,7 @@ class VarField
   end
 
   # @return [Array] all the entries of a repeatable subfield
-  # @param s [Character] the subfield code 
+  # @param s [Character] the subfield code
   def field_array(s)
     assert(s.is_a?(String) && (s =~ /^[\da-z]$/) == 0, 'method expects a lower case alphanumerical char')
     @subfield.has_key?(s) ? @subfield[s].dup : []
@@ -64,7 +64,7 @@ class VarField
   end
 
   # @return [Boolean] does the subfield codes match the given specification?
-  # @param fieldspec [String] field specification: sequence of alternative set of subfield codes that should-shouldn't be present  
+  # @param fieldspec [String] field specification: sequence of alternative set of subfield codes that should-shouldn't be present
   # The fieldspec consists of groups of characters. At least one of these groups should match for the test to succeed
   # Within the group sets of codes may be divided by a hyphen (-). The first set of codes must all be present;
   # the second set of codes must all <b>not</b> be present. Either set may be empty.
@@ -82,8 +82,8 @@ class VarField
 
   private
 
-  # @return [Array] cleaned up version of the input string 
-  # @param fieldspec [String] subfield code specification 
+  # @return [Array] cleaned up version of the input string
+  # @param fieldspec [String] subfield code specification
   # cleans the subfield code specification and splits it into an array of characters
   # The array will be sorted (a-z0-9) and duplicates will be removed.
   def fieldspec_to_array(fieldspec)
@@ -117,7 +117,7 @@ class VarField
       else
         throw "Unknown method invocation: '#{name}' with: #{args}"
     end
-    send(operation, subfields)
+    send(operation, subfields, block)
   end
 
   def to_ary
