@@ -27,7 +27,7 @@ class MarcRecord
     tag = t[0..2]
     ind1 = t[3]
     ind2 = t[4]
-    get(tag, ind1, ind2, subfields)
+    get_record(tag, ind1, ind2, subfields)
   end
 
   def each_field(t, s)
@@ -49,11 +49,10 @@ class MarcRecord
   end
 
   def all
-    return @all_records if @all_records
-    @all_records = get_all_records
+    @all_records ||= get_all_records
   end
 
-  def get(tag, ind1 = '', ind2 = '', subfields = '')
+  def get_record(tag, ind1 = '', ind2 = '', subfields = '')
 
     ind1 ||= ''
     ind2 ||= ''
@@ -146,7 +145,11 @@ class MarcRecord
 
         # [MARC 690 02 $0]
         tag('69002', '0a').each { |t|
-          xml['dc'].identifier('xsi:type' => 'dcterms:URI').text element(odis_link(t._0), CGI::escape(t._a), join: '#')
+          if t._0 =~ /^\(ODIS-(PS|ORG)\)(\d)+$/
+            xml['dc'].identifier('xsi:type' => 'dcterms:URI').text odis_link($1, $2, CGI::escape(t._a))
+          else
+            xml['dc'].identifier t._a
+          end
         }
 
         # [MARC 856 _2 $u]
@@ -567,7 +570,7 @@ class MarcRecord
         # [MARC 260 __ $c] " " [MARC 260 __ $9] " (druk: ) " [MARC 260 __ $g]
         tag('260__', 'c 9 g').each { |t|
           xml['dc'].publisher list(t._c9,
-                                   element(t._g, prefix: '(druk: ) '))
+                                   element(t._g, prefix: '(uitgave: ) '))
         }
 
         # [MARC 700 0_ $a] ", " [MARC 700 0_ $b] ", " [MARC 700 0_ $c] ", " [MARC 700 0_ $d] ", " [MARC 700 0_ $g] " ( " [MARC 700 0_ $4] "), " [MARC 700 0_ $e] "(uitgever)"
@@ -963,9 +966,9 @@ class MarcRecord
     record = ''
     doc_number = tag('001').datas
 
-    all.select { |t| t.is_a? FixField }.each { |t| record += "#{format("%09s",doc_number)} #{t.tag}   L #{t.datas}\n" }
+    all.select { |t| t.is_a? FixField }.each { |t| record += "#{format('%09s',doc_number)} #{t.tag}   L #{t.datas}\n" }
     all.select { |t| t.is_a? VarField}.each { |t|
-      record += "#{format("%09s",doc_number)} #{t.tag}#{t.ind1}#{t.ind2} L "
+      record += "#{format('%09s',doc_number)} #{t.tag}#{t.ind1}#{t.ind2} L "
       t.keys.each { |k|
         t.field_array(k).each { |f|
           record += "$$#{k}#{CGI::unescapeHTML(f)}"
@@ -980,18 +983,18 @@ class MarcRecord
   def to_oai_pmh
     XmlDocument.new.build do |xml|
       xml.tag!('OAI-PMH',
-              "xmlns" => 'http://www.openarchives.org/OAI/2.0/',
-              "xmlns:xsi" => 'http://www.w3.org/2001/XMLSchema-instance',
-              "xsi:schemaLocation" => 'http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd') {
+              'xmlns' => 'http://www.openarchives.org/OAI/2.0/',
+              'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
+              'xsi:schemaLocation' => 'http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd') {
         xml.tag!('ListRecords') {
           xml.record {
             xml.header {
               xml.identifier("aleph-publish:#{tag('001').first.datas.strip}")
             }
             xml.metadata {
-              xml.record("xmlns" => "http://www.loc.gov/MARC21/slim",
-                         "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
-                         "xsi:schemaLocation" => "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd") {
+              xml.record('xmlns' => 'http://www.loc.gov/MARC21/slim',
+                         'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance',
+                         'xsi:schemaLocation' => 'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd') {
                 xml.leader tag('LDR').first.datas
                 record.all.select { |t| t.is_a? FixField }.each { |t|
                   if t.tag.eql?('FMT')
@@ -1053,20 +1056,18 @@ class MarcRecord
     dc_element({fix: '[]'}, *parts)
   end
 
-  def odis_link(label)
-    case label
-      when /\(ODIS-(\w\w)\)(\d*)/
-        return "http://www.odis.be/lnk/#{$1.downcase}_#{$2}"
-      else
-        return label
-    end
+  def odis_link(group, id, label)
+    "http://www.odis.be/lnk/#{group.downcase[0,2]}_#{id}\##{label}"
   end
 
   def name_type(data)
     #noinspection RubyResolve
     code = data._4.to_sym
-    return :unknown unless DOLLAR4TABLE[data.tag].has_key? code
-    DOLLAR4TABLE[data.tag][code][1]
+    if DOLLAR4TABLE[data.tag].has_key? code
+      return DOLLAR4TABLE[data.tag][code][1]
+    end
+    Application.logger.warn(self.class) { "Did not find $4 value in lookuptable: #{data.dump_line}" }
+    :contributor
   end
 
   def full_name(data)
