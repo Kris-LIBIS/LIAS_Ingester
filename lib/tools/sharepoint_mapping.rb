@@ -1,6 +1,5 @@
 # coding: utf-8
 
-require 'awesome_print'
 require 'csv'
 require 'yaml'
 
@@ -33,7 +32,7 @@ class SharepointMapping < Hash
       mapping[:db_column] = db_column if db_column
       mapping[:db_datatype] = :STRING
       mapping[:db_datatype] = db_datatype if db_datatype
-      mapping[:db_valuemask] = (mapping[:db_datatype] == :STRING ? "'@@'" : "@@")
+      mapping[:db_valuemask] = (mapping[:db_datatype] == :STRING ? "'@@'" : '@@')
       mapping[:db_valuemask] = db_valuemask if db_valuemask
 #      mapping[:scope_tag] = scope_tag if scope_tag
 #      mapping[:scope_id] = scope_id if scope_id
@@ -107,7 +106,7 @@ class SharepointMapping < Hash
     mapping = self[label]
     return nil unless mapping
     mask = mapping[:db_valuemask]
-    mask.gsub("@@", value.to_s)
+    mask.gsub('@@', value.to_s)
   end
 
 end
